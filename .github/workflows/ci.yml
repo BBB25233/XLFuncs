@@ -10,6 +10,9 @@ on:
 
 jobs:
   verify:
+    permissions:
+      contents: read   # checkout / npm ci 读仓库
+      actions: write   # upload-artifact 上传构建产物
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -37,6 +40,8 @@ jobs:
     # 仅在「发布 Release」事件时运行：重新构建并把单文件产物挂到 Release 资产
     if: github.event_name == 'release'
     needs: verify
+    permissions:
+      contents: write  # action-gh-release 上传 Release 资产
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
