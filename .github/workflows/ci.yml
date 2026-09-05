@@ -5,6 +5,8 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  release:
+    types: [published]
 
 jobs:
   verify:
@@ -24,3 +26,32 @@ jobs:
       - run: npm run test        # 全部 vitest 单测 + 一致性审计
       - run: npm run build       # 类型检查 + 分包构建到 .tmp/dist-split/
       - run: npm run build:deliver # 类型检查 + 单文件构建并复制到 delivery/index-v1.html
+      # 把单文件产物作为 Artifact 留存，方便从 Actions 页面直接下载最新版
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xlfuncs-web-v1.0
+          path: delivery/index-v1.html
+          if-no-files-found: error
+
+  release:
+    # 仅在「发布 Release」事件时运行：重新构建并把单文件产物挂到 Release 资产
+    if: github.event_name == 'release'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+      - name: 安装依赖
+        working-directory: src
+        run: npm ci
+      - name: 构建单文件交付物
+        working-directory: src
+        run: npm run build:deliver
+      - name: 上传单文件产物到 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: delivery/index-v1.html

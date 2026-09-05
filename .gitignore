@@ -7,6 +7,11 @@
 /src/dist*/
 /src/dist-single/
 
+# ===== 交付物：单文件产物是构建输出，不纳入版本库 =====
+# `npm run build:deliver` 会生成仓库根的 delivery/index-v1.html。
+# 该文件改为通过 GitHub Release 作为附件分发（或手动上传），仓库只保留源码，保持轻量。
+/delivery/
+
 # 编辑器 / 系统 / 日志
 .DS_Store
 *.log
