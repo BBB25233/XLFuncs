@@ -1,0 +1,157 @@
+import type { FunctionEntry } from '@/types';
+
+/** HLOOKUP · 横向查找（lookup 类 B7 批次） */
+
+const TSV = '产品\t苹果\t香蕉\t橙子\n单价\t5\t3\t8';
+
+const hlookupEntry: FunctionEntry = {
+  id: 'hlookup',
+  enName: 'HLOOKUP',
+  zhName: '横向查找',
+  zhCommon: ['按首行查', '横表查找', '横向匹配'],
+  alias: ['横向VLOOKUP', '第一行查找', '横向检索'],
+  category: 'lookup',
+  abbr: 'hxcz',
+  pinyin: 'hengxiangchazhao',
+  keywords: ['按首行查找', '横向表', '第一行匹配', '横表取数', '表头查找'],
+  difficulty: 3,
+  usageLevel: 45,
+  version: {
+    min: 'all',
+    label: '全版本可用（Excel 2003 起）',
+    notes: '中文版 Excel 不翻译这个函数名，输入「横向查找」只会得到 #NAME?。HLOOKUP 专门对付「横着排」的表：查找值必须在第一行，返回下方第几行的那个值。如果你的表是竖排的（查找值在首列），用 VLOOKUP 而不是它。',
+  },
+  oneLiner: '在第一行里找关键字，返回它下方某一行的值',
+  summary:
+    'HLOOKUP 是「横向版 VLOOKUP」：它在表格的第一行里找你要的关键字，然后往下数第几行，把那一格的值交给你。适合表头在顶部、数据横向展开的横表。第 4 参数（精确/模糊）和 VLOOKUP 一样关键——日常几乎永远用 FALSE（精确匹配），省略或用 TRUE 时要求首行已按升序排序，否则查错不报警。',
+  syntax: {
+    patternCn: '=HLOOKUP(找什么, 横表区域, 返回第几行, [是否精确])',
+    patternEn: '=HLOOKUP(lookup_value, table_array, row_index_num, [range_lookup])',
+    args: [
+      {
+        key: 'lookup_value',
+        zh: '找什么',
+        en: 'lookup_value',
+        required: true,
+        desc: '要在表格第一行里找的那个值（通常是表头文字或数字）。',
+        accepts: '单元格、带引号的文字或数字。',
+        ifOmitted: '必填，省略会报 #N/A。',
+        example: '"香蕉"',
+        pitfallRank: 3,
+      },
+      {
+        key: 'table_array',
+        zh: '横表区域',
+        en: 'table_array',
+        required: true,
+        desc: '包含首行（查找行）和下面要返回行的整片区域。',
+        accepts: '如 $A$1:$D$3；查找值必须在这一片的第一行。',
+        ifOmitted: '必填。',
+        example: '$A$1:$D$3',
+        pitfallRank: 2,
+      },
+      {
+        key: 'row_index_num',
+        zh: '返回第几行',
+        en: 'row_index_num',
+        required: true,
+        desc: '从首行往下数第几行（首行是 1）。',
+        accepts: '正整数；1 就是首行自己，2 是它下面一行。',
+        ifOmitted: '必填。',
+        tip: '这个值相对你给的区域来数，不是相对整张工作表。',
+        example: '2',
+        pitfallRank: 1,
+      },
+      {
+        key: 'range_lookup',
+        zh: '是否精确',
+        en: 'range_lookup',
+        required: false,
+        desc: 'FALSE = 精确匹配；TRUE（或省略）= 模糊匹配（要求首行升序）。',
+        accepts: 'FALSE（精确）· TRUE（模糊）。',
+        ifOmitted: '省略等于 TRUE（模糊匹配，且首行必须已升序排序），日常极易查错。',
+        tip: '日常精确查找一律写 FALSE。',
+        example: 'FALSE',
+      },
+    ],
+  },
+  returnValue: '返回表格中指定行、查找值所在列交叉点的那个值；找不到或行号超界则 #N/A / #REF!。',
+  examples: [
+    {
+      title: '示例 1：精确查找某种水果的单价',
+      scene: '横表里第一行是水果名、第二行是对应的单价，想按名称查单价。',
+      dataTsv: TSV,
+      dataAnchor: 'A1',
+      formula: '=HLOOKUP("香蕉",A1:D2,2,FALSE)',
+      result: '返回 3（香蕉对应的单价）',
+      explanation: '在首行找到「香蕉」在第 2 列，再取该列第 2 行（单价行）的值 3。',
+    },
+    {
+      title: '示例 2：返回多行中的某一行',
+      scene: '横表有单价、库存两行，想一次取库存行。',
+      dataTsv: '产品\t苹果\t香蕉\t橙子\n单价\t5\t3\t8\n库存\t100\t60\t40',
+      dataAnchor: 'A1',
+      formula: '=HLOOKUP("橙子",A1:D3,3,FALSE)',
+      result: '返回 40（橙子第 3 行的库存）',
+      explanation: 'row_index_num=3 表示取首行往下第 3 行（库存行）。',
+    },
+    {
+      title: '示例 3：模糊匹配查区间（首行升序）',
+      scene: '用分数段横表，按具体分数查对应等级（首行已升序）。',
+      dataTsv: '分段\t0\t60\t80\t90\n等级\t不及格\t及格\t良好\t优秀',
+      dataAnchor: 'A1',
+      formula: '=HLOOKUP(85,A1:E2,2,TRUE)',
+      result: '返回「良好」（85 落在 80~90 段）',
+      explanation: 'TRUE 模糊匹配会找「小于等于 85 的最大首行值」80，返回其下方等级「良好」。首行必须升序，否则错。',
+    },
+  ],
+  pitfalls: [
+    {
+      title: '第 4 参数省略（默认 TRUE）但首行没排序',
+      reason: '省略第 4 参数等于模糊匹配，Excel 假设首行已升序，返回「小于等于查找值的最大项」。首行是文字或乱序时，结果错且不报错。',
+      fix: '精确查找永远写 FALSE：=HLOOKUP(值,区域,行号,FALSE)。',
+      level: 'high',
+    },
+    {
+      title: '想查竖表却用了 HLOOKUP',
+      reason: 'HLOOKUP 只在「第一行」里找。你的表是竖排（查找值在首列）时，它根本找不到，报 #N/A。',
+      fix: '竖排表用 VLOOKUP；横排表（查找值在首行）才用 HLOOKUP。',
+      level: 'high',
+      errorCode: '#N/A',
+    },
+    {
+      title: '返回行号超出区域行数',
+      reason: 'row_index_num 是相对区域来数的。区域只有 3 行你却写 5，下面没数据可取。',
+      fix: '行号最大只能到区域的行数（如 $A$1:$D$3 只能到 3）。',
+      level: 'mid',
+      errorCode: '#REF!',
+    },
+  ],
+  related: [
+    { id: 'vlookup', kind: 'companion', why: 'HLOOKUP 是横表版、VLOOKUP 是竖表版，套路几乎一样，只是查找方向不同。' },
+    { id: 'lookup', kind: 'confusable', why: 'LOOKUP 也能横竖向查，但语法更简单、坑更多；结构化表优先用 V/HLOOKUP。' },
+    { id: 'index', kind: 'alternative', why: '想更灵活地按坐标取数、不怕插入行列，可用 INDEX+MATCH 替代。' },
+    { id: 'match', kind: 'companion', why: 'MATCH 算位置，常和 INDEX 组合替代 HLOOKUP 往左/往右查。' },
+  ],
+  calc: {
+    enabled: true,
+    ranges: { table_array: 'A1:D2' },
+    fields: [
+      { key: 'lookup_value', label: '找什么', type: 'text', default: '"香蕉"' },
+      { key: 'table_array', label: '横表区域', type: 'ref', default: 'A1:D2', rangeKey: 'table_array' },
+      { key: 'row_index_num', label: '返回第几行', type: 'number', default: '2' },
+      { key: 'range_lookup', label: '是否精确', type: 'text', default: 'FALSE' },
+    ],
+    template: '=HLOOKUP({lookup_value},{table_array},{row_index_num},{range_lookup})',
+    cases: [
+      { label: '默认：查香蕉的单价', type: 'ok', values: {}, expect: '3', note: '首行找到「香蕉」在第 2 列，取该列第 2 行 = 3' },
+      { label: '查苹果的单价', type: 'ok', values: { lookup_value: '"苹果"' }, expect: '5', note: '首行找到「苹果」在第 1 列，取该列第 2 行 = 5' },
+      { label: '首行找不到 → #N/A', type: 'error', values: { lookup_value: '"西瓜"' }, expect: '#N/A', note: '「西瓜」不在首行，精确匹配找不到' },
+      { label: '返回行号超出 → #REF!', type: 'error', values: { row_index_num: '9' }, expect: '#REF!', note: '区域只有 2 行，第 9 行不存在' },
+      { label: '区域非法 → #REF!', type: 'error', values: { table_array: 'ZZZ' }, expect: '#REF!', note: 'ZZZ 不是合法区域引用' },
+    ],
+  },
+  meta: { updatedAt: '2026-08-31', status: 'published', customEdited: false },
+};
+
+export default hlookupEntry;

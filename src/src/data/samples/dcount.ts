@@ -1,0 +1,151 @@
+import type { FunctionEntry } from '@/types';
+
+/** DCOUNT · 数据库计数（database 类 B8 批次） */
+
+const dcountEntry: FunctionEntry = {
+  id: 'dcount',
+  enName: 'DCOUNT',
+  zhName: '数据库计数',
+  zhCommon: [
+    'DCOUNT',
+    '条件计数',
+    '库计数'
+  ],
+  alias: [
+    '条件计数'
+  ],
+  category: 'database',
+  abbr: 'sjkjs',
+  pinyin: 'shujukujishu',
+  keywords: [
+    'DCOUNT',
+    '数据库',
+    '计数',
+    '条件'
+  ],
+  difficulty: 2,
+  usageLevel: 18,
+  version: {
+    min: 'all',
+    label: '所有 Excel 版本可用',
+    notes: 'D 函数按「条件区域」从数据库表中筛选行，再对指定字段做计数（仅数字单元格）；条件支持通配符与比较运算符。'
+  },
+  oneLiner: '按条件统计数据库某字段的数字格数',
+  summary: 'DCOUNT 按条件筛选后，统计指定字段里「是数字」的单元格个数（文本不数）。和 DCOUNTA 的区别就在于是否只数数字。',
+  syntax: {
+    patternCn: '=DCOUNT(数据库,字段,条件)',
+    patternEn: '=DCOUNT(database, field, criteria)',
+    args: [
+      {
+        key: 'database',
+        zh: '数据库',
+        en: 'database',
+        required: true,
+        desc: '带标题行的数据区域（整张表含表头）。',
+        accepts: '单元格区域。',
+        ifOmitted: '必填。',
+        example: 'A1:D5',
+        tip: '首行必须是列标题。'
+      },
+      {
+        key: 'field',
+        zh: '字段',
+        en: 'field',
+        required: true,
+        desc: '要统计的列，写标题文本或列序号。',
+        accepts: '"销售额" 或 3。',
+        ifOmitted: '必填。',
+        example: '"销售额"'
+      },
+      {
+        key: 'criteria',
+        zh: '条件',
+        en: 'criteria',
+        required: true,
+        desc: '带标题的条件区域（至少含一列标题+条件值）。',
+        accepts: '单元格区域。',
+        ifOmitted: '必填。',
+        example: 'A7:B8',
+        tip: '条件区和数据库共用标题名。'
+      }
+    ]
+  },
+  returnValue: '返回匹配行的数字单元格计数（数字）。',
+  examples: [
+    {
+      title: '示例 1：按类型筛选',
+      scene: '统计「水果」的计数（仅数字单元格）。',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataAnchor: 'A1',
+      formula: '=DCOUNT(A1:D5,"销售额",G1:H2)',
+      result: '2',
+      explanation: '水果两行销售额都是数字，计数=2。'
+    },
+    {
+      title: '示例 2：多条件',
+      scene: '「水果且数量>9」的计数（仅数字单元格）。',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataAnchor: 'A1',
+      formula: '=DCOUNT(A1:D5,"销售额",G1:H3)',
+      result: '1',
+      explanation: '水果且数量>9 仅 1 行，计数=1。'
+    }
+  ],
+  pitfalls: [
+    {
+      title: '条件区缺标题',
+      reason: '条件区域必须带和数据库一致的列标题，否则筛选错乱。',
+      fix: '条件表头和数据库表头一字不差。',
+      level: 'high'
+    },
+    {
+      title: '字段名写错',
+      reason: 'field 拼错或不在表头里返回 #VALUE!。',
+      fix: '用和表头完全相同的文本。',
+      level: 'mid',
+      errorCode: '#VALUE!'
+    },
+    {
+      title: '数字当文本比大小',
+      reason: '条件写 ">9" 若字段是文本会按字符比。',
+      fix: '确保字段是数字格式。',
+      level: 'low'
+    }
+  ],
+  related: [
+    {
+      id: 'daverage',
+      kind: 'companion',
+      why: 'D 函数家族，DAVERAGE 求均值。'
+    },
+    {
+      id: 'dsum',
+      kind: 'companion',
+      why: 'DSUM 求和，最常用。'
+    }
+  ],
+  calc: {
+    enabled: true,
+    ranges: { database: 'A1:D5', criteria: 'A6:A7' },
+    fields: [
+      { key: 'database', label: '数据库区域', type: 'ref', default: 'A1:D5', hint: '含表头的数据区域' },
+      { key: 'field', label: '字段', type: 'text', default: '"销售额"', hint: '列名文本（与表头一致）或列序号（如 3）' },
+      { key: 'criteria', label: '条件区域', type: 'ref', default: 'A6:A7', hint: '首行条件列名、其下条件值' },
+    ],
+    template: '=DCOUNT({database},{field},{criteria})',
+    cases: [
+      { label: '水果的销售额数字计数（A6:A7）', type: 'ok', values: { database: 'A1:D5', field: '"销售额"', criteria: 'A6:A7' }, expect: '3', note: '水果三行销售额都是数字，计数=3。' },
+      { label: '字段用列序号 3 → 3', type: 'ok', values: { database: 'A1:D5', field: '3', criteria: 'A6:A7' }, expect: '3', note: '第 3 列为销售额，结果一致。' },
+      { label: '空条件区域 → #VALUE!', type: 'error', values: { database: 'A1:D5', field: '"销售额"', criteria: '' }, expect: '#VALUE!', note: '条件区域留空时报 #VALUE!。' },
+      { label: '字段名写错 → #VALUE!', type: 'error', values: { database: 'A1:D5', field: '"不存在"', criteria: 'A6:A7' }, expect: '#VALUE!', note: 'field 必须和表头一致。' },
+      { label: '条件区域非法 → #REF!', type: 'error', values: { database: 'A1:D5', field: '"销售额"', criteria: 'ZZZ' }, expect: '#REF!', note: '区域写法非法。' },
+    ],
+  },
+  meta: {
+    updatedAt: '2026-08-31',
+    status: 'published',
+    customEdited: false
+  }
+};
+
+export default dcountEntry;

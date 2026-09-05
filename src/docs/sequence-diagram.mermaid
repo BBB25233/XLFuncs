@@ -1,0 +1,132 @@
+sequenceDiagram
+    autonumber
+    actor U as 用户（甲方）
+    participant R as ui/router.tsx
+    participant H as pages/HomePage
+    participant S as core/search.ts
+    participant I as data/index.ts
+    participant D as pages/FunctionDetailPage
+    participant P as data/packs/registry.ts
+    participant RP as storage/repository.ts
+    participant LS as storage/localStore.ts
+    participant DF as storage/diff.ts
+    participant PG as detail/Playground
+    participant CE as core/calc/registry.ts
+    participant TS as core/tsv.ts
+    participant CP as ui/clipboard/useCopy
+    participant EB as detail/EditBar
+    participant BK as storage/backup.ts
+    participant FI as storage/fileIo.ts
+    participant EX as core/exportHtml.ts
+
+    rect rgb(245,247,250)
+    Note over U,I: 链路一 · 冷启动与搜索（首屏只加载索引，不加载正文）
+    U->>R: 打开 xxx.com/#/
+    R->>H: 渲染首页
+    H->>I: CatalogIndex.all() / countByCategory()
+    I-->>H: SearchEntry 60 条 + 各分类数量
+    H-->>U: 搜索框 + 10 张分类卡片 + 5 个常用函数
+    U->>H: 输入「zxcx」
+    H->>S: SearchService.query(index, 'zxcx')
+    S->>S: 六级打分 + 单字母缩写降级
+    S-->>H: 有序 SearchEntry（中文名 / 英文名 / 一句话用途）
+    H-->>U: 下拉结果，回车跳转
+    end
+
+    rect rgb(250,247,245)
+    Note over U,RP: 链路二 · 打开函数详情（分包懒加载 + 增量合并）
+    U->>R: 跳转 #/f/vlookup
+    R->>D: 渲染详情页（useFunctionEntry）
+    D->>P: PackLoader.loadFunction('vlookup')
+    P->>I: 查 CatalogIndex 得到 category = lookup
+    I-->>P: lookup
+    P->>P: await import('./packs/lookup.ts')
+    P-->>D: 内置 FunctionEntry（团队初稿）
+    D->>RP: getFunctionEntry('vlookup')
+    RP->>LS: read('efg:v1:overrides')
+    LS-->>RP: 增量 oneLiner = 甲方改过的版本
+    RP->>DF: deepMerge(内置, 增量)
+    DF-->>RP: 最终 FunctionEntry
+    RP-->>D: 最终条目（meta.customEdited = true）
+    D-->>U: 6 大板块 + 试算区渲染完成
+    end
+
+    rect rgb(245,250,247)
+    Note over U,CE: 链路三 · 在线试算（含错误复现与静默错误）
+    U->>PG: 把「返回第几列」改成 9
+    PG->>PG: FormulaRenderer 实时拼出 =VLOOKUP("A002",A2:C9,9,0)
+    PG->>CE: evaluate('vlookup', args, sheet, spec)
+    CE->>CE: 校验列序号 9 大于区域列数 3
+    CE-->>PG: ok=false, error=REF 引用无效 + 中文原因 + 修复建议
+    PG-->>U: 红色错误码 + 中文原因 + 修复建议
+    U->>PG: 点「错误演示：第 4 参数改成 1」
+    PG->>PG: applyCase() 填入预置参数
+    PG->>CE: evaluate('vlookup', ...)
+    CE-->>PG: ok=true, value=王五, warning=Excel 不会报错但这个值可能是错的
+    PG-->>U: 结果 + 琥珀色「静默错误」警告条
+    end
+
+    rect rgb(250,250,245)
+    Note over U,CP: 链路四 · 一键复制（TSV 载荷 + 微信降级 F25）
+    U->>D: 点「复制公式 + 数据」
+    D->>TS: buildCopyPayload(example, sampleTable)
+    TS-->>D: 标题 表头 数据行 空一行 公式 结果
+    D->>CP: copy(tsvText, '去 Excel 里按 Ctrl+V')
+    CP->>CP: 尝试 navigator.clipboard.writeText
+    alt 剪贴板 API 可用
+        CP-->>U: Toast 已复制，去 Excel 里按 Ctrl+V
+    else 微信或旧浏览器被限制
+        CP->>CP: 降级：隐藏 textarea + select + execCommand
+        alt 仍然失败
+            CP-->>U: 弹出可见文本框并全选 + 已为你选中，长按后点「拷贝」
+        end
+    end
+    end
+
+    rect rgb(248,245,250)
+    Note over U,LS: 链路五 · 编辑并保存（只写增量 diff）
+    U->>D: 点右上角「编辑」
+    D->>EB: 进入编辑态（顶栏浅黄提示：改动保存在本机浏览器）
+    U->>EB: 改「一句话用途」后点「保存」
+    EB->>RP: saveFunction(draftEntry)
+    RP->>P: loadFunction('vlookup') 取内置原文
+    P-->>RP: 内置 FunctionEntry
+    RP->>DF: deepDiff(内置, draft)
+    DF-->>RP: 仅 oneLiner 一个字段
+    RP->>LS: write('efg:v1:overrides', 合并后的 store)
+    LS-->>RP: ok
+    RP-->>D: 成功
+    D-->>U: 绿条 已保存到本机浏览器（建议定期导出备份）
+    end
+
+    rect rgb(245,248,250)
+    Note over U,RP: 链路六 · 导出备份与导入恢复
+    U->>RP: 数据管理页 点「导出备份」
+    RP->>BK: serialize(overrides)
+    BK-->>RP: BackupFile（schemaVersion + exportedAt）
+    RP->>FI: download('excel-function-guide-备份-20250115.json', json)
+    FI-->>U: 浏览器下载文件
+    U->>RP: 选文件 点「导入恢复」
+    RP->>FI: readTextFile(input)
+    FI-->>RP: 文件文本
+    RP->>BK: validate(json)
+    alt 校验通过
+        BK-->>RP: ok
+        RP->>FI: 先自动下载一份当前快照防误覆盖
+        RP->>LS: write('efg:v1:overrides', 新内容)
+        RP-->>U: 已恢复 N 个函数的自定义内容
+    else 校验失败
+        BK-->>RP: 中文失败原因
+        RP-->>U: 这个文件不是本工具导出的备份，请确认后重试
+    end
+    end
+
+    rect rgb(250,248,245)
+    Note over U,FI: 链路七 · 导出单文件离线 HTML（F24，已提为 P0）
+    U->>D: 点「分享」选「导出离线网页」
+    D->>EX: ExportHtmlBuilder.buildSingle(entry)
+    EX->>EX: 内联 CSS + 内联内容，零 JS 零外链，只读无编辑按钮
+    EX-->>D: 完整 HTML 字符串
+    D->>FI: download('Excel函数速查-VLOOKUP.html', html, 'text/html')
+    FI-->>U: 下载完成，微信发给同事双击即可打开，无需联网
+    end

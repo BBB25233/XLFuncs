@@ -1,0 +1,340 @@
+import type { FunctionEntry } from '@/types';
+
+/**
+ * SUMIFS · 多条件求和（第一版 5 个样板函数之一）
+ * 写作口径：PRD §10.4 / §10.5.2，增补件 §4
+ */
+const sumifs: FunctionEntry = {
+  id: 'sumifs',
+  enName: 'SUMIFS',
+  zhName: '多条件求和',
+  zhCommon: ['多条件汇总', '多条件加总'],
+  alias: ['按区域和金额汇总', '华东区销售额合计', '日期区间求和'],
+  category: 'math',
+  abbr: 'dtjqh',
+  pinyin: 'duotiaojianqiuhe',
+  keywords: [
+    '多条件求和',
+    '同时满足多个条件',
+    '按区域汇总金额',
+    '日期区间求和',
+    '条件求和',
+    '通配符条件',
+    '已回款合计',
+  ],
+  difficulty: 3,
+  usageLevel: 93,
+  version: {
+    min: 'all',
+    label: '全版本可用（Excel 2003 起）',
+    notes: '注意参数顺序：SUMIFS 是「求和区域在前」，而单条件的 SUMIF 是「条件区域在前」，两者相反。',
+  },
+  oneLiner: '同时满足好几个条件的数字，才加在一起',
+  summary:
+    '领导要「华东区、且金额大于 1 万、且已回款」的总数时就用它。SUMIFS 可以同时挂很多组条件，所有条件都满足的那一行才会被加进来。最容易记错的是参数顺序：求和区域写在第一个，和单条件的 SUMIF 正好相反。',
+  syntax: {
+    patternCn: '=SUMIFS(求和区域, 条件区域1, 条件1, [条件区域2], [条件2], …)',
+    patternEn: '=SUMIFS(sum_range, criteria_range1, criteria1, [criteria_range2], [criteria2], …)',
+    args: [
+      {
+        key: 'sum_range',
+        zh: '求和区域',
+        en: 'sum_range',
+        required: true,
+        desc: '真正要加起来的那一列数字，比如金额列。',
+        accepts: '一列数字区域，如 F2:F13。',
+        ifOmitted: '这是必填参数，省略公式无法成立。',
+        tip: '【最常填错的就是这里】它写在第一个参数，而 SUMIF 是写在最后一个——从 SUMIF 改成 SUMIFS 时参数顺序要整体换一遍。',
+        example: 'F2:F13',
+        pitfallRank: 1,
+      },
+      {
+        key: 'criteria_range1',
+        zh: '条件区域1',
+        en: 'criteria_range1',
+        required: true,
+        desc: '第一个条件要在哪一列里比对，比如区域列。',
+        accepts: '一列区域，行数必须和求和区域一样多。',
+        ifOmitted: '这是必填参数。',
+        tip: '行数必须和求和区域严格一致，多一行少一行都会直接报 #VALUE!。',
+        example: 'C2:C13',
+      },
+      {
+        key: 'criteria1',
+        zh: '条件1',
+        en: 'criteria1',
+        required: true,
+        desc: '第一个条件写什么。',
+        accepts: '"华东"（文本）· ">10000"（比较）· "*东*"（包含）· ">="&DATE(2024,3,1)（日期）· ">10000"&H1（引用单元格）。',
+        ifOmitted: '这是必填参数。',
+        tip: '除了纯数字，其他条件都必须带半角双引号，比较符号也要一起放进引号里。',
+        example: '"华东"',
+        pitfallRank: 2,
+      },
+      {
+        key: 'criteria_range2',
+        zh: '条件区域2',
+        en: 'criteria_range2',
+        required: false,
+        desc: '第二个条件要比对的那一列。',
+        accepts: '一列区域，行数同样要和求和区域一致。',
+        ifOmitted: '不写就只有第一个条件生效，等价于单条件求和。',
+        tip: '可以一直往后加「条件区域 + 条件」，Excel 支持到 127 组。',
+        example: 'F2:F13',
+      },
+      {
+        key: 'criteria2',
+        zh: '条件2',
+        en: 'criteria2',
+        required: false,
+        desc: '第二个条件写什么。',
+        accepts: '同条件1。',
+        ifOmitted: '不写就只有第一个条件生效。',
+        tip: '多组条件之间是「并且」关系，要表达「或者」得写两个 SUMIFS 相加。',
+        example: '">10000"',
+      },
+    ],
+  },
+  returnValue: '返回所有条件都满足的那些行、在求和区域里的数字之和；一行都不满足时返回 0。',
+  examples: [
+    {
+      title: '示例 1：华东区 且 金额大于 1 万的销售额合计',
+      scene:
+        '老板问「华东区卖了大额的加起来是多少」。要同时满足两个条件：区域是华东，且金额超过 10000。',
+      tableId: 'sales',
+      dataAnchor: 'A1',
+      formula: '=SUMIFS(F2:F13,C2:C13,"华东",F2:F13,">10000")',
+      result: '198400（华东区共 6 笔，全部超过 1 万，加总得 198400）',
+      explanation:
+        '求和区域 F2:F13 写在最前面，后面是「区域列 = 华东」和「金额列 > 10000」两组条件，两个都满足的行才被加进来。',
+    },
+    {
+      title: '示例 2：指定日期区间内、已回款的金额合计',
+      scene:
+        '要算 3 月份已回款的金额。日期条件不能直接写「2024/3/1」这种文本，要用 DATE() 构造真正的日期。',
+      tableId: 'sales',
+      dataAnchor: 'A1',
+      formula: '=SUMIFS(F2:F13,A2:A13,">="&DATE(2024,3,1),A2:A13,"<="&DATE(2024,3,31),G2:G13,"是")',
+      result: '24000（3 月共 2 笔合计 43500，其中已回款的只有 24000）',
+      explanation:
+        '"大于等于"和"小于等于"两个条件夹出一个日期区间；& 把比较符号和日期连起来，注意比较符号要放在引号里。',
+    },
+    {
+      title: '示例 3：条件用通配符（区域里包含「东」字）',
+      scene: '「华东」「华南」都算南方大区，想一次性统计区域名里带「东」的记录。',
+      tableId: 'sales',
+      dataAnchor: 'A1',
+      formula: '=SUMIFS(F2:F13,C2:C13,"*东*",D2:D13,"打印机")',
+      result: '90000（区域含「东」且产品是打印机的共 3 笔，合计 90000）',
+      explanation:
+        '* 代表任意多个字符，所以 "*东*" 表示「只要包含东字就算」；要查字面量的 * 本身，得写成 ~* 转义。',
+    },
+  ],
+  pitfalls: [
+    {
+      title: '条件区域和求和区域行数不一样',
+      reason:
+        'Excel 要求每个条件区域的大小、形状必须和求和区域完全一致。多框一行或少框一行，它不知道该拿哪一列去对应。',
+      fix: '把三个区域都框成同样的行数，比如统一 F2:F13 与 C2:C13（都是 12 行）。',
+      level: 'high',
+      errorCode: '#VALUE!',
+    },
+    {
+      title: '条件写成 >10000，忘了加引号',
+      reason:
+        '比较符号必须和数值一起放进半角双引号里。裸写 >10000 时，Excel 会把它当成一个名字去找，找不到就报错。',
+      fix: '写成 ">10000"。口诀：条件里只要不是纯数字，一律加半角双引号。',
+      level: 'high',
+      errorCode: '#NAME?',
+    },
+    {
+      title: '文本条件写成 华东，不加引号',
+      reason: '不加引号的中文会被 Excel 当成「定义的名称」去找，找不到就报 #NAME?。',
+      fix: '写成 "华东"。要引用单元格里的值，写成 C2 或 ">"&H1。',
+      level: 'high',
+      errorCode: '#NAME?',
+    },
+    {
+      title: '日期条件写成文本 "2024/3/1"',
+      reason:
+        '文本形式的日期依赖电脑的区域设置（年月日顺序）来解析。换台电脑、换个区域设置，同一条公式可能算出 0。',
+      fix: '用 ">="&DATE(2024,3,1) 构造真正的日期；或者引用一个装着真日期的单元格，写成 ">="&H1。',
+      level: 'mid',
+    },
+    {
+      title: '想表达「包含东字」却忘了加 *，或查字面量 * 忘了转义',
+      reason:
+        '不加 * 时 Excel 按「完全等于」比对，"东" 匹配不到「华东」；反过来，要查找真正的星号字符时，直接写 * 会被当成通配符。',
+      fix: '包含用 "*东*"，单个字符通配用 "?"，查找字面量的 * 或 ? 时写成 "~*" "~?"。',
+      level: 'mid',
+    },
+  ],
+  related: [
+    {
+      id: 'sumif',
+      kind: 'confusable',
+      why: '只有一个条件时用 SUMIF 更短，但参数顺序相反——SUMIF 是「条件区域在前、求和区域在后」，从 SUMIF 改过来时别照抄顺序。',
+    },
+    {
+      id: 'countifs',
+      kind: 'companion',
+      why: '要数「有几笔」而不是「金额多少」时用 COUNTIFS，条件的写法和 SUMIFS 完全一样。',
+    },
+    {
+      id: 'sumproduct',
+      kind: 'alternative',
+      why: '条件要跨列计算（比如 金额×数量 > 100000，或条件是「或者」关系）时 SUMIFS 做不到，改用 SUMPRODUCT。',
+    },
+    {
+      id: 'date',
+      kind: 'companion',
+      why: '写日期条件时用 DATE(年,月,日) 构造真日期，比手输文本日期靠谱得多。',
+    },
+  ],
+  calc: {
+    enabled: true,
+    sampleTableId: 'sales',
+    ranges: {
+      sum_range: 'F2:F13',
+      criteria_range1: 'C2:C13',
+      criteria_range2: 'F2:F13',
+      date_range: 'A2:A13',
+      paid_range: 'G2:G13',
+    },
+    fields: [
+      {
+        key: 'sum_range',
+        label: '求和区域',
+        type: 'ref',
+        rangeKey: 'sum_range',
+        default: 'F2:F13',
+        placeholder: '如 F2:F13',
+        hint: '要加起来的那一列（金额）。',
+      },
+      {
+        key: 'criteria_range1',
+        label: '条件区域1',
+        type: 'ref',
+        rangeKey: 'criteria_range1',
+        default: 'C2:C13',
+        placeholder: '如 C2:C13',
+        hint: '改成 C2:C10 试试，行数对不上会直接报 #VALUE!。',
+      },
+      {
+        key: 'criteria1',
+        label: '条件1',
+        type: 'text',
+        default: '\"华东\"',
+        placeholder: '如 \"华东\"',
+        hint: '文本和比较符号都要放进半角双引号里。',
+      },
+      {
+        key: 'criteria_range2',
+        label: '条件区域2',
+        type: 'ref',
+        rangeKey: 'criteria_range2',
+        default: 'F2:F13',
+        placeholder: '如 F2:F13',
+        hint: '第二组条件要比对的列。',
+      },
+      {
+        key: 'criteria2',
+        label: '条件2',
+        type: 'text',
+        default: '\">10000\"',
+        placeholder: '如 \">10000\"',
+        hint: '去掉引号试试，就能复现 #NAME?。',
+      },
+    ],
+    template:
+      '=SUMIFS({sum_range},{criteria_range1},{criteria1},{criteria_range2},{criteria2})',
+    cases: [
+      {
+        label: '✅ 正确写法',
+        type: 'ok',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'C2:C13',
+          criteria1: '\"华东\"',
+          criteria_range2: 'F2:F13',
+          criteria2: '\">10000\"',
+        },
+        expect: '198400',
+        note: '华东区共 6 笔，全部超过 1 万，加总得 198400。两个条件都成立的行才会被加进来。',
+      },
+      {
+        label: '❌ 条件区域行数不一致',
+        type: 'error',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'C2:C10',
+          criteria1: '\"华东\"',
+          criteria_range2: 'F2:F13',
+          criteria2: '\">10000\"',
+        },
+        expect: '#VALUE!',
+        note: '意思：类型不对。条件区域 9 行、求和区域 12 行，Excel 没法一一对应，直接报错。把 C2:C10 改回 C2:C13 就好。',
+      },
+      {
+        label: '❌ 比较符号忘了加引号',
+        type: 'error',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'C2:C13',
+          criteria1: '\"华东\"',
+          criteria_range2: 'F2:F13',
+          criteria2: '>10000',
+        },
+        expect: '#NAME?',
+        note: '意思：Excel 不认识你写的东西。裸写的 >10000 会被当成一个名字去找。写成 ">10000" 即可。',
+      },
+      {
+        label: '❌ 文本条件忘了加引号',
+        type: 'error',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'C2:C13',
+          criteria1: '华东',
+          criteria_range2: 'F2:F13',
+          criteria2: '\">10000\"',
+        },
+        expect: '#NAME?',
+        note: '意思：Excel 把「华东」当成了一个名称。中文、文本一律加半角双引号，写成 "华东"。',
+      },
+      {
+        label: '⚠️ 日期写成文本',
+        type: 'error',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'A2:A13',
+          criteria1: '\">=2024/3/1\"',
+          criteria_range2: 'F2:F13',
+          criteria2: '\">10000\"',
+        },
+        expect: '268400',
+        note: 'Excel 不会报错，但这个值可能不稳：文本日期靠电脑的区域设置解析，换台电脑可能算出 0。改用 ">="&DATE(2024,3,1)。',
+      },
+      {
+        label: '⚠️ 想「包含」却忘了加 *',
+        type: 'error',
+        values: {
+          sum_range: 'F2:F13',
+          criteria_range1: 'C2:C13',
+          criteria1: '\"华\"',
+          criteria_range2: 'F2:F13',
+          criteria2: '\">10000\"',
+        },
+        expect: '0',
+        note: 'Excel 不会报错，但这个值可能不是你要的：不加 * 时按「完全等于」比对，没有哪个区域叫「华」。包含东字要写成 "*东*"。',
+      },
+    ],
+    engine: 'builtin',
+  },
+  meta: {
+    updatedAt: '2025-01-15',
+    status: 'published',
+    customEdited: false,
+  },
+};
+
+export default sumifs;

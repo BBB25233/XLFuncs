@@ -1,0 +1,44 @@
+{
+  "name": "excel-function-guide",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Excel 函数速查网页：收录 414 个 Excel 函数，中文助记名 + 英文对照，在线试算与一键复制",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:single": "tsc --noEmit && cross-env SINGLE_FILE=1 vite build",
+    "build:deliver": "npm run build:single && node scripts/finalize-cp.mjs",
+    "preview": "vite preview",
+    "gen:pinyin": "node scripts/gen-pinyin.mjs",
+    "gen:catalog": "node scripts/regen-catalog.mjs",
+    "finalize": "node scripts/finalize-cp.mjs",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "vite-plugin-singlefile": "^2.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "pinyin-pro": "^3.25.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.2"
+  }
+}

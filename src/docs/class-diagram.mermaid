@@ -1,0 +1,339 @@
+classDiagram
+    direction LR
+
+    %% ============================================================
+    %% 数据模型（data 层）
+    %% ============================================================
+    class CatalogRow {
+        +string id
+        +string enName
+        +string zhName
+        +string[] zhCommon
+        +string[] alias
+        +CategoryId category
+        +number difficulty
+        +number usageLevel
+        +string minVersion
+        +string oneLiner
+        +string status
+        +string abbr
+        +string pinyin
+    }
+
+    class FunctionEntry {
+        +string id
+        +string enName
+        +string zhName
+        +string[] zhCommon
+        +string[] alias
+        +CategoryId category
+        +string abbr
+        +string pinyin
+        +string[] keywords
+        +number difficulty
+        +number usageLevel
+        +boolean hiddenFunction
+        +boolean dynamicArray
+        +string oneLiner
+        +string summary
+        +string returnValue
+    }
+
+    class VersionInfo {
+        +string min
+        +string label
+        +string expr
+        +string note
+        +string notes
+    }
+
+    class SyntaxBlock {
+        +string patternCn
+        +string patternEn
+    }
+
+    class ArgItem {
+        +string key
+        +string zh
+        +string en
+        +boolean required
+        +string desc
+        +string accepts
+        +string ifOmitted
+        +string tip
+        +string example
+        +number pitfallRank
+    }
+
+    class ExampleItem {
+        +string title
+        +string scene
+        +string tableId
+        +string dataTsv
+        +string dataAnchor
+        +string formula
+        +string result
+        +string explanation
+    }
+
+    class PitfallItem {
+        +string title
+        +string reason
+        +string fix
+        +string level
+        +string errorCode
+    }
+
+    class RelatedItem {
+        +string id
+        +string kind
+        +string why
+    }
+
+    class ExtraBlock {
+        +string title
+        +string[] header
+        +string[][] rows
+        +string note
+    }
+
+    class CalcSpec {
+        +boolean enabled
+        +string sampleTableId
+        +Map ranges
+        +string template
+        +string engine
+    }
+
+    class CalcField {
+        +string key
+        +string label
+        +string type
+        +Option[] options
+        +string default
+        +string hint
+        +string rangeKey
+    }
+
+    class CalcCase {
+        +string label
+        +string type
+        +Map values
+        +string expect
+        +string note
+    }
+
+    class MetaBlock {
+        +string updatedAt
+        +string status
+        +boolean customEdited
+    }
+
+    class SearchEntry {
+        +string id
+        +string enName
+        +string zhName
+        +string abbr
+        +string pinyin
+        +string[] aliases
+        +string category
+        +string oneLiner
+        +string status
+    }
+
+    class SampleTable {
+        +string name
+        +string[] columns
+        +CellValue[][] rows
+        +string anchor
+    }
+
+    FunctionEntry *-- VersionInfo : 必填 1
+    FunctionEntry *-- SyntaxBlock : 必填 1
+    FunctionEntry *-- ArgItem : 3..6
+    FunctionEntry *-- ExampleItem : 2..3
+    FunctionEntry *-- PitfallItem : 3..5
+    FunctionEntry *-- RelatedItem : 3..5
+    FunctionEntry *-- CalcSpec : 必填 1
+    FunctionEntry *-- MetaBlock : 必填 1
+    FunctionEntry o-- ExtraBlock : 可选
+    SyntaxBlock *-- ArgItem : 持有
+    CalcSpec *-- CalcField : 2..6
+    CalcSpec *-- CalcCase : 至少 4
+    CatalogRow ..> SearchEntry : 派生
+
+    %% ============================================================
+    %% core 层（纯函数，零 DOM、零 React）
+    %% ============================================================
+    class CatalogIndex {
+        -CatalogRow[] rows
+        -SearchEntry[] index
+        +SearchEntry[] all()
+        +SearchEntry get(id)
+        +SearchEntry[] byCategory(categoryId)
+        +number countByCategory(categoryId)
+    }
+
+    class PackLoader {
+        -Map loaders
+        +Promise loadPack(categoryId)
+        +Promise loadFunction(id)
+    }
+
+    class SearchService {
+        +SearchEntry[] query(index, keyword, limit)
+        -number score(entry, keyword)
+    }
+
+    class TsvUtils {
+        +string[][] parse(tsv)
+        +string stringify(rows)
+        +string buildCopyPayload(example, sampleTable)
+        +string escape(cell)
+    }
+
+    class FormulaRenderer {
+        +string render(template, args)
+        +string quoteIfText(raw)
+    }
+
+    class RefResolver {
+        +Range parseRef(ref)
+        +Sheet slice(table, ref)
+        +CellValue[][] resolve(sheet, ref)
+    }
+
+    class CalcEngine {
+        -Map handlers
+        +CalcOutcome evaluate(fnId, ctx)
+        +boolean supports(fnId)
+    }
+
+    class CalcFailure {
+        +string error
+        +string reason
+        +string fix
+    }
+
+    class CalcSuccess {
+        +boolean ok
+        +CellValue value
+        +string display
+        +string warning
+    }
+
+    class ErrorLib {
+        +CalcFailure make(code, reason, fix)
+        +CalcFailure explain(fnId, code, scenario)
+        +string[] codes()
+    }
+
+    class ExportHtmlBuilder {
+        +string buildSingle(entry)
+        +string buildAll(entries)
+        -string renderSection(entry)
+    }
+
+    class ExportCss {
+        +string tokens
+        +string full()
+    }
+
+    CatalogIndex ..> SearchEntry : 生成
+    CatalogIndex <.. PackLoader : 查分类
+    SearchService ..> SearchEntry : 检索排序
+    CalcEngine ..> CalcFailure : 失败时返回
+    CalcEngine ..> CalcSuccess : 成功时返回
+    CalcEngine ..> RefResolver : 取区域
+    CalcEngine ..> ErrorLib : 取中文解释
+    ExportHtmlBuilder ..> ExportCss : 内联样式
+    ExportHtmlBuilder ..> TsvUtils : 渲染数据表
+    ExportHtmlBuilder ..> FunctionEntry : 只读渲染
+
+    %% ============================================================
+    %% storage 层（唯一允许碰 localStorage / Blob / File）
+    %% ============================================================
+    class FunctionRepository {
+        +Promise getFunctionEntry(id)
+        +void saveFunction(entry)
+        +void resetFunction(id)
+        +string[] listOverriddenIds()
+        +BackupFile exportBackup()
+        +Result importBackup(file)
+    }
+
+    class LocalStore {
+        +T read(key, fallback)
+        +boolean write(key, value)
+        +void remove(key)
+        -Map memoryFallback
+    }
+
+    class DiffUtils {
+        +DeepPartial deepDiff(base, edited)
+        +T deepMerge(base, patch)
+    }
+
+    class BackupService {
+        +BackupFile serialize(overrides)
+        +Result validate(json)
+        +OverridesStore deserialize(backup)
+    }
+
+    class FileIo {
+        +void download(filename, content, mime)
+        +Promise readTextFile(input)
+    }
+
+    FunctionRepository --> LocalStore : 读写
+    FunctionRepository --> DiffUtils : 计算与合并增量
+    FunctionRepository --> BackupService : 导入导出
+    FunctionRepository ..> PackLoader : 取内置原文
+    BackupService --> FileIo : 落盘
+
+    %% ============================================================
+    %% ui 层（唯一允许用 React / window / document）
+    %% ============================================================
+    class HashRouter {
+        +Route[] routes
+        +void navigate(path)
+    }
+
+    class FunctionDetailPage {
+        -FunctionEntry entry
+        -boolean editing
+        +void onCopy(kind)
+        +void onShare()
+        +void onExportHtml()
+    }
+
+    class Playground {
+        -Record args
+        -CalcOutcome outcome
+        +void applyCase(calcCase)
+        +void reset()
+    }
+
+    class EditBar {
+        -FunctionEntry draft
+        +void save()
+        +void cancel()
+        +void restoreOfficial()
+    }
+
+    class UseCopy {
+        +Promise copy(text, hint)
+        -boolean tryClipboardApi(text)
+        -boolean tryExecCommand(text)
+        -void showSelectFallback(text)
+    }
+
+    HashRouter --> FunctionDetailPage : 路由 f/id
+    FunctionDetailPage --> Playground : 内嵌
+    FunctionDetailPage --> EditBar : 编辑态
+    FunctionDetailPage ..> FunctionRepository : 读写条目
+    Playground ..> CalcEngine : evaluate
+    Playground ..> FormulaRenderer : 实时回显公式
+    Playground ..> TsvUtils : 复制示例
+    EditBar ..> FunctionRepository : saveFunction
+    UseCopy ..> FileIo : 离线导出下载

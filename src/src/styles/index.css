@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================================
+ * 全局基线（PRD §8.3 / §8.4）
+ * 不联网加载字体，用系统自带字体栈，加载快、不闪。
+ * ========================================================================= */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: #ffffff;
+    color: #1f1f1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+      'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 禁止移动端点击高亮 */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* iOS 输入框字号 < 16px 会自动放大页面，这里统一兜底 */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    color: inherit;
+  }
+
+  code,
+  pre,
+  .font-mono {
+    font-family: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Courier New', monospace;
+    font-variant-ligatures: none;
+  }
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #1d4ed8;
+  }
+
+  /* 只做 150ms 的淡入与颜色过渡，禁止装饰性动效 */
+  button,
+  a,
+  input,
+  select {
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease,
+      opacity 150ms ease;
+  }
+}
+
+/* =========================================================================
+ * 0.5px 细线（PRD §8.2：分割线 0.5px；低分屏降级为 1px #EDEDEB）
+ * 这是全站唯一允许写全局类的三处之一（细线 / 滚动条 / 字体栈）。
+ * ========================================================================= */
+@layer utilities {
+  .hairline {
+    border-style: solid;
+    border-width: 0.5px;
+    border-color: #e8e8e6;
+  }
+
+  .hairline-t {
+    border-top-style: solid;
+    border-top-width: 0.5px;
+    border-top-color: #e8e8e6;
+  }
+
+  .hairline-b {
+    border-bottom-style: solid;
+    border-bottom-width: 0.5px;
+    border-bottom-color: #e8e8e6;
+  }
+
+  .hairline-l {
+    border-left-style: solid;
+    border-left-width: 0.5px;
+    border-left-color: #e8e8e6;
+  }
+
+  .hairline-r {
+    border-right-style: solid;
+    border-right-width: 0.5px;
+    border-right-color: #e8e8e6;
+  }
+
+  /* 横向滚动条：代码块 / 示例数据表使用 */
+  .scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #e8e8e6 transparent;
+  }
+
+  .scroll-x::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .scroll-x::-webkit-scrollbar-thumb {
+    background-color: #e8e8e6;
+    border-radius: 3px;
+  }
+
+  .scroll-x::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  /* 150ms 淡入，全站唯一的动效 */
+  .fade-in {
+    animation: fade-in 150ms ease-out both;
+  }
+}
+
+/* 低分屏（非 Retina）下 0.5px 会被抹掉，降级为 1px 更浅的线 */
+@media (max-resolution: 1.49dppx) {
+  .hairline {
+    border-width: 1px;
+    border-color: #ededeb;
+  }
+
+  .hairline-t {
+    border-top-width: 1px;
+    border-top-color: #ededeb;
+  }
+
+  .hairline-b {
+    border-bottom-width: 1px;
+    border-bottom-color: #ededeb;
+  }
+
+  .hairline-l {
+    border-left-width: 1px;
+    border-left-color: #ededeb;
+  }
+
+  .hairline-r {
+    border-right-width: 1px;
+    border-right-color: #ededeb;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
