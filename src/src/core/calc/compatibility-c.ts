@@ -3,7 +3,7 @@ import { ERROR_CODES, make } from '@/core/errors';
 import { ok, fail, stripQuotes } from './types';
 import { toNumber, formatNumber, numericValues } from './helpers';
 import { sliceSheet } from '@/core/ref';
-import { lngamma, lowerRegGamma, upperRegGamma, lowerRegBeta, erf } from './special';
+import { lngamma, upperRegGamma, lowerRegBeta, erf } from './special';
 import { percentileInc, rank } from './quantile';
 
 /**

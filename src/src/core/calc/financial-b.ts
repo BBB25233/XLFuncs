@@ -78,11 +78,6 @@ function addMonths(d: YMD, months: number): YMD {
   const day = Math.min(d.day, daysInMonthY(year, month));
   return { year, month, day };
 }
-function dateLessY(a: YMD, b: YMD): boolean {
-  if (a.year !== b.year) return a.year < b.year;
-  if (a.month !== b.month) return a.month < b.month;
-  return a.day < b.day;
-}
 function sameDateY(a: YMD, b: YMD): boolean {
   return a.year === b.year && a.month === b.month && a.day === b.day;
 }

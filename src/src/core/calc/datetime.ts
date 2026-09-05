@@ -1,4 +1,4 @@
-import type { CalcContext, CalcHandler, CalcOutcome, CellValue, Sheet } from '@/types';
+import type { CalcContext, CalcHandler, CalcOutcome, Sheet } from '@/types';
 import { ERROR_CODES, make } from '@/core/errors';
 import { cellValue } from '@/core/ref';
 import { dateToSerial, parseDateText, toDateParts } from './helpers';

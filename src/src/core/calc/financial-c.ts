@@ -1,10 +1,10 @@
-import type { CalcContext, CalcHandler, CalcOutcome, CellValue } from '@/types';
+import type { CalcContext, CalcHandler, CalcOutcome } from '@/types';
 import { ERROR_CODES, make } from '@/core/errors';
 import { fail, ok, stripQuotes } from './types';
 import { formatNumber, toNumber, parseDateText, dateToSerial, serialToParts } from './helpers';
 import { dayCount, yearFraction, couponSchedule } from './daycount';
 import type { DayCountBasis } from './daycount';
-import { durationCalc, irrCalc, ipmtCalc } from './financial-b';
+import { durationCalc, ipmtCalc } from './financial-b';
 import { pmtCalc } from './financial';
 
 /**
@@ -72,11 +72,6 @@ function addMonths(d: YMD, months: number): YMD {
   const month = (total % 12) + 1;
   const day = Math.min(d.day, daysInMonthY(year, month));
   return { year, month, day };
-}
-function dateLessY(a: YMD, b: YMD): boolean {
-  if (a.year !== b.year) return a.year < b.year;
-  if (a.month !== b.month) return a.month < b.month;
-  return a.day < b.day;
 }
 function sameDateY(a: YMD, b: YMD): boolean {
   return a.year === b.year && a.month === b.month && a.day === b.day;

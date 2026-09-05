@@ -6,12 +6,10 @@ import { sliceSheet } from '@/core/ref';
 import {
   gamma,
   lngamma,
-  beta,
   lowerRegGamma,
   upperRegGamma,
   lowerRegBeta,
   erf,
-  erfc,
 } from './special';
 
 /**

@@ -1,4 +1,4 @@
-import type { CalcContext, CalcHandler, CalcOutcome, CellValue, Sheet } from '@/types';
+import type { CalcContext, CalcHandler, CalcOutcome, CellValue } from '@/types';
 import { ERROR_CODES, make } from '@/core/errors';
 import { fail, ok, stripQuotes } from './types';
 import { sliceSheet } from '@/core/ref';
@@ -6,7 +6,6 @@ import {
   formatNumber,
   numericValues,
   countNonBlank,
-  avgValues,
   maxValues,
   minValues,
 } from './helpers';

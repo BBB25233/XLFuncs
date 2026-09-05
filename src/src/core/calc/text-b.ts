@@ -204,7 +204,12 @@ export const cleanCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   const { args } = ctx;
   const t = textArg(args.text);
   if (t.fail) return t.fail;
-  const r = t.value.replace(/[\x00-\x1F\x7F]/g, '');
+  // CLEAN：剔除 ASCII 控制字符（0x00–0x1F）与 DEL（0x7F）。
+  // 用码点过滤而非控制字符正则，规避 no-control-regex 报错（控制字符正则无论字面量还是转义都会被判错）。
+  const r = [...t.value].filter((ch) => {
+    const c = ch.codePointAt(0)!;
+    return c > 0x1f && c !== 0x7f;
+  }).join('');
   return ok(r, r);
 };
 
