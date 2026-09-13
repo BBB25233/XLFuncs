@@ -5,9 +5,6 @@ import { TOTAL_COUNT } from '@/data';
 import { getFontScale, setFontScale } from '@/ui/settings/fontScale';
 import type { FontScale } from '@/ui/settings/fontScale';
 
-/** 应用版本号（与 package.json 的 version 对齐） */
-const APP_VERSION = '2.0.0';
-
 const FONT_OPTIONS: { value: FontScale; label: string }[] = [
   { value: 'small', label: '小' },
   { value: 'normal', label: '标准' },
@@ -98,7 +95,7 @@ export default function SettingsPage(): ReactElement {
       </div>
 
       <p className="mt-8 text-center text-xs text-ink-3">
-        Excel 函数速查 v{APP_VERSION} · {TOTAL_COUNT} 个函数
+        Excel 函数速查 · {TOTAL_COUNT} 个函数
       </p>
     </div>
   );
