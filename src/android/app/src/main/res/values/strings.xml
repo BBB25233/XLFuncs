@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Excel 函数速查</string>
+    <string name="title_activity_main">Excel 函数速查</string>
+    <string name="package_name">com.bbb25.xlfuncs</string>
+    <string name="custom_url_scheme">com.bbb25.xlfuncs</string>
+</resources>
