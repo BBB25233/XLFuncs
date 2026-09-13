@@ -1,12 +1,19 @@
 name: Android APK
 
-# 手动触发：GitHub → Actions → 左侧选 “Android APK” → Run workflow → 运行结束后在该次运行页底部下载 APK
+# 触发方式：
+#  1) 手动：Actions → 左侧 “Android APK” → Run workflow（结果在本次运行的 Artifacts 里下载）
+#  2) 发布 Release：在仓库发布（Publish）一个 Release 时自动构建，
+#     并把 APK 作为资产挂到该 Release 的下载区（与 ci.yml 挂 index-v1.html 同理）
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # 把 APK 挂到 Release 资产需要写权限
     steps:
       - uses: actions/checkout@v4
 
@@ -46,9 +53,18 @@ jobs:
           chmod +x ./gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: 上传 APK（在该次运行的 Artifacts 下载）
+      - name: 复制为发布名（含版本号，便于识别）
+        run: cp src/android/app/build/outputs/apk/debug/app-debug.apk "XLFuncs-android-${GITHUB_REF_NAME}.apk"
+
+      - name: 上传为工作流产物（手动触发时在 Artifacts 下载）
         uses: actions/upload-artifact@v4
         with:
           name: xlfuncs-android-debug
           path: src/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: 挂到 Release 下载资产（仅发布 Release 时）
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: XLFuncs-android-*.apk
