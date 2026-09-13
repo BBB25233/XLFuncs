@@ -3,6 +3,8 @@ import type { ReactElement } from 'react';
 import { Outlet, ScrollRestoration } from 'react-router-dom';
 import Header from '@/ui/layout/Header';
 import Footer from '@/ui/layout/Footer';
+import Drawer from '@/ui/layout/Drawer';
+import AndroidBackHandler from '@/ui/native/AndroidBackHandler';
 import { ToastHost } from '@/ui/components/Toast';
 import { useCopyFallback, clearCopyFallback, COPY_FALLBACK_HINT } from '@/ui/clipboard/useCopy';
 import { showToast } from '@/ui/hooks/useToast';
@@ -116,6 +118,8 @@ export default function AppShell(): ReactElement {
         <Outlet />
       </main>
       <Footer />
+      <Drawer />
+      <AndroidBackHandler />
       <ToastHost />
       <CopyFallbackLayer />
       <ScrollRestoration />

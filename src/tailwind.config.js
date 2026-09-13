@@ -29,15 +29,18 @@ export default {
       warn: '#D97706',
       err: '#DC2626',
     },
+    // 字号统一乘以 --fs：安卓端「字号」设置用它缩放；网页端该变量缺省为 1，
+    // 因此 calc(32px * 1) === 32px，渲染与改动前逐像素一致。
+    // 只缩放文字与行高；spacing / borderRadius 不受影响。
     fontSize: {
-      h1: ['32px', { lineHeight: '44px', fontWeight: '600' }],
-      h2: ['24px', { lineHeight: '34px', fontWeight: '600' }],
-      h3: ['18px', { lineHeight: '28px', fontWeight: '600' }],
-      h4: ['16px', { lineHeight: '26px', fontWeight: '600' }],
-      body: ['16px', { lineHeight: '28px', fontWeight: '400' }],
-      sm: ['14px', { lineHeight: '22px', fontWeight: '400' }],
-      xs: ['13px', { lineHeight: '20px', fontWeight: '400' }],
-      code: ['15px', { lineHeight: '26px', fontWeight: '400' }],
+      h1: ['calc(32px * var(--fs, 1))', { lineHeight: 'calc(44px * var(--fs, 1))', fontWeight: '600' }],
+      h2: ['calc(24px * var(--fs, 1))', { lineHeight: 'calc(34px * var(--fs, 1))', fontWeight: '600' }],
+      h3: ['calc(18px * var(--fs, 1))', { lineHeight: 'calc(28px * var(--fs, 1))', fontWeight: '600' }],
+      h4: ['calc(16px * var(--fs, 1))', { lineHeight: 'calc(26px * var(--fs, 1))', fontWeight: '600' }],
+      body: ['calc(16px * var(--fs, 1))', { lineHeight: 'calc(28px * var(--fs, 1))', fontWeight: '400' }],
+      sm: ['calc(14px * var(--fs, 1))', { lineHeight: 'calc(22px * var(--fs, 1))', fontWeight: '400' }],
+      xs: ['calc(13px * var(--fs, 1))', { lineHeight: 'calc(20px * var(--fs, 1))', fontWeight: '400' }],
+      code: ['calc(15px * var(--fs, 1))', { lineHeight: 'calc(26px * var(--fs, 1))', fontWeight: '400' }],
     },
     spacing: {
       // 只允许 4 的倍数中这几档（PRD §8.5）

@@ -7,13 +7,20 @@ import SearchPage from '@/ui/pages/SearchPage';
 import FunctionDetailPage from '@/ui/pages/FunctionDetailPage';
 import DataPage from '@/ui/pages/DataPage';
 import AboutPage from '@/ui/pages/AboutPage';
+import SettingsPage from '@/ui/pages/SettingsPage';
 import EmptyState from '@/ui/components/EmptyState';
 import { catalogIndex } from '@/data';
+import { IS_NATIVE } from '@/ui/native/platform';
 
 /**
  * 全站使用 hash 路由（F26 / PRD §5.1）。
  * `#` 后面的内容不会发送给服务器，因此在任何纯静态托管上刷新、分享都 100% 可用，不会 404。
  */
+/** 安卓壳专用路由；网页端为空数组，因此 #/settings 仍落到下面的通配 404 */
+const nativeRoutes: RouteObject[] = IS_NATIVE
+  ? [{ path: 'settings', element: <SettingsPage /> }]
+  : [];
+
 const routes: RouteObject[] = [
   {
     path: '/',
@@ -25,6 +32,7 @@ const routes: RouteObject[] = [
       { path: 'f/:id', element: <FunctionDetailPage /> },
       { path: 'data', element: <DataPage /> },
       { path: 'about', element: <AboutPage /> },
+      ...nativeRoutes,
       {
         path: '*',
         element: (

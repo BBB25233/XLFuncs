@@ -18,7 +18,7 @@
     color: #1f1f1f;
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
       'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--fs, 1));
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -35,7 +35,7 @@
   select,
   button {
     font-family: inherit;
-    font-size: 16px;
+    font-size: calc(16px * var(--fs, 1));
     line-height: 1.5;
     color: inherit;
   }
@@ -126,6 +126,15 @@
   .fade-in {
     animation: fade-in 150ms ease-out both;
   }
+
+  /* 安卓抽屉（仅原生端挂载，网页端永不出现）：遮罩淡入 + 面板左滑入 */
+  .drawer-mask {
+    animation: drawer-mask-in 180ms ease-out both;
+  }
+
+  .drawer-panel {
+    animation: drawer-panel-in 220ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
 }
 
 /* 低分屏（非 Retina）下 0.5px 会被抹掉，降级为 1px 更浅的线 */
@@ -162,5 +171,23 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes drawer-mask-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-panel-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }

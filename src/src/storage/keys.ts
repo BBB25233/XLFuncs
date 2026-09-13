@@ -11,6 +11,8 @@ export const STORAGE_KEYS = {
   settings: 'efg:v1:settings',
   /** 最近浏览（第一版只记录不展示，见 U6） */
   recent: 'efg:v1:recent',
+  /** 界面偏好：{ fontScale: 'small' | 'normal' | 'large' }（仅安卓端使用） */
+  ui: 'efg:v1:ui',
 } as const;
 
 /** 备份文件的结构版本号。结构变更时 +1，导入时做兼容判断 */
