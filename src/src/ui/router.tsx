@@ -5,6 +5,7 @@ import HomePage from '@/ui/pages/HomePage';
 import CategoryPage from '@/ui/pages/CategoryPage';
 import SearchPage from '@/ui/pages/SearchPage';
 import FunctionDetailPage from '@/ui/pages/FunctionDetailPage';
+import InterpreterPage from '@/ui/pages/InterpreterPage';
 import DataPage from '@/ui/pages/DataPage';
 import AboutPage from '@/ui/pages/AboutPage';
 import SettingsPage from '@/ui/pages/SettingsPage';
@@ -30,6 +31,7 @@ const routes: RouteObject[] = [
       { path: 'category/:id', element: <CategoryPage /> },
       { path: 'search', element: <SearchPage /> },
       { path: 'f/:id', element: <FunctionDetailPage /> },
+      { path: 'interpreter', element: <InterpreterPage /> },
       { path: 'data', element: <DataPage /> },
       { path: 'about', element: <AboutPage /> },
       ...nativeRoutes,

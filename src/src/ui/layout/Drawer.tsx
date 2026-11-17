@@ -14,6 +14,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: '首页' },
   { to: '/search', label: '搜索' },
+  { to: '/interpreter', label: '公式解释' },
   { to: '/settings', label: '设置' },
 ];
 

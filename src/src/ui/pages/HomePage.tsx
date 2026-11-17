@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { all, TOTAL_COUNT } from '@/data';
 import SearchBox from '@/ui/components/SearchBox';
 import { CategoryGrid } from '@/ui/components/CategoryCard';
@@ -33,6 +33,18 @@ export default function HomePage(): ReactElement {
             navigate(`/search?q=${encodeURIComponent(keyword)}`);
           }}
         />
+      </section>
+
+      <section className="mb-8">
+        <Link
+          to="/interpreter"
+          className="block rounded-card border border-line bg-bg p-4 hover:border-accent"
+        >
+          <h2 className="text-h3 text-ink">公式解释器</h2>
+          <p className="mt-1 text-sm text-ink-2">
+            粘贴一段多层嵌套的公式，按步骤讲清它先算什么、后算什么、每一步产出什么。
+          </p>
+        </Link>
       </section>
 
       <section className="mb-8">
