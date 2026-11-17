@@ -28,12 +28,16 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
-
-      - name: 安装 Android SDK 34（与 capacitor variables.gradle 对齐）
+      # 不再使用 android-actions/setup-android：它会执行 `sdkmanager tools`，
+      # 而 Google 已下架 tools 包，导致 setup 步骤直接失败（sdkmanager exit 1）。
+      # ubuntu-latest 本身预装 Android SDK，这里直接用预装的 sdkmanager 补齐 platform 34。
+      - name: 准备 Android SDK 34（使用 runner 预装）
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          set -e
+          SDKMANAGER=$(command -v sdkmanager || ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | head -1)
+          echo "sdkmanager: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
 
       - name: 安装网页依赖
         working-directory: src
