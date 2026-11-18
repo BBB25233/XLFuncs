@@ -1,7 +1,7 @@
 {
   "name": "excel-function-guide",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Excel 函数速查网页：收录 414 个 Excel 函数，中文助记名 + 英文对照，在线试算与一键复制",
   "scripts": {

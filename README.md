@@ -2,7 +2,7 @@
 
 [![函数总数](https://img.shields.io/badge/函数-414-4285F4)](https://github.com/BBB25233/XLFuncs/releases)
 [![分类](https://img.shields.io/badge/分类-12-34A853)](https://github.com/BBB25233/XLFuncs/releases)
-[![版本](https://img.shields.io/badge/版本-v1.1-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
+[![版本](https://img.shields.io/badge/版本-v1.2-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
 [![网页端](https://img.shields.io/badge/网页端-单文件离线-9AA0A6)](https://github.com/BBB25233/XLFuncs/releases)
 [![安卓端](https://img.shields.io/badge/安卓端-Capacitor%206-3DDC84)](https://github.com/BBB25233/XLFuncs/releases)
 [![构建](https://img.shields.io/badge/构建-CI%20自动发布-9AA0A6)](https://github.com/BBB25233/XLFuncs/actions)
@@ -187,7 +187,7 @@ data/     数据层：414 条目录、12 个分类包、样板内容、三张样
 ## 👤 作者与版本
 
 - **作者 ID**：`BBB25`
-- **版本**：第一版 `v1.1` · 414 函数 / 12 分类 · 含公式解释器
+- **版本**：第一版 `v1.2` · 414 函数 / 12 分类 · 含公式解释器
 - **形态**：网页单文件（`index-v1.html`）+ 安卓 App（Capacitor 6）
 - **范围**：完整框架 + 全部函数的完整内容，均为「内容完整、可在线试算」的函数，无需等待后续补齐。
 
