@@ -31,6 +31,12 @@ describe('explainFormula', () => {
       '取什么',
       '找不到时',
     ]);
+    // 精确匹配（第 4 参为 0）不应再提示表头风险
+    expect(step.warnings.join(' ')).not.toContain('表头');
+  });
+
+  it('近似匹配 + 整列引用才提示表头风险', () => {
+    const step = explainFormula('=VLOOKUP(A2,D:F,3)', emptyEntries).steps[0];
     expect(step.warnings.join(' ')).toContain('表头');
   });
 

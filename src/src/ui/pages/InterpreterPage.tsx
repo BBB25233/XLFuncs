@@ -1,26 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
-import type { ExplainResult } from '@/core/interpreter';
-import {
-  FormulaParseError,
-  collectFunctionNames,
-  explainParsed,
-  layoutDiagram,
-  parseUserFormula,
-} from '@/core/interpreter';
+import type { Diagnostic, DiagnosticFix, ExplainResult } from '@/core/interpreter';
+import { buildTree, layoutDiagram, layoutTree, toMermaid } from '@/core/interpreter';
 import { INTERPRETER_SAMPLES } from '@/data/interpreterSamples';
 import { useCopy } from '@/ui/clipboard/useCopy';
+import { analyzeFormula } from '@/ui/interpreter/analyze';
 import DiagramView from '@/ui/interpreter/DiagramView';
 import FormulaInput from '@/ui/interpreter/FormulaInput';
 import StepList from '@/ui/interpreter/StepList';
-import { loadEntries } from '@/ui/interpreter/loadEntries';
-
-function formatError(error: unknown): string {
-  if (error instanceof FormulaParseError) {
-    return `第 ${error.position + 1} 个字符附近：${error.message}`;
-  }
-  return error instanceof Error ? error.message : '解析失败，请检查公式。';
-}
+import TreeCanvas from '@/ui/interpreter/TreeCanvas';
+import TreeView from '@/ui/interpreter/TreeView';
 
 function toPlainText(result: ExplainResult): string {
   const lines: string[] = [result.summary, ''];
@@ -44,7 +33,11 @@ function toPlainText(result: ExplainResult): string {
 export default function InterpreterPage(): ReactElement {
   const [formula, setFormula] = useState(INTERPRETER_SAMPLES[0].formula);
   const [result, setResult] = useState<ExplainResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
+  const [view, setView] = useState<'flow' | 'tree'>('tree');
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  const [canvasOpen, setCanvasOpen] = useState(false);
   const { copy } = useCopy();
 
   useEffect(() => {
@@ -52,23 +45,21 @@ export default function InterpreterPage(): ReactElement {
 
     const timer = window.setTimeout(() => {
       void (async () => {
-        try {
-          const ast = parseUserFormula(formula);
-          const names = collectFunctionNames(ast);
-          const entries = await loadEntries(names);
-          if (cancelled) {
-            return;
-          }
-          setResult(explainParsed(ast, entries, formula.trim()));
-          setError(null);
-        } catch (caught) {
-          if (cancelled) {
-            return;
-          }
-          setResult(null);
-          setError(formatError(caught));
+        const outcome = await analyzeFormula(formula);
+        if (cancelled) {
+          return;
         }
-      })();
+        setDiagnostics(outcome.diagnostics);
+        setResult(outcome.result);
+        setActiveStep(null);
+        // 默认全展开，折叠完全交给用户手动切换
+        setCollapsed(new Set<string>());
+      })().catch(() => {
+        if (!cancelled) {
+          setDiagnostics([]);
+          setResult(null);
+        }
+      });
     }, 250);
 
     return () => {
@@ -82,11 +73,43 @@ export default function InterpreterPage(): ReactElement {
     [result],
   );
 
-  const trimmedFormula = formula.trim();
-  const canFixEquals = trimmedFormula !== '' && !trimmedFormula.startsWith('=');
+  const tree = useMemo(
+    () => (result === null ? null : buildTree(result.ast, result.steps)),
+    [result],
+  );
 
-  const fixEquals = (): void => {
-    setFormula(trimmedFormula.startsWith('＝') ? `=${trimmedFormula.slice(1)}` : `=${trimmedFormula}`);
+  const treeLayout = useMemo(
+    () => (tree === null ? null : layoutTree(tree, { collapsed })),
+    [tree, collapsed],
+  );
+
+  useEffect(() => {
+    if (activeStep === null) {
+      return;
+    }
+    document
+      .getElementById(`step-${activeStep}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [activeStep]);
+
+  const selectStep = (stepN: number): void => {
+    setActiveStep(stepN);
+  };
+
+  const toggleNode = (id: string): void => {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const applyFix = (fix: DiagnosticFix): void => {
+    setFormula((current) => current.slice(0, fix.start) + fix.text + current.slice(fix.end));
   };
 
   return (
@@ -103,9 +126,9 @@ export default function InterpreterPage(): ReactElement {
 
       <FormulaInput
         value={formula}
-        error={error}
+        diagnostics={diagnostics}
         onChange={setFormula}
-        onFixEquals={canFixEquals ? fixEquals : undefined}
+        onFix={applyFix}
       />
 
       {result === null ? null : (
@@ -114,12 +137,63 @@ export default function InterpreterPage(): ReactElement {
             {result.summary}
           </p>
 
-          {layout === null ? null : (
-            <section className="mt-6">
-              <h2 className="mb-3 text-h3 text-ink">计算流程</h2>
+          <section className="mt-6">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-h3 text-ink">{view === 'tree' ? '表达式结构' : '计算流程'}</h2>
+              <div className="flex items-center gap-2">
+                {view === 'tree' ? (
+                  <button
+                    type="button"
+                    onClick={() => setCanvasOpen(true)}
+                    className="rounded-btn border border-line px-2 py-1 text-xs text-ink-2 hover:border-accent hover:text-accent"
+                  >
+                    全屏查看
+                  </button>
+                ) : null}
+                {view === 'tree' && tree !== null ? (
+                  <button
+                    type="button"
+                    onClick={() => void copy(toMermaid(tree), '已复制 Mermaid')}
+                    className="rounded-btn border border-line px-2 py-1 text-xs text-ink-2 hover:border-accent hover:text-accent"
+                  >
+                    复制 Mermaid
+                  </button>
+                ) : null}
+                {(
+                  [
+                    { key: 'flow', label: '流程' },
+                    { key: 'tree', label: '结构树' },
+                  ] as const
+                ).map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => setView(item.key)}
+                    className={`rounded-btn border px-2 py-1 text-xs ${
+                      view === item.key
+                        ? 'border-accent bg-accent text-bg'
+                        : 'border-line text-ink-2 hover:border-accent hover:text-accent'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {view === 'tree' ? (
+              treeLayout === null ? null : (
+                <TreeView
+                  layout={treeLayout}
+                  activeStep={activeStep ?? undefined}
+                  onSelectStep={selectStep}
+                  onToggle={toggleNode}
+                />
+              )
+            ) : layout === null ? null : (
               <DiagramView layout={layout} />
-            </section>
-          )}
+            )}
+          </section>
 
           <section className="mt-8">
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -132,10 +206,20 @@ export default function InterpreterPage(): ReactElement {
                 复制文字说明
               </button>
             </div>
-            <StepList steps={result.steps} />
+            <StepList steps={result.steps} activeN={activeStep ?? undefined} />
           </section>
         </>
       )}
+
+      {canvasOpen && treeLayout !== null ? (
+        <TreeCanvas
+          layout={treeLayout}
+          activeStep={activeStep ?? undefined}
+          onSelectStep={selectStep}
+          onToggle={toggleNode}
+          onClose={() => setCanvasOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

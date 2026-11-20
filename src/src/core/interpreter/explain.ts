@@ -184,7 +184,7 @@ export function explainParsed(ast: AstNode, entries: EntryMap, formula: string):
     ? `共分解为 ${steps.length} 步，依次执行：${steps.map((step) => step.short).join(' → ')}。最后一步决定最终返回什么。`
     : '这段公式只有一个值，没有可分解的计算步骤。';
 
-  return { formula, summary, steps, structure: computeStructure(ast, steps) };
+  return { formula, summary, steps, ast, structure: computeStructure(ast, steps) };
 }
 
 /** 公式原文 → 解释结果 */

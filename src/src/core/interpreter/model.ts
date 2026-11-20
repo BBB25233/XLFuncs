@@ -39,6 +39,8 @@ export interface ExplainResult {
   formula: string;
   summary: string;
   steps: ExplainStep[];
+  /** 解析后的语法树，供树视图渲染 */
+  ast: import('./ast').AstNode;
   /** 仅当根节点是二元运算、且左右两支各自足够复杂时给出 */
   structure?: ExplainStructure;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { AstNode } from './ast';
 import { FormulaParseError } from './errors';
-import { parseFormula } from './parser';
+import { parseFormula, parseWithDiagnostics } from './parser';
 
 function expectBinary(node: AstNode): Extract<AstNode, { kind: 'binary' }> {
   if (node.kind !== 'binary') {
@@ -60,5 +60,52 @@ describe('parseFormula', () => {
 
   it('空公式报错', () => {
     expect(() => parseFormula('   ')).toThrow(FormulaParseError);
+  });
+});
+
+describe('parseWithDiagnostics（错误恢复）', () => {
+  it('缺少右括号：给出 E201，同时保留可用的 AST', () => {
+    const result = parseWithDiagnostics('=SUM(A1:A3');
+    expect(result.ast?.kind).toBe('call');
+    const codes = result.diagnostics.map((item) => item.code);
+    expect(codes).toContain('E201');
+    expect(result.diagnostics[0].start).toBe(10);
+  });
+
+  it('多余右括号：给出 E202 且继续解析', () => {
+    const result = parseWithDiagnostics('=SUM(A1:A3))');
+    expect(result.diagnostics.map((item) => item.code)).toContain('E202');
+    expect(result.ast?.kind).toBe('call');
+  });
+
+  it('末尾运算符：报缺少操作数', () => {
+    const result = parseWithDiagnostics('=1+');
+    expect(result.diagnostics.some((item) => item.code === 'E204' || item.code === 'E205')).toBe(true);
+  });
+
+  it('空参数给出 E203，AST 仍保留两个参数位', () => {
+    const result = parseWithDiagnostics('=SUM(,A1)');
+    expect(result.diagnostics.map((item) => item.code)).toContain('E203');
+    if (result.ast?.kind === 'call') {
+      expect(result.ast.args).toHaveLength(2);
+    }
+  });
+
+  it('一次报出多处错误', () => {
+    const result = parseWithDiagnostics('=SUM(A1:A3))+#');
+    expect(result.diagnostics.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(result.diagnostics.map((item) => item.code))).toEqual(
+      new Set(['E102', 'E202', 'E204']),
+    );
+  });
+
+  it('严格 parseFormula 对同一输入仍然抛错', () => {
+    expect(() => parseFormula('=SUM(A1:A3')).toThrow(FormulaParseError);
+  });
+
+  it('诊断区间落在出错字符上', () => {
+    const result = parseWithDiagnostics('=1#2');
+    const item = result.diagnostics.find((diagnostic) => diagnostic.code === 'E102');
+    expect(item).toMatchObject({ start: 2, end: 3 });
   });
 });

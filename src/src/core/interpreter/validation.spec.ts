@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FormulaParseError } from './errors';
-import { parseUserFormula } from './validation';
+import { checkFormulaInput, parseUserFormula } from './validation';
+import { parseWithDiagnostics } from './parser';
 
 function messageOf(source: string): string {
   try {
@@ -37,8 +38,10 @@ describe('parseUserFormula', () => {
     expect(messageOf('==SUM(A1)')).toContain('只能有一个');
   });
 
-  it('提示全角等号改用半角', () => {
-    expect(messageOf('＝SUM(A1)')).toContain('全角等号');
+  it('全角等号不再阻断，交给词法层给警告', () => {
+    expect(checkFormulaInput('＝SUM(A1)')).toEqual([]);
+    const list = parseWithDiagnostics('＝SUM(A1)').diagnostics;
+    expect(list.map((item) => item.code)).toContain('W405');
   });
 
   it('错误带字符位置', () => {

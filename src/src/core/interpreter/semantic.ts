@@ -314,8 +314,14 @@ export function describeCall(node: CallNode, children: ChildDesc[], entries: Ent
       { k: '取什么', v: `命中那一行向右数第 ${columnIndex ?? '?'} 列${targetColumn === null ? '' : `（${targetColumn} 列）`}的值` },
       { k: '找不到时', v: '返回 #N/A' },
     ];
-    if (tableNode !== undefined && tableNode.kind === 'reference' && isWholeColumnRange(tableNode.text)) {
-      draft.warnings.push('整列引用包含表头行，查找值若恰好等于表头文字，会被误命中。');
+    // 与 checks.ts 的 W402 保持一致：只有近似匹配才提示表头风险
+    if (
+      exact !== true &&
+      tableNode !== undefined &&
+      tableNode.kind === 'reference' &&
+      isWholeColumnRange(tableNode.text)
+    ) {
+      draft.warnings.push('整列引用包含表头行，近似匹配时可能误命中。');
     }
     if (columnIndex === null) {
       draft.warnings.push('第 3 个参数应为数字（返回区域中的第几列）。');
