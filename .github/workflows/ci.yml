@@ -10,6 +10,8 @@ on:
 
 jobs:
   verify:
+    # Release 事件只跑 release job（构建并挂资产）；提交已在 push 时验证过，避免重复跑一遍
+    if: github.event_name != 'release'
     permissions:
       contents: read   # checkout / npm ci 读仓库
       actions: write   # upload-artifact 上传构建产物
@@ -39,7 +41,6 @@ jobs:
   release:
     # 仅在「发布 Release」事件时运行：重新构建并把单文件产物挂到 Release 资产
     if: github.event_name == 'release'
-    needs: verify
     permissions:
       contents: write  # action-gh-release 上传 Release 资产
     runs-on: ubuntu-latest
