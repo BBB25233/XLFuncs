@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** REPLACEB · 按字节替换（text 类 B5 批次） */
 
-const TSV = '文本\t说明\n"中文Excel"\t要替换\n"中文测试"\t纯中文';
+const TSV = '文本\t说明\n中文Excel\t要替换\n中文测试\t纯中文';
 
 const replacebEntry: FunctionEntry = {
   id: 'replaceb',

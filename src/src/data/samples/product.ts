@@ -79,7 +79,7 @@ const productEntry: FunctionEntry = {
     {
       title: '示例 3：区域里混了文本也不报错',
       scene: '从系统导出的表里某个系数格是文本（如"暂无"），手写成乘法会崩，PRODUCT 不会。',
-      dataTsv: '系数1\t系数2\t系数3\n2\t"暂无"\t4',
+      dataTsv: '系数1\t系数2\t系数3\n2\t暂无\t4',
       dataAnchor: 'A1',
       formula: '=PRODUCT(A2:C2)',
       result: '2×4 = 8（文本"暂无"被自动跳过）',

@@ -11,7 +11,7 @@ import { ifCalc } from './if';
 import { xlookupCalc } from './xlookup';
 import { textCalc } from './text';
 
-/* ===================== 第一版 v1.0：全部函数注册 ===================== */
+/* ===================== 第二版补齐的 55 个 ===================== */
 // logical（新增 5：IFS / IFERROR / AND / OR / NOT）
 import { ifsCalc, iferrorCalc, andCalc, orCalc, notCalc, trueCalc, falseCalc, xorCalc, switchCalc } from './logical';
 // text（新增 9：LEFT / RIGHT / MID / LEN / TRIM / TEXTJOIN / FIND / SUBSTITUTE / VALUE）
@@ -82,7 +82,7 @@ import { indexCalc, matchCalc, indirectCalc, offsetCalc, rowCalc, columnCalc, un
 // information（3：ISNUMBER / ISBLANK / ISERROR）
 import { isnumberCalc, isblankCalc, iserrorCalc } from './information';
 
-/* ===================== 第一版 v1.0：其余函数（B4–B11，103 个） ===================== */
+/* ===================== 第二版第三波补齐（B4–B11，103 个） ===================== */
 // text（B4 22：数组/文本变换）
 import {
   arraytotextCalc, bahttextCalc, charCalc, cleanCalc, codeCalc, concatCalc, concatenateCalc,
@@ -125,7 +125,7 @@ import { besseliCalc, besseljCalc, besselkCalc, besselyCalc } from './engineerin
 /**
  * 函数注册表：Record<fnId, CalcHandler>，evaluate() 是统一入口。
  *
- * 第一版 v1.0 共 414 个函数，全部在这里逐函数注册，
+ * 第一版只有 5 个样板函数。第二版补齐 55 个，全部在这里逐函数注册，
  * 其余代码一行没改（ADR-A1 的「逐函数切换」能力）。现在 60 个函数全部开放在线试算。
  */
 

@@ -215,6 +215,9 @@ export function lowerRegBeta(a: number, b: number, x: number): number {
     const front = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lbeta) / a;
     return front * betacf(a, b, x);
   }
-  const front = Math.exp(b * Math.log(x) + a * Math.log(1 - x) - lbeta) / b;
+  // 对称分支：I_x(a,b) = 1 - I_{1-x}(b,a)，前项仍用 x^a·(1-x)^b，
+  // 只是除以 b 并改用 betacf(b,a,1-x)。早期这里把 a/b 的指数写反了，
+  // 导致 x 落在对称分支时结果错误（如 I_0.95(20,1) 直接返回 1）。
+  const front = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lbeta) / b;
   return 1 - front * betacf(b, a, 1 - x);
 }

@@ -6,7 +6,7 @@ import type { FunctionEntry } from '@/types';
  */
 
 /** 系数小表：3 个系数，纵向排列在 A2:A4 */
-const COEFF_TSV = '系数\na\n1\n2\n3';
+const COEFF_TSV = '系数\n1\n2\n3';
 
 const seriesumEntry: FunctionEntry = {
   id: 'seriesum',
@@ -98,7 +98,7 @@ const seriesumEntry: FunctionEntry = {
     {
       title: '示例 2：近似算 e^x（泰勒展开前几项）',
       scene: 'e^x ≈ 1 + x + x²/2! + x³/3!，取 x=1 应接近 e≈2.718。',
-      dataTsv: '系数\na\n1\n1\n0.5\n0.1667',
+      dataTsv: '系数\n1\n1\n0.5\n0.1667',
       dataAnchor: 'A1',
       formula: '=SERIESSUM(1, 0, 1, A2:A5)',
       result: '1 + 1 + 0.5 + 0.1667 = 2.6667（项数越多越接近 2.718）',
@@ -108,7 +108,7 @@ const seriesumEntry: FunctionEntry = {
     {
       title: '示例 3：只取偶次项的级数（步长 m=2）',
       scene: '想算 1 + 3·x² + 5·x⁴（只取 0、2、4 次方）。',
-      dataTsv: '系数\na\n1\n3\n5',
+      dataTsv: '系数\n1\n3\n5',
       dataAnchor: 'A1',
       formula: '=SERIESSUM(2, 0, 2, A2:A4)',
       result: '1·2⁰ + 3·2² + 5·2⁴ = 1 + 12 + 80 = 93',

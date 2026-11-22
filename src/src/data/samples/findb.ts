@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** FINDB · 按字节查找位置（text 类 B5 批次） */
 
-const TSV = '文本\t查找\t说明\n"中文Excel"\t"Excel"\t从字节定位\n"数据表ABC"\t"ABC"\t英文子串';
+const TSV = '文本\t查找\t说明\n中文Excel\tExcel\t从字节定位\n数据表ABC\tABC\t英文子串';
 
 const findbEntry: FunctionEntry = {
   id: 'findb',
@@ -78,7 +78,7 @@ const findbEntry: FunctionEntry = {
     {
       title: '示例 2：区分大小写导致找不到',
       scene: '用大写去查小写子串。',
-      dataTsv: '文本\t查找\n"中文excel"\t"Excel"',
+      dataTsv: '文本\t查找\n中文excel\tExcel',
       dataAnchor: 'A1',
       formula: '=FINDB(B2,A2)',
       result: '#VALUE!（大小写不匹配）',

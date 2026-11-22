@@ -64,7 +64,7 @@ const rsqEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=RSQ(C2:C6,B2:B6)',
-      result: '约 0.993（即 99.3% 的销售额波动可由广告费解释）',
+      result: '约 0.9912（即 99.12% 的销售额波动可由广告费解释）',
       explanation: 'R² 极高，说明这组数据的线性拟合非常好（实际业务中很难有这么高的值）。',
     },
     {
@@ -73,7 +73,7 @@ const rsqEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=CORREL(B2:B6,C2:C6)^2',
-      result: '约 0.993（与 RSQ 一致）',
+      result: '约 0.9912（与 RSQ 一致）',
       explanation: 'RSQ = r²，两者可互相验证。注意 RSQ 的参数顺序是 (y, x)，而 CORREL 的顺序无关紧要。',
     },
     {

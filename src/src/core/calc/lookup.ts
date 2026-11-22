@@ -207,7 +207,7 @@ export const uniqueCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 };
 
 /* ============================================================================
- * 以下 7 个函数为查找与引用类的试算实现（第一版 v1.0）。
+ * 以下 7 个函数为第二版补齐的查找与引用类试算实现。
  *
  * 简化说明：
  * - HLOOKUP 仅支持精确匹配（range_lookup 忽略或 FALSE）；首行即 block.header。

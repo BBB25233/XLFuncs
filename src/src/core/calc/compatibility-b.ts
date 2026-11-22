@@ -147,7 +147,9 @@ export const dbcsCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   let out = '';
   for (const ch of inner) {
     const c = ch.codePointAt(0) as number;
-    if (c >= 0x21 && c <= 0x7e) {
+    if (c === 0x20) {
+      out += '\u3000';
+    } else if (c >= 0x21 && c <= 0x7e) {
       out += String.fromCharCode(c - 0x21 + 0xff01);
     } else {
       out += ch;
@@ -166,7 +168,9 @@ export const jisCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   let out = '';
   for (const ch of inner) {
     const c = ch.codePointAt(0) as number;
-    if (c >= 0x21 && c <= 0x7e) {
+    if (c === 0x20) {
+      out += '\u3000';
+    } else if (c >= 0x21 && c <= 0x7e) {
       out += String.fromCharCode(c - 0x21 + 0xff01);
     } else {
       out += ch;
@@ -356,7 +360,8 @@ export const covarCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   for (let i = 0; i < n; i++) {
     cov += (a[i] - ma) * (b[i] - mb);
   }
-  cov /= n - 1;
+  // Excel 的 COVAR 是总体协方差（除以 n）；样本口径由 COVARIANCE.S 提供
+  cov /= n;
   return ok(cov, formatNumber(cov));
 };
 
@@ -376,8 +381,8 @@ export const critbinomCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   if (p < 0 || p > 1) {
     return fail(make(ERROR_CODES.NUM, 'p 必须在 [0,1]', '需满足 0≤p≤1。'));
   }
-  if (alpha < 0 || alpha > 1) {
-    return fail(make(ERROR_CODES.NUM, 'alpha 必须在 [0,1]', '需满足 0≤alpha≤1。'));
+  if (alpha <= 0 || alpha > 1) {
+    return fail(make(ERROR_CODES.NUM, 'alpha 必须在 (0,1]', '需满足 0<alpha≤1，填 0 会报 #NUM!。'));
   }
   for (let k = 0; k <= n; k++) {
     const c = k === n ? 1 : lowerRegBeta(n - k, k + 1, 1 - p);

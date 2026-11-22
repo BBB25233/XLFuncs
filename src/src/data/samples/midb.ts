@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** MIDB · 按字节中间截取（text 类 B5 批次） */
 
-const TSV = '文本\t说明\n"中文Excel中文"\t中英混排\n"AB中文CD"\t中英夹心';
+const TSV = '文本\t说明\n中文Excel中文\t中英混排\nAB中文CD\t中英夹心';
 
 const midbEntry: FunctionEntry = {
   id: 'midb',

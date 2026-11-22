@@ -43,7 +43,7 @@ export default function AboutPage(): ReactElement {
 
       <section className="mb-6">
         <h2 className="mb-2 text-h3 text-ink">版本</h2>
-        <p className="text-sm text-ink-2">v1.3 · 完整框架 + 414 个函数。作者 ID：BBB25</p>
+        <p className="text-sm text-ink-2">v1.4 · 完整框架 + 414 个函数。作者 ID：BBB25</p>
       </section>
     </div>
   );

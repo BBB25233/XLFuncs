@@ -73,7 +73,7 @@ const covarianceSEntry: FunctionEntry = {
       formula: '=COVARIANCE.S(B2:B6,C2:C6/10)',
       result: '约 260（缩小到 1/10，但相关强度其实没变）',
       explanation:
-        '这正是协方差的短板：单位一变数值就变。要判断强弱必须用相关系数 CORREL（本例恒为 0.997）。',
+        '这正是协方差的短板：单位一变数值就变。要判断强弱必须用相关系数 CORREL（本例恒为 0.9956）。',
     },
     {
       title: '示例 3：两组个数不等时报错',

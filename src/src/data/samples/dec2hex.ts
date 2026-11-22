@@ -20,7 +20,25 @@ const dec2hexEntry: FunctionEntry = {
   syntax: { patternCn: '=DEC2HEX(数值, [位数])', patternEn: '=DEC2HEX(number, [places])', args: [{ key: 'number', zh: '数值', en: 'number', required: true, desc: '十进制整数' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '十六进制文本',
-  examples: [{ title: '示例：转十六进制', scene: '十进制 255', dataAnchor: 'A2', formula: '=DEC2HEX(255)', result: 'FF', explanation: '255₁₀ = FF₁₆。' }],
+  examples: [
+    {
+      title: '示例：转十六进制',
+      scene: '十进制 255',
+      dataAnchor: 'A2',
+      formula: '=DEC2HEX(255)',
+      result: 'FF',
+      explanation: '255₁₀ = FF₁₆。',
+    },
+    {
+      title: '示例：负数按 40 位补码输出，−1 是 10 个 F',
+      scene: '温度传感器给的是有符号数 −1，转成十六进制准备填进报文，结果得到一长串 F。',
+      dataAnchor: 'A2',
+      formula: '=DEC2HEX(-1)',
+      result: 'FFFFFFFFFF',
+      explanation:
+        '负十进制一律按 40 位（10 位十六进制）补码输出：−1 就是 10 个 F，不是「-1」也不是 1 个 F。只想要低 4 位（16 位整数）得自己截：=RIGHT(DEC2HEX(-1),4) 得到 FFFF。',
+    },
+  ],
   pitfalls: [{ title: '负数用补码', reason: '负十进制按二进制补码输出。', fix: '负数结果是其补码的十六进制。', level: 'low' }],
   related: [{ id: 'hex2dec', kind: 'companion', why: 'HEX2DEC 与本品类相关' },
     { id: 'dec2bin', kind: 'companion', why: 'DEC2BIN 与本品类相关' },

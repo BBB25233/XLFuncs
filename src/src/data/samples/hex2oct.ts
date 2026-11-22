@@ -20,7 +20,25 @@ const hex2octEntry: FunctionEntry = {
   syntax: { patternCn: '=HEX2OCT(十六进制文本, [位数])', patternEn: '=HEX2OCT(number, [places])', args: [{ key: 'number', zh: '十六进制文本', en: 'number', required: true, desc: '十六进制字符串' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '八进制文本',
-  examples: [{ title: '示例：转八进制', scene: '十六进制 FF', dataAnchor: 'A2', formula: '=HEX2OCT("FF")', result: '377', explanation: 'FF₁₆ = 377₈。' }],
+  examples: [
+    {
+      title: '示例：转八进制',
+      scene: '十六进制 FF',
+      dataAnchor: 'A2',
+      formula: '=HEX2OCT("FF")',
+      result: '377',
+      explanation: 'FF₁₆ = 377₈。',
+    },
+    {
+      title: '示例：0xFFF 是 7777，不能按位硬拼',
+      scene: '权限掩码习惯写八进制，设备文档给的是 0xFFF，想换成 7777 好和配置说明对照。',
+      dataAnchor: 'A2',
+      formula: '=HEX2OCT("FFF")',
+      result: '7777',
+      explanation:
+        '十六进制 1 位对 4 个二进制位、八进制 1 位对 3 个，位数对不齐就不能一位换一位地抄。正确做法是先落到同一个十进制值：FFF₁₆ = 4095₁₀ = 7777₈。',
+    },
+  ],
   pitfalls: [{ title: '位数上限', reason: 'HEX2OCT 最多 10 位八进制。', fix: '位数不超 10。', level: 'low' }],
   related: [{ id: 'oct2hex', kind: 'companion', why: 'OCT2HEX 与本品类相关' },
     { id: 'hex2dec', kind: 'companion', why: 'HEX2DEC 与本品类相关' },

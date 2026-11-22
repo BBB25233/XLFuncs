@@ -2,7 +2,7 @@
 
 [![函数总数](https://img.shields.io/badge/函数-414-4285F4)](https://github.com/BBB25233/XLFuncs/releases)
 [![分类](https://img.shields.io/badge/分类-12-34A853)](https://github.com/BBB25233/XLFuncs/releases)
-[![版本](https://img.shields.io/badge/版本-v1.3-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
+[![版本](https://img.shields.io/badge/版本-v1.4-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
 [![网页端](https://img.shields.io/badge/网页端-单文件离线-9AA0A6)](https://github.com/BBB25233/XLFuncs/releases)
 [![安卓端](https://img.shields.io/badge/安卓端-Capacitor%206-3DDC84)](https://github.com/BBB25233/XLFuncs/releases)
 [![构建](https://img.shields.io/badge/构建-CI%20自动发布-9AA0A6)](https://github.com/BBB25233/XLFuncs/actions)
@@ -30,6 +30,18 @@
 - **单文件离线（网页端）**：交付物是一个独立的 `index-v1.html`，**双击即可打开**，无需联网、无需安装。
 - **原生 App 体验（安卓端）**：返回键逐级回退、侧滑抽屉导航、字号可调、应用图标。
 - **零外部依赖**：页面不引用任何外部网络资源。
+
+---
+
+## 🆕 v1.4 更新
+
+- **以真实 Excel 为准的数值审计**：1587 条内容（示例 + 试算用例）用本机 Excel 逐条复核，自动命中从 174 降到 136。
+- **日期口径修正**：补齐 1900 假闰年补偿（此前所有日期序列号少 1 天），并去掉两处重复补正；`WEEKDAY` / `DATEVALUE` / 债券日期类随之对齐。
+- **30/360 计息修正**：`DAYS360` 改为 NASD 月末规则，整年由 359 天修正为 360。
+- **分位数与排名**：`QUARTILE.INC` 对小数 quart 向零截尾；`PERCENTRANK` 精确命中改用「小于个数/(n-1)」。
+- **数据库函数条件区**：13 个 D 函数的示例条件区落到表格右侧、条件值不再带引号（Excel 口径）；试算仍兼容带引号写法。
+- **数值链订正**：截距 −6→−18、`STDEVA` 41.3→45.63，连带 15 个统计函数。
+- **`DBCS` / `JIS`**：半角空格转全角空格（`Ｕ+3000`）。
 
 ---
 
@@ -200,7 +212,7 @@ data/     数据层：414 条目录、12 个分类包、样板内容、三张样
 ## 👤 作者与版本
 
 - **作者 ID**：`BBB25`
-- **版本**：第一版 `v1.3` · 414 函数 / 12 分类 · 含公式解释器
+- **版本**：第一版 `v1.4` · 414 函数 / 12 分类 · 含公式解释器
 - **形态**：网页单文件（`index-v1.html`）+ 安卓 App（Capacitor 6）
 - **范围**：完整框架 + 全部函数的完整内容，均为「内容完整、可在线试算」的函数，无需等待后续补齐。
 

@@ -156,6 +156,11 @@ export function parseDateText(raw: string): { year: number; month: number; day: 
   const s = String(raw).trim();
   let matched = /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/.exec(s);
   if (matched === null) {
+    // 中文日期：2024年3月15日 / 2024 年 3 月 15 日
+    matched = /^(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?$/.exec(s);
+    if (matched !== null) {
+      return { year: Number(matched[1]), month: Number(matched[2]), day: Number(matched[3]) };
+    }
     matched = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/.exec(s);
     if (matched === null) {
       return null;
@@ -169,7 +174,9 @@ export function parseDateText(raw: string): { year: number; month: number; day: 
 export function dateToSerial(year: number, month: number, day: number): number {
   const target = Date.UTC(year, month - 1, day);
   const base = Date.UTC(1899, 11, 31);
-  return Math.round((target - base) / 86400000);
+  const diff = Math.round((target - base) / 86400000);
+  // Excel 把 1900 当闰年（虚构 1900-02-29，序列号 60），1900-03-01 起整体后移 1 天
+  return diff >= 60 ? diff + 1 : diff;
 }
 
 /** 序列号 → 日期部件；越界 → null */

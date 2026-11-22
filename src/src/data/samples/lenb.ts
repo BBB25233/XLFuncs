@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** LENB · 字节长度（text 类 B5 批次） */
 
-const TSV = '文本\t说明\n"中文"\t纯中文\n"Excel"\t纯英文\n"中文A"\t混排';
+const TSV = '文本\t说明\n中文\t纯中文\nExcel\t纯英文\n中文A\t混排';
 
 const lenbEntry: FunctionEntry = {
   id: 'lenb',

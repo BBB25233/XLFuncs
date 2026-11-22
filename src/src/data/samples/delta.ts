@@ -20,7 +20,26 @@ const deltaEntry: FunctionEntry = {
   syntax: { patternCn: '=DELTA(数1, [数2])', patternEn: '=DELTA(number1, [number2])', args: [{ key: 'a', zh: '数1', en: 'number1', required: true, desc: '第一个数，默认与 0 比较' },
     { key: 'b', zh: '数2', en: 'number2', required: false, desc: '第二个数，默认 0' }] },
   returnValue: '1（相等）或 0（不等）',
-  examples: [{ title: '示例：相等判定', scene: '5 与 5', dataAnchor: 'A2', formula: '=DELTA(5,5)', result: '1', explanation: '两数相等返回 1。' }],
+  examples: [
+    {
+      title: '示例：相等判定',
+      scene: '5 与 5',
+      dataAnchor: 'A2',
+      formula: '=DELTA(5,5)',
+      result: '1',
+      explanation: '两数相等返回 1。',
+    },
+    {
+      title: '示例：来料实测值是否与标准值完全一致',
+      scene: '检验时要数出「实测和标准一模一样」的批次，差一点点也算不合格，正好用 0/1 打标记再 SUM 求件数。',
+      dataTsv: '物料\t标准值\t实测值\nA\t10\t10\nB\t10\t10.02',
+      dataAnchor: 'A1',
+      formula: '=DELTA(B2,C2)',
+      result: '1（A 行 10 与 10 完全一样）；B 行 10 与 10.02 → 0',
+      explanation:
+        'DELTA 判的是「完全相等」，差 0.02 也返回 0，它不带公差、也不四舍五入，要按公差判就用 GESTEP。另外省略第 2 参数时它比的是 0：=DELTA(B2) 只有 B2 正好等于 0 才返回 1，这是最容易误解的用法。',
+    },
+  ],
   pitfalls: [{ title: '只判相等', reason: '不像 IF 能返回任意值。', fix: '要其他结果用 IF。', level: 'low' }],
   related: [{ id: 'gestep', kind: 'companion', why: 'GESTEP 与本品类相关' },
     { id: 'if', kind: 'companion', why: 'IF 与本品类相关' },

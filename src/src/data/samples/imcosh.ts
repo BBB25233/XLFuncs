@@ -19,7 +19,25 @@ const imcoshEntry: FunctionEntry = {
   summary: 'IMCOSH 返回复数的双曲余弦。',
   syntax: { patternCn: '=IMCOSH(复数)', patternEn: '=IMCOSH(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数双曲余弦',
-  examples: [{ title: '示例：双曲余弦', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMCOSH("1+i")', result: 'NaN+NaNi', explanation: '按 cosh 复数公式算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 cosh(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的双曲余弦长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMCOSH("1+i")',
+      result: '0.83373+0.988898i',
+      explanation: '按 cosh(x+yi)=cosh x·cos y+i·sinh x·sin y 算得，虚部符号和 IMCOS 正好相反。',
+    },
+    {
+      title: '示例 2：算有损传输线的双曲余弦',
+      scene: '有损线用 γl=0.8+1.2i 描述（0.8 奈培衰减、1.2 弧度相移），cosh(γl) 是拼输入阻抗的一半。',
+      dataAnchor: 'A2',
+      formula: '=IMCOSH("0.8+1.2i")',
+      result: '0.48463+0.827749i',
+      explanation:
+        '实部 0.48463、虚部 0.827749，结果仍是复数文本。它和 IMSINH 的 0.321812+1.246542i 是同一组「cosh / sinh」，双曲和三角别混。',
+    },
+  ],
   pitfalls: [{ title: '与 IMCOS 区分', reason: '双曲与三角别混。', fix: '双曲用 IMCOSH。', level: 'low' }],
   related: [{ id: 'imcos', kind: 'companion', why: 'IMCOS 与本品类相关' },
     { id: 'imsinh', kind: 'companion', why: 'IMSINH 与本品类相关' },

@@ -19,7 +19,25 @@ const imsinhEntry: FunctionEntry = {
   summary: 'IMSINH 返回复数的双曲正弦。',
   syntax: { patternCn: '=IMSINH(复数)', patternEn: '=IMSINH(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数双曲正弦',
-  examples: [{ title: '示例：双曲正弦', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMSINH("1+i")', result: 'NaN+NaNi', explanation: '按 sinh 复数公式算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 sinh(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的双曲正弦长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMSINH("1+i")',
+      result: '0.634964+1.298458i',
+      explanation: '按 sinh(x+yi)=sinh x·cos y+i·cosh x·sin y 算得，实部虚部正好和 IMSIN 对调。',
+    },
+    {
+      title: '示例 2：算有损传输线的双曲正弦',
+      scene: '有损线的衰减用 sinh(γl) 表述，γl 取 0.8+1.2i（0.8 奈培衰减、1.2 弧度相移）。',
+      dataAnchor: 'A2',
+      formula: '=IMSINH("0.8+1.2i")',
+      result: '0.321812+1.246542i',
+      explanation:
+        '实部 0.321812、虚部 1.246542。结果还是复数文本，i 后缀不能删；它和三角的 IMSIN 是两个函数，别只凭名字当成一个。',
+    },
+  ],
   pitfalls: [{ title: '与 IMSIN 区分', reason: '双曲与三角别混。', fix: '双曲用 IMSINH。', level: 'low' }],
   related: [{ id: 'imsin', kind: 'companion', why: 'IMSIN 与本品类相关' },
     { id: 'imcosh', kind: 'companion', why: 'IMCOSH 与本品类相关' },

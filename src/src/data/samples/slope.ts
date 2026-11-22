@@ -70,8 +70,8 @@ const slopeEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=INTERCEPT(C2:C6,B2:B6)',
-      result: '约 -6（截距 a）；结合斜率 10.4 得 y = -6 + 10.4x',
-      explanation: '有了斜率和截距就能手算预测值：x=60 时 y ≈ -6 + 624 = 618。',
+      result: '约 -18（截距 a）；结合斜率 10.4 得 y = -18 + 10.4x',
+      explanation: '有了斜率和截距就能手算预测值：x=60 时 y ≈ -18 + 624 = 606。',
     },
     {
       title: '示例 3：x 完全无波动时报 #DIV/0!',

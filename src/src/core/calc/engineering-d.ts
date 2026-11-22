@@ -79,10 +79,17 @@ function besselI(x: number, n: number): number {
 function y0Series(x: number): number {
   const h = x / 2;
   const j0 = besselJ(x, 0);
+  // 逐项递推：t_k = H_k/(k!)²·h^{2k}，t_{k+1}/t_k = (H_{k+1}/H_k)·h²/(k+1)²
+  // 直接算 factorial(k) 与 h^{2k} 会在 x≥4 时先后溢出成 Infinity，得到 NaN
   let sum = 0;
+  let term = h * h;
+  let hk = 1;
   for (let k = 1; k < 600; k += 1) {
-    const term = (harmonic(k) / Math.pow(factorial(k), 2)) * Math.pow(h, 2 * k);
     sum += (k % 2 === 1 ? 1 : -1) * term; // (-1)^{k+1}
+    const hNext = hk + 1 / (k + 1);
+    term *= ((hNext / hk) * (h * h)) / ((k + 1) * (k + 1));
+    hk = hNext;
+    if (Math.abs(term) < 1e-17 * Math.max(1, Math.abs(sum))) break;
   }
   return (2 / Math.PI) * ((Math.log(h) + GAMMA) * j0 + sum);
 }
@@ -90,12 +97,18 @@ function y0Series(x: number): number {
 function y1Series(x: number): number {
   const h = x / 2;
   const j1 = besselJ(x, 1);
-  // DLMF 10.8.2：Y_1 = (2/π)(ln(x/2)+γ)J_1 - 2/(πx) - (1/π) Σ_{k≥0} (-1)^k (H_k+H_{k+1})/(k!(k+1)!) (x/2)^{2k+1}
+  // DLMF 10.8.2；同样用逐项递推避免阶乘与幂次的中间量溢出
+  // u_k = (H_k+H_{k+1})/(k!(k+1)!)·h^{2k+1}
   let sum = 0;
+  let term = h;
+  let hk = 0;
   for (let k = 0; k < 600; k += 1) {
-    const term =
-      ((harmonic(k) + harmonic(k + 1)) / (factorial(k) * factorial(k + 1))) * Math.pow(h, 2 * k + 1);
     sum += (k % 2 === 0 ? 1 : -1) * term; // (-1)^k
+    const hk1 = hk + 1 / (k + 1);
+    const hk2 = hk1 + 1 / (k + 2);
+    term *= ((hk1 + hk2) / (hk + hk1)) * ((h * h) / ((k + 1) * (k + 2)));
+    hk = hk1;
+    if (Math.abs(term) < 1e-17 * Math.max(1, Math.abs(sum))) break;
   }
   return (2 / Math.PI) * ((Math.log(h) + GAMMA) * j1) - 2 / (Math.PI * x) - sum / Math.PI;
 }

@@ -75,20 +75,20 @@ const dcountaEntry: FunctionEntry = {
     {
       title: '示例 1：按类型筛选',
       scene: '统计「水果」的计数（含文本，非空即数）。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\n苹果\t水果\t1000\t10\t\t水果\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DCOUNTA(A1:D5,"销售额",G1:H2)',
-      result: '2',
-      explanation: '水果两行销售额都非空，计数=2。'
+      formula: '=DCOUNTA(A1:D5,"销售额",F1:F2)',
+      result: '3',
+      explanation: '水果有三行（两只苹果、一个橙子），销售额都非空，计数=3。条件区放在表格右侧 F1:F2：第 1 行写列名「类型」，第 2 行写条件值「水果」，和数据库的表头一字不差才认。'
     },
     {
       title: '示例 2：多条件',
       scene: '「水果且数量>9」的计数（含文本，非空即数）。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\t数量\n苹果\t水果\t1000\t10\t\t水果\t>9\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DCOUNTA(A1:D5,"销售额",G1:H3)',
-      result: '1',
-      explanation: '水果且数量>9 仅 1 行非空，计数=1。'
+      formula: '=DCOUNTA(A1:D5,"销售额",F1:G2)',
+      result: '2',
+      explanation: '同一行的两个条件之间是「且」：类型=水果、数量>9。三行水果只有数量 10 和 12 的两只苹果过关，销售额都非空，计数=2。条件区 F1:G2 的行是「且」，另起一行才是「或」。'
     }
   ],
   pitfalls: [

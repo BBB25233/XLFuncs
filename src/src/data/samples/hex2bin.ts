@@ -20,7 +20,25 @@ const hex2binEntry: FunctionEntry = {
   syntax: { patternCn: '=HEX2BIN(十六进制文本, [位数])', patternEn: '=HEX2BIN(number, [places])', args: [{ key: 'number', zh: '十六进制文本', en: 'number', required: true, desc: '十六进制字符串' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '二进制文本',
-  examples: [{ title: '示例：转二进制', scene: '十六进制 F', dataAnchor: 'A2', formula: '=HEX2BIN("F")', result: '1111', explanation: 'F₁₆ = 1111₂。' }],
+  examples: [
+    {
+      title: '示例：转二进制',
+      scene: '十六进制 F',
+      dataAnchor: 'A2',
+      formula: '=HEX2BIN("F")',
+      result: '1111',
+      explanation: 'F₁₆ = 1111₂。',
+    },
+    {
+      title: '示例：补到 8 位才好按字节看位',
+      scene: '读到一个十六进制字节 1F，想看它 8 个 bit 分别是多少，直接转出来只有 5 位，对不齐。',
+      dataAnchor: 'A2',
+      formula: '=HEX2BIN("1F",8)',
+      result: '00011111',
+      explanation:
+        '1F₁₆ = 31₁₀ = 11111₂，用第 2 参数补到 8 位就是 00011111，从左到右正好是 bit7…bit0。不写第 2 参数只会得到 11111，位数少了容易数错位。',
+    },
+  ],
   pitfalls: [{ title: '位数上限', reason: 'HEX2BIN 最多 10 位二进制。', fix: '位数不超 10。', level: 'low' }],
   related: [{ id: 'bin2hex', kind: 'companion', why: 'BIN2HEX 与本品类相关' },
     { id: 'hex2dec', kind: 'companion', why: 'HEX2DEC 与本品类相关' },

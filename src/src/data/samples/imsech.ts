@@ -19,7 +19,25 @@ const imsechEntry: FunctionEntry = {
   summary: 'IMSECH 返回复数的双曲余割 = 1/cosh。',
   syntax: { patternCn: '=IMSECH(复数)', patternEn: '=IMSECH(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数双曲余割',
-  examples: [{ title: '示例：双曲余割', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMSECH("1+i")', result: 'NaN+NaNi', explanation: '1/cosh 算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 sech(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的 sech（双曲余弦的倒数）长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMSECH("1+i")',
+      result: '0.498337-0.591084i',
+      explanation: '就是 1/cosh，结果仍是带 i 后缀的复数文本，虚部符号和 IMSEC 相反。',
+    },
+    {
+      title: '示例 2：有损线上取 1/cosh',
+      scene: '算反射系数要在分母上放 cosh(γl)，取它的倒数直接用 IMSECH，γl=0.8+1.2i。',
+      dataAnchor: 'A2',
+      formula: '=IMSECH("0.8+1.2i")',
+      result: '0.526751-0.899693i',
+      explanation:
+        '得 0.526751−0.899693i，乘上 IMCOSH 的 0.48463+0.827749i 约为 1。它和 IMSEC（1/cos）不是同一个函数，别看到名字像就替用。',
+    },
+  ],
   pitfalls: [{ title: '与 IMCSCH 区分', reason: '双曲与三角别混。', fix: '双曲用 IMSECH。', level: 'low' }],
   related: [{ id: 'imcsch', kind: 'companion', why: 'IMCSCH 与本品类相关' },
     { id: 'imcosh', kind: 'companion', why: 'IMCOSH 与本品类相关' },

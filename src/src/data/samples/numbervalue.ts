@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** NUMBERVALUE · 按指定分隔符把文本转数字（text 类 B5 批次） */
 
-const TSV = '文本\t说明\n"1.234,56"\t欧式(点千分位逗号小数)\n"1,234.56"\t英式(逗号千分位点小数)\n"1 234,56"\t空格千分位';
+const TSV = '文本\t说明\n1.234,56\t欧式(点千分位逗号小数)\n1,234.56\t英式(逗号千分位点小数)\n1 234,56\t空格千分位';
 
 const numbervalueEntry: FunctionEntry = {
   id: 'numbervalue',

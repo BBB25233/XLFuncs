@@ -60,7 +60,7 @@ const stdevaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEVA(B2:B5)',
-      result: '约 41.3（把「缺考」当 0 后，4 个值的样本标准差）',
+      result: '约 45.63（把「缺考」当 0 后，4 个值的样本标准差）',
       explanation: '四个值 85、0、72、0 参与计算，波动很大，符合「缺考拉大差距」的直觉。',
     },
     {
@@ -69,7 +69,7 @@ const stdevaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEV.S(B2:B5)',
-      result: '约 44.8（只算 85、72、0 三个数字）',
+      result: '约 45.79（只算 85、72、0 三个数字）',
       explanation:
         'STDEV.S 跳过文本只算 3 个数，STDEVA 算 4 个（补 0）。分母不同结果就不同——要用哪个，取决于业务上「缺考算不算 0 分」。',
     },

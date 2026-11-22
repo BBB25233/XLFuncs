@@ -20,7 +20,25 @@ const oct2hexEntry: FunctionEntry = {
   syntax: { patternCn: '=OCT2HEX(八进制文本, [位数])', patternEn: '=OCT2HEX(number, [places])', args: [{ key: 'number', zh: '八进制文本', en: 'number', required: true, desc: '八进制字符串' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '十六进制文本',
-  examples: [{ title: '示例：转十六进制', scene: '八进制 377', dataAnchor: 'A2', formula: '=OCT2HEX("377")', result: 'FF', explanation: '377₈ = FF₁₆。' }],
+  examples: [
+    {
+      title: '示例：转十六进制',
+      scene: '八进制 377',
+      dataAnchor: 'A2',
+      formula: '=OCT2HEX("377")',
+      result: 'FF',
+      explanation: '377₈ = FF₁₆。',
+    },
+    {
+      title: '示例：777 换成十六进制是 1FF，不是按位抄',
+      scene: '同一组开关，配置文件一处写八进制 777、一处写十六进制，得确认两边其实是同一个值。',
+      dataAnchor: 'A2',
+      formula: '=OCT2HEX("777")',
+      result: '1FF',
+      explanation:
+        '777₈ = 511₁₀ = 1FF₁₆。八进制 3 位一组、十六进制 4 位一组，位数对不齐就必须整体换算；能用同一个十进制数对上，才算两边真的一致。',
+    },
+  ],
   pitfalls: [{ title: '位数上限', reason: 'OCT2HEX 最多 10 位十六进制。', fix: '位数不超 10。', level: 'low' }],
   related: [{ id: 'hex2oct', kind: 'companion', why: 'HEX2OCT 与本品类相关' },
     { id: 'oct2dec', kind: 'companion', why: 'OCT2DEC 与本品类相关' },

@@ -19,7 +19,25 @@ const hex2decEntry: FunctionEntry = {
   summary: 'HEX2DEC 把最多 10 位的十六进制文本转成十进制整数，最高位为符号位。',
   syntax: { patternCn: '=HEX2DEC(十六进制文本)', patternEn: '=HEX2DEC(number)', args: [{ key: 'number', zh: '十六进制文本', en: 'number', required: true, desc: '十六进制字符串（A-F 不区分大小写）' }] },
   returnValue: '十进制整数',
-  examples: [{ title: '示例：转十进制', scene: '十六进制 FF', dataAnchor: 'A2', formula: '=HEX2DEC("FF")', result: '255', explanation: 'FF₁₆ = 255₁₀。' }],
+  examples: [
+    {
+      title: '示例：转十进制',
+      scene: '十六进制 FF',
+      dataAnchor: 'A2',
+      formula: '=HEX2DEC("FF")',
+      result: '255',
+      explanation: 'FF₁₆ = 255₁₀。',
+    },
+    {
+      title: '示例：10 个 F 是 −1，不是天文数字',
+      scene: '硬件手册给的是 10 位十六进制补码，直接丢给 HEX2DEC，结果冒出来一个负数。',
+      dataAnchor: 'A2',
+      formula: '=HEX2DEC("FFFFFFFFFF")',
+      result: '-1',
+      explanation:
+        '十六进制的最高位（第 40 位）是符号位，最高位为 1 就按补码算成负数。9 个 F 还是正数 68719476735，第 10 个 F 补上就变成 −1——多半说明这个字段本来就是有符号的。',
+    },
+  ],
   pitfalls: [{ title: '字母大小写无关', reason: 'A-F 与 a-f 等价。', fix: '混用大小写无妨。', level: 'low' }],
   related: [{ id: 'dec2hex', kind: 'companion', why: 'DEC2HEX 与本品类相关' },
     { id: 'hex2bin', kind: 'companion', why: 'HEX2BIN 与本品类相关' },

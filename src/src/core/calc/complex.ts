@@ -141,8 +141,10 @@ export function complexText(re: number, im: number, suffix: 'i' | 'j' = 'i'): st
   if (im === 0) return String(re);
   const sign = im < 0 ? '-' : '+';
   const imAbs = Math.abs(im);
-  if (re === 0) return `${imAbs}${suffix}`;
-  return `${re}${sign}${imAbs}${suffix}`;
+  // Excel 在系数为 1 时省略数字：2+1i 写作 2+i，1i 写作 i
+  const tail = imAbs === 1 ? suffix : `${imAbs}${suffix}`;
+  if (re === 0) return im < 0 ? `-${tail}` : tail;
+  return `${re}${sign}${tail}`;
 }
 
 // ============================================================================

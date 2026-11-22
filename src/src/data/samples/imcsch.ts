@@ -19,7 +19,25 @@ const imcschEntry: FunctionEntry = {
   summary: 'IMCSCH 返回复数的双曲正割 = 1/sinh。',
   syntax: { patternCn: '=IMCSCH(复数)', patternEn: '=IMCSCH(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数双曲正割',
-  examples: [{ title: '示例：双曲正割', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMCSCH("1+i")', result: 'NaN+NaNi', explanation: '1/sinh 算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 csch(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的 csch（双曲正弦的倒数）长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMCSCH("1+i")',
+      result: '0.303931-0.621518i',
+      explanation: '就是 1/sinh，结果仍是带 i 后缀的复数文本。',
+    },
+    {
+      title: '示例 2：有损线上取 1/sinh',
+      scene: '同一条有损线，这次要双曲正弦的倒数（串接支节参数常用），γl 取 0.8+1.2i。',
+      dataAnchor: 'A2',
+      formula: '=IMCSCH("0.8+1.2i")',
+      result: '0.194163-0.752093i',
+      explanation:
+        '得 0.194163−0.752093i，乘上 IMSINH 的 0.321812+1.246542i 约为 1。输入让 sinh 为 0（比如 0）会报 #NUM!，那是函数的奇点。',
+    },
+  ],
   pitfalls: [{ title: '与 IMCSC 区分', reason: '双曲与三角别混。', fix: '双曲用 IMCSCH。', level: 'low' }],
   related: [{ id: 'imsech', kind: 'companion', why: 'IMSECH 与本品类相关' },
     { id: 'imsinh', kind: 'companion', why: 'IMSINH 与本品类相关' },

@@ -84,7 +84,7 @@ const linestEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=LINEST(C2:C6,B2:B6)',
-      result: '约 {10.4, -6}（斜率 10.4、截距 -6）',
+      result: '约 {10.4, -18}（斜率 10.4、截距 -18）',
       explanation: '结果是一行两列：先斜率后截距（注意顺序是反的）。与 SLOPE、INTERCEPT 结果一致。',
     },
     {

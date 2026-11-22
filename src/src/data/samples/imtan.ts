@@ -19,7 +19,25 @@ const imtanEntry: FunctionEntry = {
   summary: 'IMTAN 返回复数的正切 = sin/cos。',
   syntax: { patternCn: '=IMTAN(复数)', patternEn: '=IMTAN(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数正切',
-  examples: [{ title: '示例：正切', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMTAN("1+i")', result: 'NaN+NaNi', explanation: 'sin/cos 算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 tan(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的正切长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMTAN("1+i")',
+      result: '0.271753+1.083923i',
+      explanation: 'IMTAN 内部就是 sin/cos 相除，结果仍是带 i 后缀的复数文本。',
+    },
+    {
+      title: '示例 2：算传输线输入阻抗里的 tan(γl)',
+      scene: '微波里用 tan(γl) 求一段线的归一化输入阻抗，电长度取 0.5+0.5i（0.5 弧度相位、0.5 衰减）。',
+      dataAnchor: 'A2',
+      formula: '=IMTAN("0.5+0.5i")',
+      result: '0.403896+0.564083i',
+      explanation:
+        '得 0.403896+0.564083i，还是 a+bi 文本。它的倒数正是 IMCOT 的 0.83914−1.171945i，两者相乘约为 1，可以互相验算。',
+    },
+  ],
   pitfalls: [{ title: '与 IMCOT 互逆', reason: 'tan 与 cot 互为倒数。', fix: 'cot 用 IMCOT。', level: 'low' }],
   related: [{ id: 'imcot', kind: 'companion', why: 'IMCOT 与本品类相关' },
     { id: 'imsin', kind: 'companion', why: 'IMSIN 与本品类相关' },

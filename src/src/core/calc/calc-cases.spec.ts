@@ -7,7 +7,7 @@ import { loadFunction } from '@/data/loadFunction';
 import { allIds } from '@/data';
 
 /**
- * 通用试算验收（覆盖全部 414 个函数）。
+ * 通用试算验收（覆盖全部 60 函数，含第二版补齐的 55 个）。
  *
  * 不手写为每个函数写 describe 块——直接遍历每个函数的 calc.cases，
  * 用 evaluateEntry 跑一遍，并断言结果与 case.expect 一致：

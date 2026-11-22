@@ -2153,7 +2153,7 @@
       "协方差"
     ],
     "alias": [
-      "样本协方差"
+      "总体协方差"
     ],
     "keywords": [
       "covar",
@@ -4691,18 +4691,18 @@
   {
     "id": "imcsc",
     "enName": "IMCSC",
-    "zhName": "复数正割",
+    "zhName": "复数余割",
     "zhCommon": [
       "IMCSC",
-      "复数正割"
+      "复数余割"
     ],
     "alias": [
-      "复正割"
+      "复余割"
     ],
     "keywords": [
       "imcsc",
       "复数",
-      "正割"
+      "余割"
     ],
     "category": "engineering",
     "difficulty": 4,
@@ -4710,8 +4710,8 @@
     "minVersion": "all",
     "oneLiner": "算复数的正割",
     "status": "published",
-    "abbr": "fszg",
-    "pinyin": "fushuzhengge"
+    "abbr": "fsyg",
+    "pinyin": "fushuyuge"
   },
   {
     "id": "imcsch",
@@ -4941,18 +4941,18 @@
   {
     "id": "imsec",
     "enName": "IMSEC",
-    "zhName": "复数余割",
+    "zhName": "复数正割",
     "zhCommon": [
       "IMSEC",
-      "复数余割"
+      "复数正割"
     ],
     "alias": [
-      "复余割"
+      "复正割"
     ],
     "keywords": [
       "imsec",
       "复数",
-      "余割"
+      "正割"
     ],
     "category": "engineering",
     "difficulty": 4,
@@ -4960,8 +4960,8 @@
     "minVersion": "all",
     "oneLiner": "算复数的余割",
     "status": "published",
-    "abbr": "fsyg",
-    "pinyin": "fushuyuge"
+    "abbr": "fszg",
+    "pinyin": "fushuzhengge"
   },
   {
     "id": "imsech",

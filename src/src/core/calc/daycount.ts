@@ -46,12 +46,21 @@ function actualDays(d1: YMD, d2: YMD): number {
 export function dayCount(basis: DayCountBasis, d1: YMD, d2: YMD): number {
   switch (basis) {
     case 0: {
-      // US 30/360
+      // US 30/360（NASD）：
+      // 起始日是月末 → 记 30 号；结束日是月末时，起始日早于 30 号 → 顺延到下月 1 日，
+      // 否则也记 30 号。早期实现只做了 min(30, day)，会把 1/1→12/31 算成 359。
       let { year: y1, month: m1, day: dd1 } = d1;
       let { year: y2, month: m2, day: dd2 } = d2;
-      if (isLastDayOfFeb(d1)) dd1 = 30;
-      if (isLastDayOfFeb(d2) && dd1 === 30) dd2 = 30;
-      const v = 360 * (y2 - y1) + 30 * (m2 - m1) + (Math.min(30, dd2) - Math.min(30, dd1));
+      if (dd1 === daysInMonth(y1, m1)) dd1 = 30;
+      if (dd2 === daysInMonth(y2, m2)) {
+        if (dd1 < 30) {
+          m2 += 1;
+          dd2 = 1;
+        } else {
+          dd2 = 30;
+        }
+      }
+      const v = 360 * (y2 - y1) + 30 * (m2 - m1) + (dd2 - dd1);
       return Math.abs(v);
     }
     case 4: {

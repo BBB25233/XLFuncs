@@ -44,7 +44,7 @@ const discEntry: FunctionEntry = {
     ],
     template: '=DISC({settlement},{maturity},{pr},{redemption},{basis})',
     cases: [
-      { label: '贴现率 0.02507', type: 'ok', values: {}, expect: '0.02507', note: '价格97.5、赎回100、一年期。' },
+      { label: '贴现率 0.025', type: 'ok', values: {}, expect: '0.025', note: '价格97.5、赎回100、整年 30/360：2.5/100×360/360。' },
       { label: '结算日晚于到期日', type: 'error', values: { settlement: '2008-12-31', maturity: '2008-01-01' }, expect: '#NUM!', note: '结算日须早于到期日。' },
       { label: '价格为0', type: 'error', values: { pr: '0' }, expect: '#NUM!', note: 'pr 必须 > 0。' },
       { label: '基准非法', type: 'error', values: { basis: '5' }, expect: '#VALUE!', note: 'basis 只能是 0–4。' },

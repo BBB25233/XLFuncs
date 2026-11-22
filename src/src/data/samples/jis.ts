@@ -19,7 +19,8 @@ const jisEntry: FunctionEntry = {
   summary: 'JIS 将半角（单字节）英数标点转为全角（双字节），用于日文等排版。',
   syntax: { patternCn: '=JIS(文本)', patternEn: '=JIS(text)', args: [{ key: 't', zh: '文本', en: 'text', required: true, desc: '含半角字符的文本' }] },
   returnValue: '全角文本',
-  examples: [{ title: '示例：半角转全角', scene: '半角 ABC', dataAnchor: 'A2', formula: '=JIS(A2)', result: 'ＡＢＣ', explanation: '半角字母变全角。' }],
+  examples: [{ title: '示例：半角转全角', scene: '半角 ABC', dataAnchor: 'A2', formula: '=JIS(A2)', result: 'ＡＢＣ', explanation: '半角字母变全角。' },
+    { title: '示例 2：编号补成全角填日文表单', scene: '要往日文格式的申请表里填编号，对方要求全角，A-01 这种半角写法得先转成全角再贴。', dataTsv: '编号\nA-01', dataAnchor: 'A1', formula: '=JIS(A2)', result: 'Ａ－０１（字母、数字和连字符 - 全部变成全角）', explanation: 'JIS 把半角 0x21–0x7E 的字符逐个换成对应全角，连字符也不例外；半角空格 0x20 不在范围内，不会变宽。' }],
   pitfalls: [{ title: '与 DBCS 类似', reason: '两者都做半→全转换。', fix: '按区域习惯选用。', level: 'low' }],
   related: [{ id: 'asc', kind: 'companion', why: 'ASC 与本品类相关' },
     { id: 'dbcs', kind: 'companion', why: 'DBCS 与本品类相关' },
@@ -32,6 +33,8 @@ const jisEntry: FunctionEntry = {
     cases: [
       { label: '半角转全角', type: 'ok', values: {}, expect: 'ＡＢＣ', note: '半角字母转成对应的全角字母。' },
       { label: '缺少文本', type: 'error', values: { t: '' }, expect: '#VALUE!', note: 'JIS 需要一个文本参数。' },
+      { label: '只输入半角空格', type: 'error', values: { t: ' ' }, expect: '#VALUE!', note: '空格会被当成空参数，JIS 依然报「缺少文本」。' },
+      { label: '只输入制表符', type: 'error', values: { t: '\t' }, expect: '#VALUE!', note: '只剩一个制表符时同样是空文本，先把要转换的字符补进去。' },
     ],
   },
   meta: { updatedAt: '2026-08-31', status: 'published', customEdited: false },

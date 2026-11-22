@@ -116,11 +116,11 @@ function buildBaseCalc(src: 'bin' | 'oct' | 'hex' | 'dec', dest: 'bin' | 'oct' |
       if (dest === 'bin' && (value < -(1n << 9n) || value > (1n << 9n) - 1n)) {
         return fail(make(ERROR_CODES.NUM, 'DEC2BIN 只支持 -512…511 的整数，超范围报 #NUM!。', '把数字控制在 -512 到 511 之间。'));
       }
-      if (dest === 'oct' && (value < -(1n << 29n) + 1n || value > (1n << 29n) - 1n)) {
-        return fail(make(ERROR_CODES.NUM, 'DEC2OCT 只支持 -2^29+1…2^29-1 的整数，超范围报 #NUM!。', '把数字控制在 -536870911 到 536870911 之间。'));
+      if (dest === 'oct' && (value < -(1n << 29n) || value > (1n << 29n) - 1n)) {
+        return fail(make(ERROR_CODES.NUM, 'DEC2OCT 只支持 -2^29+1…2^29-1 的整数，超范围报 #NUM!。', '把数字控制在 -536870912 到 536870911 之间。'));
       }
-      if (dest === 'hex' && (value < -(1n << 39n) + 1n || value > (1n << 39n) - 1n)) {
-        return fail(make(ERROR_CODES.NUM, 'DEC2HEX 只支持 -2^39+1…2^39-1 的整数，超范围报 #NUM!。', '把数字控制在 -549755813887 到 549755813887 之间。'));
+      if (dest === 'hex' && (value < -(1n << 39n) || value > (1n << 39n) - 1n)) {
+        return fail(make(ERROR_CODES.NUM, 'DEC2HEX 只支持 -2^39+1…2^39-1 的整数，超范围报 #NUM!。', '把数字控制在 -549755813888 到 549755813887 之间。'));
       }
     } else {
       const info = SRC_WIDTH[src];
@@ -129,6 +129,18 @@ function buildBaseCalc(src: 'bin' | 'oct' | 'hex' | 'dec', dest: 'bin' | 'oct' |
         return fail(make(ERROR_CODES.NUM, '文本里有超出当前进制的字符或位数超限，Excel 报 #NUM!。', '确认文本只含该进制的合法字符（二进制 0/1、八进制 0-7、十六进制 0-9/A-F），且不超过 10 位。'));
       }
       value = r.value;
+    }
+
+    // 源不是十进制时，还要确认目标进制放得下（如 HEX2BIN("200")=512 超出 10 位）
+    if (src !== 'dec' && dest !== 'dec') {
+      const bits = dest === 'bin' ? 10 : dest === 'oct' ? 30 : 40;
+      const min = -(1n << BigInt(bits - 1));
+      const max = (1n << BigInt(bits - 1)) - 1n;
+      if (value < min || value > max) {
+        return fail(
+          make(ERROR_CODES.NUM, '结果超出目标进制的表示范围，Excel 报 #NUM!。', '先确认这个数在目标进制里放得下，或改用数值更大的函数。'),
+        );
+      }
     }
 
     if (dest === 'dec') {
@@ -140,9 +152,18 @@ function buildBaseCalc(src: 'bin' | 'oct' | 'hex' | 'dec', dest: 'bin' | 'oct' |
     const placesRaw = (ctx.args.places ?? '').trim();
     if (placesRaw !== '' && value >= 0n) {
       const p = parseNumberArg(placesRaw, ctx.sheet);
-      if (p !== null && Number.isInteger(p) && p > 0) {
-        return ok(out, out.padStart(p, '0'));
+      if (p === null) {
+        return fail(make(ERROR_CODES.VALUE, 'places 不是数字，Excel 报 #VALUE!。', 'places 要写成整数，如 8。'));
       }
+      if (!Number.isInteger(p) || p <= 0) {
+        return fail(make(ERROR_CODES.NUM, 'places 必须是正整数，Excel 报 #NUM!。', '把 places 改成 1 以上的整数，或直接省略它。'));
+      }
+      if (p < out.length) {
+        return fail(
+          make(ERROR_CODES.NUM, 'places 比结果位数还小，放不下，Excel 报 #NUM!。', `把 places 改成 ${out.length} 以上，或省略它。`),
+        );
+      }
+      return ok(out, out.padStart(p, '0'));
     }
     return ok(out, out);
   };
@@ -225,10 +246,12 @@ export const bitlshiftCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   const s = bitInput(ctx.args.shift ?? '', ctx.sheet);
   if (!a.ok) return failBit(a.error);
   if (!s.ok) return failBit(s.error);
-  if (!Number.isInteger(Number(s.value))) {
+  const shift = Number(s.value);
+  if (!Number.isInteger(shift) || Math.abs(shift) > 53) {
     return failBit(ERROR_CODES.NUM);
   }
-  const r = a.value << s.value;
+  // 负位移方向相反：BITLSHIFT(-n) 等价于 BITRSHIFT(n)
+  const r = shift >= 0 ? a.value << BigInt(shift) : a.value >> BigInt(-shift);
   if (r < 0n || r > BIT_MAX) {
     return failBit(ERROR_CODES.NUM);
   }
@@ -240,10 +263,12 @@ export const bitrshiftCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   const s = bitInput(ctx.args.shift ?? '', ctx.sheet);
   if (!a.ok) return failBit(a.error);
   if (!s.ok) return failBit(s.error);
-  if (!Number.isInteger(Number(s.value))) {
+  const shift = Number(s.value);
+  if (!Number.isInteger(shift) || Math.abs(shift) > 53) {
     return failBit(ERROR_CODES.NUM);
   }
-  const r = a.value >> s.value;
+  // 负位移方向相反：BITRSHIFT(-n) 等价于 BITLSHIFT(n)
+  const r = shift >= 0 ? a.value >> BigInt(shift) : a.value << BigInt(-shift);
   if (r < 0n || r > BIT_MAX) {
     return failBit(ERROR_CODES.NUM);
   }

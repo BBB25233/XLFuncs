@@ -44,7 +44,7 @@ const accrintmEntry: FunctionEntry = {
     ],
     template: '=ACCRINTM({issue},{maturity},{rate},{par},{basis})',
     cases: [
-      { label: '年末应计 99.722222', type: 'ok', values: {}, expect: '99.722222', note: '面值1000、票面10%、全年应计。' },
+      { label: '年末应计 100', type: 'ok', values: {}, expect: '100', note: '面值1000、票面10%、整年 360/360 应计。' },
       { label: '票面率非数字', type: 'error', values: { rate: 'abc' }, expect: '#VALUE!', note: 'rate 必须是数字。' },
       { label: '到期日早于发行日', type: 'error', values: { maturity: '2008-01-01', issue: '2008-07-01' }, expect: '#NUM!', note: '到期日须晚于发行日。' },
       { label: '面值非数字', type: 'error', values: { par: 'abc' }, expect: '#VALUE!', note: 'par 必须是数字。' },

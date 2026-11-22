@@ -60,7 +60,7 @@ const varaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=VARA(B2:B5)',
-      result: '约 1706（STDEVA ≈ 41.3，41.3² ≈ 1706）',
+      result: '约 2082（STDEVA ≈ 45.63，45.63² ≈ 2082）',
       explanation: '四个值 85、0、72、0 参与，方差数值很大，反映了缺考造成的分化。',
     },
     {
@@ -69,7 +69,7 @@ const varaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=VAR.S(B2:B5)',
-      result: '约 2008（只算 85、72、0 三个数字）',
+      result: '约 2096（只算 85、72、0 三个数字）',
       explanation: 'VAR.S 跳过文本只算 3 个数，VARA 算 4 个（补 0）。业务口径决定该用哪个。',
     },
     {
@@ -78,7 +78,7 @@ const varaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=SQRT(VARA(B2:B5))',
-      result: '41.3（与 STDEVA 一致）',
+      result: '45.63（与 STDEVA 一致）',
       explanation: 'SQRT(VARA(...)) = STDEVA(...)，可用来交叉验证。',
     },
   ],

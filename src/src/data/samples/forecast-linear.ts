@@ -73,7 +73,7 @@ const forecastLinearEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=FORECAST.LINEAR(60,C2:C6,B2:B6)',
-      result: '约 618',
+      result: '约 606',
       explanation: '历史范围是 10–50，预测 60 属于轻度外推，结论可用但需谨慎。',
     },
     {
@@ -82,7 +82,7 @@ const forecastLinearEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=INTERCEPT(C2:C6,B2:B6)+SLOPE(C2:C6,B2:B6)*60',
-      result: '约 618（与 FORECAST.LINEAR 一致）',
+      result: '约 606（与 FORECAST.LINEAR 一致）',
       explanation: '两者等价，可用来交叉验证公式是否写对。',
     },
     {
@@ -91,7 +91,7 @@ const forecastLinearEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=FORECAST.LINEAR(1000,C2:C6,B2:B6)',
-      result: '约 10394（数学上正确，但业务上毫无意义）',
+      result: '约 10382（数学上正确，但业务上毫无意义）',
       explanation:
         '线性模型不会自动「饱和」。离开历史范围越远，结论越不可信——这是误用预测函数最常见的问题。',
     },

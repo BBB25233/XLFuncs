@@ -60,8 +60,8 @@ const stdevpaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEVPA(B2:B5)',
-      result: '约 35.8（85、0、72、0 四个值的总体标准差）',
-      explanation: '除以 n=4（而非 n−1=3），所以结果比 STDEVA 的 41.3 小。',
+      result: '约 39.52（85、0、72、0 四个值的总体标准差）',
+      explanation: '除以 n=4（而非 n−1=3），所以结果比 STDEVA 的 45.63 小。',
     },
     {
       title: '示例 2：与 STDEVA 的差别（除数不同）',
@@ -69,7 +69,7 @@ const stdevpaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEVA(B2:B5)',
-      result: '约 41.3（除以 n−1=3）',
+      result: '约 45.63（除以 n−1=3）',
       explanation: 'STDEVA 用 n−1、STDEVPA 用 n。全量数据用 PA，抽样数据用 A。',
     },
     {

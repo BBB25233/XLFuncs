@@ -121,12 +121,14 @@ export const quartileExcCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 export const quartileIncCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   const q = toNumber(ctx.args.quart);
   if (q === null) return fail(make(ERROR_CODES.VALUE, 'quart 必须是数字', 'quart 取 0~4'));
-  if (!Number.isInteger(q) || q < 0 || q > 4) {
-    return fail(make(ERROR_CODES.NUM, 'quart 必须是 0 到 4 的整数', 'QUARTILE.INC 支持 0~4'));
+  if (q < 0 || q > 4) {
+    return fail(make(ERROR_CODES.NUM, 'quart 超出 0~4', 'QUARTILE.INC 只接受 0 到 4，小数会向零截尾。'));
   }
+  // Excel 对非整数 quart 向零截尾：0.25 → 0（取最小值），3.9 → 3
+  const qi = Math.trunc(q);
   const { nums, fail: f } = sliceNums(ctx.sheet, ctx.args.array ?? '');
   if (f) return f;
-  const r = percentileInc(nums, q / 4);
+  const r = percentileInc(nums, qi / 4);
   if (Number.isNaN(r)) return fail(make(ERROR_CODES.NUM, '无法计算四分位', '请检查数据区域'));
   return ok(r, formatNumber(r));
 };

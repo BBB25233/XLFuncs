@@ -20,7 +20,26 @@ const gestepEntry: FunctionEntry = {
   syntax: { patternCn: '=GESTEP(数, [阈值])', patternEn: '=GESTEP(number, [step])', args: [{ key: 'n', zh: '数', en: 'number', required: true, desc: '要比较的数' },
     { key: 'step', zh: '阈值', en: 'step', required: false, desc: '阈值，默认 0' }] },
   returnValue: '1（≥阈值）或 0',
-  examples: [{ title: '示例：阈值判定', scene: '8 是否 ≥ 5', dataAnchor: 'A2', formula: '=GESTEP(8,5)', result: '1', explanation: '8≥5 返回 1。' }],
+  examples: [
+    {
+      title: '示例：阈值判定',
+      scene: '8 是否 ≥ 5',
+      dataAnchor: 'A2',
+      formula: '=GESTEP(8,5)',
+      result: '1',
+      explanation: '8≥5 返回 1。',
+    },
+    {
+      title: '示例：偏差在 0.05 公差内算合格，一列 0/1 标出来',
+      scene: '实测值与标准值的偏差要控制在 0.05 以内，想一个公式直接得到合格/不合格，再 SUM 数出合格件数。',
+      dataTsv: '物料\t标准值\t实测值\nA\t10\t10.02\nB\t10\t10.09',
+      dataAnchor: 'A1',
+      formula: '=GESTEP(0.05,ABS(C2-B2))',
+      result: '1（A 行偏差 0.02，没超公差）；B 行偏差 0.09 → 0',
+      explanation:
+        'GESTEP 判的是「第 1 个 ≥ 第 2 个」，把公差放前面、实际偏差放后面，得到的 1 就是「偏差没超公差」。注意是 ≥ 不是 >：偏差正好 0.05 也算合格，要求严格小于就得改用 IF。',
+    },
+  ],
   pitfalls: [{ title: '与 DELTA 区别', reason: 'GESTEP 是 ≥，DELTA 是 =。', fix: '相等用 DELTA、≥ 用 GESTEP。', level: 'low' }],
   related: [{ id: 'delta', kind: 'companion', why: 'DELTA 与本品类相关' },
     { id: 'if', kind: 'companion', why: 'IF 与本品类相关' },

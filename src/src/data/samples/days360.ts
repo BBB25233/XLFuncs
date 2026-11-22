@@ -24,7 +24,7 @@ const days360Entry: FunctionEntry = {
   },
   oneLiner: '按 30/360 银行约定算两日期天数',
   summary:
-    '算债券利息、贷款计息时，银行不按真实日历，而是「每月 30 天、每年 360 天」。DAYS360 就是这套约定下的天数。它和真实的 DAYS 结果不同（比如整年算 359 天而非 365），金融对账务必用同一套。',
+    '算债券利息、贷款计息时，银行不按真实日历，而是「每月 30 天、每年 360 天」。DAYS360 就是这套约定下的天数。它和真实的 DAYS 结果不同（比如整年算 360 天而非 365），金融对账务必用同一套。',
   syntax: {
     patternCn: '=DAYS360(开始日, 结束日, [方法])',
     patternEn: '=DAYS360(start_date, end_date, [method])',
@@ -71,8 +71,8 @@ const days360Entry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=DAYS360(A2,B2)',
-      result: '359（每月30天：11×30 + 30−1）',
-      explanation: '从 1/1 到 12/31，按 30/360 约定得 359 天，而非真实 365。',
+      result: '360（每月30天：12×30）',
+      explanation: '从 1/1 到 12/31，按 US 30/360 约定得 360 天（欧式口径 359），而非真实 365。',
     },
     {
       title: '示例 2：半年计息',
@@ -96,7 +96,7 @@ const days360Entry: FunctionEntry = {
   pitfalls: [
     {
       title: '和真实 DAYS 结果混用对不上账',
-      reason: 'DAYS360 整年算 359 天，DAYS 算 365 天，金融对账必须用同一口径。',
+      reason: 'DAYS360 整年算 360 天，DAYS 算 365 天，金融对账必须用同一口径。',
       fix: '利息/债券统一用 DAYS360；日常天数用 DAYS。',
       level: 'high',
     },
@@ -142,7 +142,7 @@ const days360Entry: FunctionEntry = {
     ],
     template: '=DAYS360({start_date},{end_date},{method})',
     cases: [
-      { label: '全年 30/360 = 359', type: 'ok', values: {}, expect: '359', note: '美式，每月 30 天' },
+      { label: '全年 30/360 = 359', type: 'ok', values: {}, expect: '360', note: '美式，每月 30 天' },
       { label: '半年 = 180', type: 'ok', values: { start_date: '"2024-1-15"', end_date: '"2024-7-15"' }, expect: '180', note: '6 个月 × 30' },
       { label: '欧式 2/29→3/1 = 2', type: 'ok', values: { start_date: '"2024-2-29"', end_date: '"2024-3-1"', method: 'TRUE' }, expect: '2', note: '欧式月末规则不同' },
       { label: '开始日非法 → #VALUE!', type: 'error', values: { start_date: '"bad"', end_date: '"2024-12-31"' }, expect: '#VALUE!', note: '开始日必须是合法日期' },

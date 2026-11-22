@@ -38,8 +38,8 @@ import { yearFraction } from './daycount';
  * 时补 1，保证与 serialToParts 互逆、且 WEEKDAY 的周几与 Excel 一致。
  */
 function toExcelSerial(year: number, month: number, day: number): number {
-  const t = dateToSerial(year, month, day);
-  return t >= 60 ? t + 1 : t;
+  // dateToSerial 已包含 1900 假闰年的补正，这里不要再加 1（历史重复补偿会导致整层日期多一天）
+  return dateToSerial(year, month, day);
 }
 
 /** 解析日期参数：序列号或日期文本 → {year,month,day}；非法 → null */

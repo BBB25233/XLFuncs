@@ -75,20 +75,20 @@ const dmaxEntry: FunctionEntry = {
     {
       title: '示例 1：按类型筛选',
       scene: '统计「水果」的最大值。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\n苹果\t水果\t1000\t10\t\t水果\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DMAX(A1:D5,"销售额",G1:H2)',
-      result: '1000',
-      explanation: '水果销售额最大 1000。'
+      formula: '=DMAX(A1:D5,"销售额",F1:F2)',
+      result: '1200',
+      explanation: '三行水果里最大销售额是 1200。'
     },
     {
       title: '示例 2：多条件',
       scene: '「水果且数量>9」的最大值。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\t数量\n苹果\t水果\t1000\t10\t\t水果\t>9\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DMAX(A1:D5,"销售额",G1:H3)',
-      result: '1000',
-      explanation: '水果且数量>9 最大 1000。'
+      formula: '=DMAX(A1:D5,"销售额",F1:G2)',
+      result: '1200',
+      explanation: '水果且数量>9 的两行里最大仍是 1200。'
     }
   ],
   pitfalls: [

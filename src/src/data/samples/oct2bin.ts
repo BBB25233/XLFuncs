@@ -20,7 +20,25 @@ const oct2binEntry: FunctionEntry = {
   syntax: { patternCn: '=OCT2BIN(八进制文本, [位数])', patternEn: '=OCT2BIN(number, [places])', args: [{ key: 'number', zh: '八进制文本', en: 'number', required: true, desc: '八进制字符串' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '二进制文本',
-  examples: [{ title: '示例：转二进制', scene: '八进制 72', dataAnchor: 'A2', formula: '=OCT2BIN("72")', result: '111010', explanation: '72₈ = 111010₂。' }],
+  examples: [
+    {
+      title: '示例：转二进制',
+      scene: '八进制 72',
+      dataAnchor: 'A2',
+      formula: '=OCT2BIN("72")',
+      result: '111010',
+      explanation: '72₈ = 111010₂。',
+    },
+    {
+      title: '示例：1 位八进制正好展开成 3 位二进制',
+      scene: '八进制权限位 777 想拆成 9 个开关看，一位对三位最省事。',
+      dataAnchor: 'A2',
+      formula: '=OCT2BIN("777")',
+      result: '111111111',
+      explanation:
+        '每 1 位八进制对应 3 位二进制：7→111、7→111、7→111，拼起来 9 个 1。777₈ = 511₁₀，正好是 10 位补码能表示的最大正数，再大就溢出了。',
+    },
+  ],
   pitfalls: [{ title: '位数上限', reason: 'OCT2BIN 最多 10 位二进制。', fix: '位数不超 10。', level: 'low' }],
   related: [{ id: 'bin2oct', kind: 'companion', why: 'BIN2OCT 与本品类相关' },
     { id: 'oct2dec', kind: 'companion', why: 'OCT2DEC 与本品类相关' },

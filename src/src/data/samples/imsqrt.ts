@@ -19,7 +19,25 @@ const imsqrtEntry: FunctionEntry = {
   summary: 'IMSQRT 返回复数的主平方根（复数）。',
   syntax: { patternCn: '=IMSQRT(复数)', patternEn: '=IMSQRT(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数平方根',
-  examples: [{ title: '示例：平方根', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMSQRT("1+i")', result: 'NaN+NaNi', explanation: '按复数开方公式算得主值。' }],
+  examples: [
+    {
+      title: '示例 1：算 √(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它开方后是多少。',
+      dataAnchor: 'A2',
+      formula: '=IMSQRT("1+i")',
+      result: '1.098684+0.45509i',
+      explanation: '平方根有两个值，Excel 只返回主值（虚部符号跟着原数走），结果仍是复数文本。',
+    },
+    {
+      title: '示例 2：极坐标开方：模开方、幅角减半',
+      scene: '阻抗变换要把 5+12i 开方：模是 13、辐角 67.38°，开方后模变成 √13、辐角只剩一半。',
+      dataAnchor: 'A2',
+      formula: '=IMSQRT("5+12i")',
+      result: '3+2i',
+      explanation:
+        '按「模开方、幅角减半」得 √13≈3.6056 和 33.69°，换回直角坐标正好是 3+2i（因为 (3+2i)²=5+12i），所以结果不是 3.6056 这种单个数字。对负数开方也不报错：SQRT(−4) 给 #NUM!，IMSQRT(−4) 给主值 2i。',
+    },
+  ],
   pitfalls: [{ title: '取主值', reason: '平方根有两值，取主值。', fix: '理解主值即可。', level: 'low' }],
   related: [{ id: 'impower', kind: 'companion', why: 'IMPOWER 与本品类相关' },
     { id: 'imexp', kind: 'companion', why: 'IMEXP 与本品类相关' },

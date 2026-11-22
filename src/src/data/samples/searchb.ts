@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** SEARCHB · 按字节查找位置（不区分大小写/支持通配符，text 类 B5 批次） */
 
-const TSV = '文本\t查找\t说明\n"中文Excel"\t"excel"\t忽略大小写\n"数据表A*C"\t"A*C"\t通配符';
+const TSV = '文本\t查找\t说明\n中文Excel\texcel\t忽略大小写\n数据表A*C\tA*C\t通配符';
 
 const searchbEntry: FunctionEntry = {
   id: 'searchb',

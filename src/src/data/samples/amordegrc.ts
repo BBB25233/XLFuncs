@@ -47,7 +47,7 @@ const amordegrcEntry: FunctionEntry = {
     ],
     template: '=AMORDEGRC({cost},{date},{first},{salvage},{period},{rate},{basis})',
     cases: [
-      { label: '首期折旧 897.5', type: 'ok', values: {}, expect: '897.5', note: '成本2400、残值300、折旧率15%、首期。' },
+      { label: '首期折旧 900', type: 'ok', values: {}, expect: '900', note: '成本2400、残值300、折旧率15%、首期。' },
       { label: '成本非数字', type: 'error', values: { cost: 'abc' }, expect: '#VALUE!', note: 'cost 必须是数字。' },
       { label: '买入日晚于首期', type: 'error', values: { date: '2008-12-31', first: '2008-01-01' }, expect: '#NUM!', note: '买入日须早于首期结束日。' },
       { label: '折旧率<=0', type: 'error', values: { rate: '0' }, expect: '#NUM!', note: 'rate 必须为正。' },

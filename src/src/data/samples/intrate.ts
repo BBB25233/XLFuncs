@@ -44,7 +44,7 @@ const intrateEntry: FunctionEntry = {
     ],
     template: '=INTRATE({settlement},{maturity},{investment},{redemption},{basis})',
     cases: [
-      { label: '利率 0.050139', type: 'ok', values: {}, expect: '0.050139', note: '投资10000、赎回10500、一年期贴现利率。' },
+      { label: '利率 0.05', type: 'ok', values: {}, expect: '0.05', note: '投资10000、赎回10500、一年期贴现利率。' },
       { label: '结算日晚于到期日', type: 'error', values: { settlement: '2008-12-31', maturity: '2008-01-01' }, expect: '#NUM!', note: '结算日须早于到期日。' },
       { label: '投资额为0', type: 'error', values: { investment: '0' }, expect: '#NUM!', note: 'investment 必须 > 0。' },
       { label: '基准非法', type: 'error', values: { basis: '5' }, expect: '#VALUE!', note: 'basis 只能是 0–4。' },

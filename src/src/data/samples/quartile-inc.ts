@@ -135,7 +135,7 @@ const quartileIncEntry: FunctionEntry = {
       { label: 'Q2=quart2 中位数', type: 'ok', values: { array: 'A2:A9', quart: '2' }, expect: '82.5', note: 'INC Q2' },
       { label: 'Q1=quart1', type: 'ok', values: { array: 'A2:A9', quart: '1' }, expect: '73.75', note: 'INC Q1' },
       { label: 'quart=5 报错', type: 'error', values: { array: 'A2:A9', quart: '5' }, expect: '#NUM!', note: 'quart>4' },
-      { label: 'quart=0.5 报错', type: 'error', values: { array: 'A2:A9', quart: '0.5' }, expect: '#NUM!', note: 'quart 须整数' },
+      { label: 'quart=0.5 → 60', type: 'ok', values: { array: 'A2:A9', quart: '0.5' }, expect: '60', note: 'Excel 对小数 quart 向零截尾，0.5 → 0 取最小值' },
       { label: 'quart 非数字', type: 'error', values: { array: 'A2:A9', quart: 'abc' }, expect: '#VALUE!', note: 'quart 必须数字' },
     ],
   },

@@ -303,7 +303,8 @@ export const percentrankCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   if (countEq === 0) {
     return fail(make(ERROR_CODES.NA, '要查的值不在区域里，没有它的排名。', '确认这个值确实出现在区域中。'));
   }
-  const rp = (countLess + 0.5 * countEq) / (n - 1);
+  // 精确命中时 Excel 直接用「小于 x 的个数 /(n-1)」；插值公式只在两值之间才用
+  const rp = countLess / (n - 1);
   const factor = Math.pow(10, sig);
   const roundedRp = Math.round(rp * factor) / factor;
   return ok(rp, formatNumber(roundedRp));

@@ -20,7 +20,25 @@ const bin2hexEntry: FunctionEntry = {
   syntax: { patternCn: '=BIN2HEX(二进制文本, [位数])', patternEn: '=BIN2HEX(number, [places])', args: [{ key: 'number', zh: '二进制文本', en: 'number', required: true, desc: '二进制字符串' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '十六进制文本',
-  examples: [{ title: '示例：转十六进制', scene: '二进制 1111', dataAnchor: 'A2', formula: '=BIN2HEX("1111")', result: 'F', explanation: '1111₂ = F₁₆。' }],
+  examples: [
+    {
+      title: '示例：转十六进制',
+      scene: '二进制 1111',
+      dataAnchor: 'A2',
+      formula: '=BIN2HEX("1111")',
+      result: 'F',
+      explanation: '1111₂ = F₁₆。',
+    },
+    {
+      title: '示例：第 2 参数补齐位数，按 4 位十六进制对齐',
+      scene: '设备手册把寄存器地址都写成 4 位十六进制，1111 这种短串要补成 000F 才好逐位对照。',
+      dataAnchor: 'A2',
+      formula: '=BIN2HEX("1111",4)',
+      result: '000F',
+      explanation:
+        '第 2 参数是「最少位数」，不够就在左边补 0，所以 1111₂ 会变成 000F 而不是 F。补位只对非负结果生效：负数本来就按 10 位补码满宽输出，再补也没意义。',
+    },
+  ],
   pitfalls: [{ title: 'places 不足报错', reason: '结果位数超过 places 会 #NUM!。', fix: 'places 取足够大或省略。', level: 'low' }],
   related: [{ id: 'hex2bin', kind: 'companion', why: 'HEX2BIN 与本品类相关' },
     { id: 'bin2dec', kind: 'companion', why: 'BIN2DEC 与本品类相关' },

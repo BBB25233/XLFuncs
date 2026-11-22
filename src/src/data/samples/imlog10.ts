@@ -19,7 +19,25 @@ const imlog10Entry: FunctionEntry = {
   summary: 'IMLOG10 返回以 10 为底的复数对数 = IMLN/ln10。',
   syntax: { patternCn: '=IMLOG10(复数)', patternEn: '=IMLOG10(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数常用对数',
-  examples: [{ title: '示例：常用对数', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMLOG10("1+i")', result: 'NaN+NaNi', explanation: 'IMLN 除以 ln10。' }],
+  examples: [
+    {
+      title: '示例 1：算 log10(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的常用对数长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMLOG10("1+i")',
+      result: '0.150515+0.341094i',
+      explanation: '就是 IMLN(1+i) 的实部、虚部各除以 ln10，结果仍是复数文本。',
+    },
+    {
+      title: '示例 2：复数增益换算成分贝',
+      scene: '某频点的传递函数是 3+4i（模 5、辐角 53.13°），要按 20·log10 换算成 dB。',
+      dataAnchor: 'A2',
+      formula: '=IMLOG10("3+4i")',
+      result: '0.69897+0.402719i',
+      explanation:
+        '实部 0.69897 就是 log10(5)，乘 20 得 13.98 dB；虚部 0.402719 是辐角 0.9273 弧度除以 ln10。负数取对数也不会报错，而是给复数主值：IMLOG10("−1") 得 1.364376i（对应辐角 π）。',
+    },
+  ],
   pitfalls: [{ title: '以 10 为底', reason: '不是自然对数。', fix: '自然对数用 IMLN。', level: 'low' }],
   related: [{ id: 'imln', kind: 'companion', why: 'IMLN 与本品类相关' },
     { id: 'imlog2', kind: 'companion', why: 'IMLOG2 与本品类相关' },

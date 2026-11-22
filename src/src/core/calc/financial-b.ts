@@ -61,10 +61,8 @@ function ser(d: YMD): number {
 
 /** 转 Excel 序列号（含 1900 闰年 bug 修正：1900-02-28 之后的日期 +1）。 */
 function excelSerial(d: YMD): number {
-  const s = dateToSerial(d.year, d.month, d.day);
-  const t = Date.UTC(d.year, d.month - 1, d.day);
-  const base = Date.UTC(1900, 1, 28); // 1900-02-28
-  return t > base ? s + 1 : s;
+  // dateToSerial 已含 1900 假闰年补正，这里不再重复 +1
+  return dateToSerial(d.year, d.month, d.day);
 }
 
 /* 本地 addMonths / 日期比较（daycount 内部未导出，这里复制一份） */

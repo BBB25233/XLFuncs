@@ -19,7 +19,25 @@ const imcosEntry: FunctionEntry = {
   summary: 'IMCOS 返回复数的余弦（结果仍是复数）。',
   syntax: { patternCn: '=IMCOS(复数)', patternEn: '=IMCOS(inumber)', args: [{ key: 'n', zh: '复数', en: 'inumber', required: true, desc: '复数文本' }] },
   returnValue: '复数余弦',
-  examples: [{ title: '示例：余弦', scene: '复数 1+i', dataAnchor: 'A2', formula: '=IMCOS("1+i")', result: 'NaN+NaNi', explanation: '按 cos 复数公式算得。' }],
+  examples: [
+    {
+      title: '示例 1：算 cos(1+i)',
+      scene: '手上只有一个复数 1+i，想看看它的余弦长什么样。',
+      dataAnchor: 'A2',
+      formula: '=IMCOS("1+i")',
+      result: '0.83373-0.988898i',
+      explanation: '按 cos(x+yi)=cos x·cosh y−i·sin x·sinh y 拆开算得，结果仍是复数文本。',
+    },
+    {
+      title: '示例 2：取正交解调的同相分量',
+      scene: '正交解调要同时拿同相（cos）和正交（sin）两路分量，相位 2 弧度、衰减 0.5 的 2+0.5i 交给 IMCOS。',
+      dataAnchor: 'A2',
+      formula: '=IMCOS("2+0.5i")',
+      result: '-0.469258-0.473831i',
+      explanation:
+        '实部 −0.469258、虚部 −0.473831。它和 IMSIN 的 1.025347−0.216852i 一起构成这一时刻的两路正交分量，两个都是带 i 后缀的复数文本。',
+    },
+  ],
   pitfalls: [{ title: '结果为复数', reason: '别当实数用。', fix: '结果是复数文本。', level: 'low' }],
   related: [{ id: 'imsin', kind: 'companion', why: 'IMSIN 与本品类相关' },
     { id: 'imcosh', kind: 'companion', why: 'IMCOSH 与本品类相关' },

@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** TEXTSPLIT · 按分隔符拆分成数组（text 类 B5 批次，Microsoft 365） */
 
-const TSV = '文本\t说明\n"苹果,香蕉,橙子"\t逗号分隔\n"北/京/市"\t斜杠分隔';
+const TSV = '文本\t说明\n苹果,香蕉,橙子\t逗号分隔\n北/京/市\t斜杠分隔';
 
 const textsplitEntry: FunctionEntry = {
   id: 'textsplit',
@@ -77,12 +77,12 @@ const textsplitEntry: FunctionEntry = {
     },
     {
       title: '示例 2：同时按行、列拆分',
-      scene: '文本里有换行（分行）和逗号（分列）。',
-      dataTsv: '文本\n"甲,1\n乙,2"',
+      scene: '一个单元格里同时有点号（分行）和竖线（分列），要拆成 2×2。',
+      dataTsv: '文本\n甲|1;乙|2',
       dataAnchor: 'A1',
-      formula: '=TEXTSPLIT(A2,,",")',
+      formula: '=TEXTSPLIT(A2,"|",";")',
       result: '甲 1 / 乙 2（两行两列）',
-      explanation: '省略列分隔符、行分隔符用换行符，实现行列二维拆分。',
+      explanation: '先按 ; 分行、再按 | 分列。单元格内没法存换行，所以用一个显式行分隔符演示二维拆分。',
     },
     {
       title: '示例 3：中英逗号都支持',

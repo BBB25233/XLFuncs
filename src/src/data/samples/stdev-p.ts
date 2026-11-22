@@ -61,8 +61,8 @@ const stdevPEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEV.P(B2:B6)',
-      result: '约 5.91 分',
-      explanation: '因为这就是全部数据，除以 n=5，得到总体标准差 5.91，可直接用于描述这批学生的分化程度。',
+      result: '约 5.89 分',
+      explanation: '因为这就是全部数据，除以 n=5，得到总体标准差 5.89，可直接用于描述这批学生的分化程度。',
     },
     {
       title: '示例 2：与 STDEV.S 的差别',
@@ -70,7 +70,7 @@ const stdevPEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STDEV.S(B2:B6)',
-      result: '约 6.61 分（比 P 版本的 5.91 大）',
+      result: '约 6.58 分（比 P 版本的 5.89 大）',
       explanation: 'S 除以 n−1=4、P 除以 n=5，所以 S 更大。全量数据用 P 才准确。',
     },
     {

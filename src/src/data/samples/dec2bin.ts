@@ -20,7 +20,25 @@ const dec2binEntry: FunctionEntry = {
   syntax: { patternCn: '=DEC2BIN(数值, [位数])', patternEn: '=DEC2BIN(number, [places])', args: [{ key: 'number', zh: '数值', en: 'number', required: true, desc: '十进制整数（-512~511）' },
     { key: 'places', zh: '位数', en: 'places', required: false, desc: '结果最少位数' }] },
   returnValue: '二进制文本',
-  examples: [{ title: '示例：转二进制', scene: '十进制 100', dataAnchor: 'A2', formula: '=DEC2BIN(100)', result: '1100100', explanation: '100₁₀ = 1100100₂。' }],
+  examples: [
+    {
+      title: '示例：转二进制',
+      scene: '十进制 100',
+      dataAnchor: 'A2',
+      formula: '=DEC2BIN(100)',
+      result: '1100100',
+      explanation: '100₁₀ = 1100100₂。',
+    },
+    {
+      title: '示例：负十进制的输出是 10 位补码，不是加个负号',
+      scene: '寄存器里读到的有符号数是 −1，要换成二进制去和硬件手册逐位对照。',
+      dataAnchor: 'A2',
+      formula: '=DEC2BIN(-1)',
+      result: '1111111111',
+      explanation:
+        'DEC2BIN 只支持 −512~511，负数按 10 位补码输出：−1 是 10 个 1、−2 是 1111111110、−512 是 1000000000。位数不是「刚好够用」，而是一律 10 位。',
+    },
+  ],
   pitfalls: [{ title: '范围限制', reason: '超出 -512~511 会 #NUM!。', fix: '范围外先拆算。', level: 'mid' }],
   related: [{ id: 'bin2dec', kind: 'companion', why: 'BIN2DEC 与本品类相关' },
     { id: 'dec2hex', kind: 'companion', why: 'DEC2HEX 与本品类相关' },

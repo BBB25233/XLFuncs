@@ -61,8 +61,8 @@ const varPEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=VAR.P(B2:B6)',
-      result: '约 34.96（因为 STDEV.P ≈ 5.91，5.91² ≈ 34.96）',
-      explanation: '全量数据除以 n=5。若这是抽样，就该改用 VAR.S（结果约 43.7）。',
+      result: '约 34.64（因为 STDEV.P ≈ 5.89，5.89² ≈ 34.64）',
+      explanation: '全量数据除以 n=5。若这是抽样，就该改用 VAR.S（结果约 43.3）。',
     },
     {
       title: '示例 2：用 SQRT 验证与 STDEV.P 的关系',
@@ -70,7 +70,7 @@ const varPEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=SQRT(VAR.P(B2:B6))',
-      result: '5.91（与 STDEV.P 完全一致）',
+      result: '5.89（与 STDEV.P 完全一致）',
       explanation: 'SQRT(VAR.P(...)) = STDEV.P(...)，这是检查公式是否用对的好办法。',
     },
     {

@@ -75,20 +75,20 @@ const dvarpEntry: FunctionEntry = {
     {
       title: '示例 1：按类型筛选',
       scene: '统计「水果」的总体方差。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\n苹果\t水果\t1000\t10\t\t水果\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DVARP(A1:D5,"销售额",G1:H2)',
-      result: '10000',
-      explanation: '水果销售额 1000、800 的总体方差=10000。'
+      formula: '=DVARP(A1:D5,"销售额",F1:F2)',
+      result: '26666.666667',
+      explanation: '三行水果总体方差 ≈ 26666.67。'
     },
     {
       title: '示例 2：多条件',
       scene: '「水果且数量>9」的总体方差。',
-      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\t数量\n苹果\t水果\t1000\t10\t\t水果\t>9\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
       dataAnchor: 'A1',
-      formula: '=DVARP(A1:D5,"销售额",G1:H3)',
-      result: '0',
-      explanation: '仅 1 行时方差为 0。'
+      formula: '=DVARP(A1:D5,"销售额",F1:G2)',
+      result: '10000',
+      explanation: '两行总体方差 = 10000。'
     }
   ],
   pitfalls: [

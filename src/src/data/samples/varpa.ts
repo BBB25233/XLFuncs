@@ -60,8 +60,8 @@ const varpaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=VARPA(B2:B5)',
-      result: '约 1280（STDEVPA ≈ 35.8，35.8² ≈ 1280）',
-      explanation: '除以 n=4。若这是抽样数据，就该改用 VARA（结果约 1706）。',
+      result: '约 1562（STDEVPA ≈ 39.52，39.52² ≈ 1562）',
+      explanation: '除以 n=4。若这是抽样数据，就该改用 VARA（结果约 2082）。',
     },
     {
       title: '示例 2：与 VARA 的差别（除数不同）',
@@ -69,7 +69,7 @@ const varpaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=VARA(B2:B5)',
-      result: '约 1706（除以 n−1=3）',
+      result: '约 2082（除以 n−1=3）',
       explanation: 'VARA 用 n−1、VARPA 用 n。全量用 VARPA，抽样用 VARA。',
     },
     {
@@ -78,7 +78,7 @@ const varpaEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=SQRT(VARPA(B2:B5))',
-      result: '35.8（与 STDEVPA 一致）',
+      result: '39.52（与 STDEVPA 一致）',
       explanation: 'SQRT(VARPA(...)) = STDEVPA(...)，可用于交叉验证。',
     },
   ],

@@ -2,7 +2,7 @@ import type { FunctionEntry } from '@/types';
 
 /** RIGHTB · 按字节从右截取（text 类 B5 批次） */
 
-const TSV = '文本\t说明\n"Excel中文"\t英文前后\n"数据表ABC"\t中文在前';
+const TSV = '文本\t说明\nExcel中文\t英文前后\n数据表ABC\t中文在前';
 
 const rightbEntry: FunctionEntry = {
   id: 'rightb',

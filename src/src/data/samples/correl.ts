@@ -61,7 +61,7 @@ const correlEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=CORREL(B2:B6,C2:C6)',
-      result: '约 0.997（极强正相关）',
+      result: '约 0.9956（极强正相关）',
       explanation: '广告费增加时销售额同步上升，r 接近 1，说明两者高度线性相关。',
     },
     {

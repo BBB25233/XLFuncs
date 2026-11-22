@@ -61,7 +61,7 @@ const pearsonEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=PEARSON(B2:B6,C2:C6)',
-      result: '约 0.997（与 =CORREL(B2:B6,C2:C6) 完全相同）',
+      result: '约 0.9956（与 =CORREL(B2:B6,C2:C6) 完全相同）',
       explanation: '两者数学等价，选一个用即可。',
     },
     {
@@ -70,7 +70,7 @@ const pearsonEntry: FunctionEntry = {
       dataTsv: 'x\ty\n1\t5\n2\t2\n3\t8\n4\t3\n5\t6',
       dataAnchor: 'A1',
       formula: '=PEARSON(A2:A6,B2:B6)',
-      result: '约 0.3（弱相关）',
+      result: '约 0.199（弱相关）',
       explanation: '接近 0 表示线性关系很弱，不能据此下结论说两者有关联。',
     },
     {

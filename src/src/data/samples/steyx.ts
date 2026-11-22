@@ -61,8 +61,8 @@ const steyxEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=STEYX(C2:C6,B2:B6)',
-      result: '约 14.3（即预测值典型偏差约 ±14.3）',
-      explanation: '配合 FORECAST 的预测值，可给出「实际值大概在预测值 ±14.3 附近」的判断。',
+      result: '约 17.89（即预测值典型偏差约 ±17.89）',
+      explanation: '配合 FORECAST 的预测值，可给出「实际值大概在预测值 ±17.89 附近」的判断。',
     },
     {
       title: '示例 2：构造约 95% 的预测区间',
@@ -70,9 +70,9 @@ const steyxEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=FORECAST.LINEAR(60,C2:C6,B2:B6)',
-      result: '约 618（x=60 时的预测值）',
+      result: '约 606（x=60 时的预测值）',
       explanation:
-        '经验做法：预测区间 ≈ 618 ± 2×14.3，即约 589～647。汇报预测时给区间比给单点更专业。',
+        '经验做法：预测区间 ≈ 606 ± 2×17.89，即约 570～642。汇报预测时给区间比给单点更专业。',
     },
     {
       title: '示例 3：数据点太少时结果不可靠',

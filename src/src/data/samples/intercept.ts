@@ -22,7 +22,7 @@ const interceptEntry: FunctionEntry = {
   },
   oneLiner: '算出最佳拟合直线与 y 轴的交点（x=0 时的 y 值）',
   summary:
-    'INTERCEPT 给出回归方程 y = a + b·x 中的 a。它的业务含义是「自变量为 0 时的基准水平」，比如「不投广告时也有约 -6 的销售额」——这个例子里截距为负显然不合常理，正说明**外推要谨慎**：截距是数学拟合的产物，只有在 x=0 落在观测范围内时才有实际意义。它主要用来和 SLOPE 配合拼出完整方程。',
+    'INTERCEPT 给出回归方程 y = a + b·x 中的 a。它的业务含义是「自变量为 0 时的基准水平」，比如「不投广告时也有约 -18 的销售额」——这个例子里截距为负显然不合常理，正说明**外推要谨慎**：截距是数学拟合的产物，只有在 x=0 落在观测范围内时才有实际意义。它主要用来和 SLOPE 配合拼出完整方程。',
   syntax: {
     patternCn: '=INTERCEPT(已知的y, 已知的x)',
     patternEn: '=INTERCEPT(known_y\'s, known_x\'s)',
@@ -61,7 +61,7 @@ const interceptEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=INTERCEPT(C2:C6,B2:B6)',
-      result: '约 -6（即回归方程 y = -6 + 10.4x）',
+      result: '约 -18（即回归方程 y = -18 + 10.4x）',
       explanation: '配合 SLOPE 的 10.4，得到完整方程。注意截距为负在此例中并不合理，说明不能拿它做「零投放时的销售额」推断。',
     },
     {
@@ -70,8 +70,8 @@ const interceptEntry: FunctionEntry = {
       dataTsv: '月份\t销量\n0\t50\n1\t62\n2\t71\n3\t85',
       dataAnchor: 'A1',
       formula: '=INTERCEPT(B2:B5,A2:A5)',
-      result: '约 50.5（第 0 月的基线销量）',
-      explanation: '这里 x=0 在观测范围内，截距 50.5 就是有意义的「起始水平」。',
+      result: '约 49.9（第 0 月的基线销量）',
+      explanation: '这里 x=0 在观测范围内，截距 49.9 就是有意义的「起始水平」。',
     },
     {
       title: '示例 3：x 无波动时报 #DIV/0!',
