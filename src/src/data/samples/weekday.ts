@@ -20,11 +20,11 @@ const weekdayEntry: FunctionEntry = {
     min: 'all',
     label: '全版本可用（Excel 2003 起）',
     notes:
-      'WEEKDAY 返回日期是星期几；第二参数 return_type 决定编号方式：省略或 1 = 周日1…周六7；2 = 周一1…周日7。文本日期要先 DATEVALUE 化。',
+      'WEEKDAY 返回日期是星期几；第二参数 return_type 决定编号方式：省略或 1 = 周日1…周六7；2 = 周一1…周日7。文本日期（"2024-3-15"）Excel 会自动识别，不像日期的文本才报 #VALUE!。',
   },
   oneLiner: '算出某个日期是星期几（1–7）',
   summary:
-    '做排班、判断周末、按星期分组时，WEEKDAY 一下就告诉你某天是周几。默认编号是「周日=1…周六=7」；如果习惯「周一=1」，把第二参数填 2 即可。参数是真日期；文本 "2024-3-15" 要先 DATEVALUE 转一下。',
+    '做排班、判断周末、按星期分组时，WEEKDAY 一下就告诉你某天是周几。默认编号是「周日=1…周六=7」；如果习惯「周一=1」，把第二参数填 2 即可。参数可以是真日期，也可以直接是文本 "2024-3-15"（Excel 会自动识别成日期）。',
   syntax: {
     patternCn: '=WEEKDAY(日期, [编号方式])',
     patternEn: '=WEEKDAY(serial_number, [return_type])',
@@ -37,7 +37,7 @@ const weekdayEntry: FunctionEntry = {
         desc: '一个真日期（序列号）或日期单元格引用。',
         accepts: '日期单元格、TODAY()、DATE(2024,3,15)。',
         ifOmitted: '必填，省略公式不成立。',
-        tip: '⚠️ 文本日期直接喂会报 #VALUE!，先 DATEVALUE 化。',
+        tip: '⚠️ 文本 "2024-3-15" 能直接取（周五=6）；"abc" 这类文本才报 #VALUE!。',
         example: 'A2',
         pitfallRank: 1,
       },
@@ -75,20 +75,21 @@ const weekdayEntry: FunctionEntry = {
       explanation: '默认 1 给「周日=1」的 6；填 2 给「周一=1」的 5。',
     },
     {
-      title: '示例 3：文本日期直接喂报错',
-      scene: '单元格里是文本 "2024-3-15"。',
+      title: '示例 3：文本日期也能直接取星期',
+      scene: '单元格里存的是文本 "2024-3-15"（从系统导出、靠左对齐）。',
       dataTsv: '文本日期\n2024-3-15',
       dataAnchor: 'A1',
       formula: '=WEEKDAY(A2)',
-      result: '#VALUE!',
-      explanation: '文本日期不是真日期，先 DATEVALUE(A2) 转成真日期再取星期。',
+      result: '6',
+      explanation:
+        'Excel 会把 "2024-3-15" 自动识别成日期，默认编号下周五是 6，不用先 DATEVALUE。换成 "abc" 这种不像日期的文本才报 #VALUE!。',
     },
   ],
   pitfalls: [
     {
-      title: '文本日期直接喂 WEEKDAY 报 #VALUE!',
-      reason: 'WEEKDAY 要真日期（序列号），文本 "2024-3-15" 不是。',
-      fix: '先 DATEVALUE(A2) 或把单元格改成真日期。',
+      title: '文本写法不像日期，报 #VALUE!',
+      reason: 'WEEKDAY 能识别 "2024-3-15" 和 "2024年3月15日"，但识别不了 "abc" 这类文本，直接报 #VALUE!。',
+      fix: '把文本改成 "2024-3-15" 这种带分隔符的写法；实在改不了先用 DATEVALUE 转成序列号。',
       level: 'high',
       errorCode: '#VALUE!',
     },
@@ -124,7 +125,6 @@ const weekdayEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'serial_number', label: '日期', type: 'text', default: '2024-01-15', placeholder: '如 2024-01-15 或序列号 45292', hint: '要算星期几的日期' },

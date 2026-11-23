@@ -123,7 +123,6 @@ const concatEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text1', label: '文本1', type: 'text', default: '"Hello"' },

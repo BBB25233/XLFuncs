@@ -60,7 +60,7 @@ const datevalueEntry: FunctionEntry = {
       dataTsv: '截止日\n2026-12-31',
       dataAnchor: 'A1',
       formula: '=DATEVALUE(A2)-TODAY()',
-      result: '约 123 天（以页面基准日 2026-08-30 计，实际随今天变化）',
+      result: '随当天变化：等于 2026-12-31 与今天的天数差（2026-11-23 时为 38 天）',
       explanation: '文本截止日先转序列号，再减 TODAY() 得到剩余天数。',
     },
     {
@@ -114,7 +114,6 @@ const datevalueEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'date_text', label: '文本日期', type: 'text', default: '"2024-1-15"' },

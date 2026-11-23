@@ -58,7 +58,7 @@ const countblankEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=COUNTA(B2:B4)/(COUNTA(B2:B4)+COUNTBLANK(B2:B4))',
-      result: '2 ÷ 3 = 66.7%',
+      result: '0.667（2 ÷ 3）',
       explanation: '已填数 ÷（已填数 + 空白数）。这是做数据质量看板的常用组合。',
     },
     {

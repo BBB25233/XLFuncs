@@ -109,7 +109,6 @@ const factdoubleEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '7' },
@@ -119,6 +118,7 @@ const factdoubleEntry: FunctionEntry = {
       { label: 'FACTDOUBLE(7) → 105', type: 'ok', values: { number: '7' }, expect: '105', note: '7!! = 7×5×3×1 = 105。' },
       { label: '负数 -7 → #NUM!', type: 'error', values: { number: '-7' }, expect: '#NUM!', note: '负数不能双阶乘，报 #NUM!。' },
       { label: '文本 abc → #VALUE!', type: 'error', values: { number: 'abc' }, expect: '#VALUE!', note: '含文本会报 #VALUE!。' },
+          { label: 'FACTDOUBLE(6) → 48', type: 'ok', values: { number: '6' }, expect: '48', note: '6!! = 6×4×2 = 48。' },
     ],
   },
   meta: {

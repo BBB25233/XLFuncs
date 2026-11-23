@@ -2,6 +2,7 @@ import type { CalcContext, CalcHandler, CalcOutcome, CellValue, Sheet } from '@/
 import { ERROR_CODES, make } from '@/core/errors';
 import { fail, ok, stripQuotes } from './types';
 import { sliceSheet } from '@/core/ref';
+import { parseCriterion } from './criteria';
 import { formatNumber, toNumber } from './helpers';
 
 /**
@@ -15,56 +16,6 @@ import { formatNumber, toNumber } from './helpers';
  * 错误：field 不存在 → #VALUE!；criteria 列名不匹配 → #VALUE!；区域非法 → #REF!。
  */
 
-/** 比较一个数据库单元格与一个条件值（支持 > >= < <= <> = 前缀） */
-function matchCondition(cell: CellValue, critRaw: CellValue): boolean {
-  const c = String(critRaw).trim();
-  const m = c.match(/^(>=|<=|<>|>|<|=)(.*)$/);
-  if (m !== null) {
-    const op = m[1];
-    const operand = m[2].trim();
-    const a = toNumber(cell);
-    const b = toNumber(operand);
-    if (a !== null && b !== null) {
-      switch (op) {
-        case '>':
-          return a > b;
-        case '>=':
-          return a >= b;
-        case '<':
-          return a < b;
-        case '<=':
-          return a <= b;
-        case '<>':
-          return a !== b;
-        case '=':
-          return a === b;
-      }
-    }
-    const sa = String(cell);
-    switch (op) {
-      case '>':
-        return sa > operand;
-      case '>=':
-        return sa >= operand;
-      case '<':
-        return sa < operand;
-      case '<=':
-        return sa <= operand;
-      case '<>':
-        return sa !== operand;
-      case '=': // eslint-disable-next-line no-fallthrough
-      default:
-        return sa === operand;
-    }
-  }
-  // 无运算符：精确相等（数字按数值，文本忽略大小写）
-  const a = toNumber(cell);
-  const b = toNumber(c);
-  if (a !== null && b !== null) {
-    return a === b;
-  }
-  return String(cell).toLowerCase() === c.toLowerCase();
-}
 
 export const dsumCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   const { sheet, args } = ctx;
@@ -154,7 +105,11 @@ export const dsumCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
         }
         const dbCol = dbHeader.indexOf(String(fname).trim());
         hasCond = true;
-        if (!matchCondition(dbRow[dbCol], cval)) {
+        const criterion = parseCriterion(String(cval), sheet, 'cell');
+        if (criterion.failure !== null) {
+          return fail(criterion.failure);
+        }
+        if (!criterion.test(dbRow[dbCol])) {
           allTrue = false;
           break;
         }

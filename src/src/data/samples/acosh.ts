@@ -49,8 +49,8 @@ const acoshEntry: FunctionEntry = {
       scene: '先 COSH 再 ACOSH，确认能还原。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=ACOSH(COSH(A3))',
-      result: '5（A3 是 5，COSH(5)≈74.21，ACOSH 还原回 5）',
+      formula: '=ACOSH(COSH(A4))',
+      result: '5（A4 是 5，COSH(5)≈74.21，ACOSH 还原回 5）',
       explanation: '正向再反向应还原原值。注意 ACOSH 只返回非负值，这也是双曲函数的一个特点。',
     },
     {
@@ -68,7 +68,7 @@ const acoshEntry: FunctionEntry = {
       scene: ' recipients 使用 Excel 2010，没有 ACOSH 函数。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=LN(A3+SQRT(A3*A3-1))',
+      formula: '=LN(A4+SQRT(A4*A4-1))',
       result: '2.2924（与 =ACOSH(5) 结果一致）',
       explanation: 'ACOSH(x) = ln(x + √(x²−1))。旧版 Excel 可以用这个手写式替代。',
     },
@@ -114,12 +114,11 @@ const acoshEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '2', placeholder: '如 2', hint: '必须 ≥ 1' },
     ],
-    template: '=ACOSH(A2)',
+    template: '=ACOSH({number})',
     cases: [
       { label: '反双曲余弦 1', type: 'ok', values: { number: '1' }, expect: '0', note: 'acosh(1)=0' },
       { label: '反双曲余弦 2', type: 'ok', values: { number: '2' }, expect: '1.316958', note: 'acosh(2)≈1.316958' },

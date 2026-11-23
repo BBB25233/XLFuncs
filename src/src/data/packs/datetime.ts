@@ -43,7 +43,7 @@ const YMD_TSV = '年\t月\t日\n2024\t3\t15';
 const HIRE_TSV = '姓名\t入职日期\n张三\t2021-03-15\n李四\t2019-07-01';
 
 /** 生日 / 今天小表：用于演示 DATEDIF 算年龄 */
-const BIRTH_TSV = '事项\t日期\n出生\t1990-05-20\n今天\t2026-08-30';
+const BIRTH_TSV = '事项\t日期\n出生\t1990-05-20\n截止日\t2026-08-30';
 
 /** 签约日小表：用于演示 EDATE 推月份 */
 const SIGN_TSV = '姓名\t签约日\n甲公司\t2024-01-15';
@@ -177,6 +177,20 @@ const pack: Record<string, FunctionEntry> = {
           values: {},
           expect: '2026-08-30',
           note: 'TODAY() 返回的是真日期（序列号），可直接与别的日期相减得到整数天数。',
+        },
+        {
+          label: '说明：配合 EDATE 推到期日',
+          type: 'ok',
+          values: {},
+          expect: '2026-08-30',
+          note: 'EDATE(TODAY(),12) 可按今天推算一年后的到期日。',
+        },
+        {
+          label: '说明：TEXT 格式化后即为文本',
+          type: 'ok',
+          values: {},
+          expect: '2026-08-30',
+          note: 'TEXT(TODAY(),"yyyy-mm-dd") 返回文本，不能再直接参与日期运算。',
         },
       ],
     },
@@ -313,6 +327,20 @@ const pack: Record<string, FunctionEntry> = {
           values: {},
           expect: '2026-08-30 11:42:05',
           note: 'NOW 含时间部分，两个日期相减得到的小数需乘 24 才是小时数。',
+        },
+        {
+          label: '说明：只取日期部分用 INT',
+          type: 'ok',
+          values: {},
+          expect: '2026-08-30 11:42:05',
+          note: 'INT(NOW()) 抹掉时间小数，只保留当天日期。',
+        },
+        {
+          label: '说明：只取时间部分用减法',
+          type: 'ok',
+          values: {},
+          expect: '2026-08-30 11:42:05',
+          note: 'NOW()-INT(NOW()) 得到 0–1 之间的小数，表示当天已过的比例。',
         },
       ],
     },
@@ -1053,8 +1081,8 @@ const pack: Record<string, FunctionEntry> = {
         scene: '已知出生日期，想算出到今天满多少整岁。',
         dataTsv: BIRTH_TSV,
         dataAnchor: 'A1',
-        formula: '=DATEDIF(A2,B2,"Y")',
-        result: '出生 1990-05-20、今天 2026-08-30 → 返回 36（周岁）。',
+        formula: '=DATEDIF(B2,B3,"Y")',
+        result: '出生 1990-05-20、截止 2026-08-30 → 返回 36（周岁）。',
         explanation: '"Y" 只数完整的年，没满的月日不计，所以是周岁而非虚岁。',
       },
       {
@@ -1062,8 +1090,8 @@ const pack: Record<string, FunctionEntry> = {
         scene: '想知道两个日期之间隔了多少天。',
         dataTsv: BIRTH_TSV,
         dataAnchor: 'A1',
-        formula: '=DATEDIF(A2,B2,"D")',
-        result: '1990-05-20 到 2026-08-30 → 返回 13259 天（约）。',
+        formula: '=DATEDIF(B2,B3,"D")',
+        result: '1990-05-20 到 2026-08-30 → 返回 13251 天。',
         explanation: '"D" 直接给总天数，最直观。',
       },
       {
@@ -1071,8 +1099,8 @@ const pack: Record<string, FunctionEntry> = {
         scene: '年龄 36 岁但还没到生日，想知道差几个月。',
         dataTsv: BIRTH_TSV,
         dataAnchor: 'A1',
-        formula: '=DATEDIF(A2,B2,"YM")',
-        result: '返回 3，表示距离下一个整年还差约 3 个月（5 月到 8 月）。',
+        formula: '=DATEDIF(B2,B3,"YM")',
+        result: '返回 3，表示距离下一个整年还差 3 个月（5 月到 8 月）。',
         explanation: '"YM" 忽略已经数过的整年，只看余下的月差。',
       },
     ],

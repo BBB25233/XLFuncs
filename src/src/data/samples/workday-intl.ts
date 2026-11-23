@@ -144,12 +144,11 @@ const workdayIntlEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'start_date', label: '开始日期', type: 'text', default: '2024-01-01', placeholder: '如 2024-01-01', hint: '基准日期' },
       { key: 'days', label: '工作日数', type: 'number', default: '10', hint: '要往前/后跳几个工作日（整数）' },
-      { key: 'weekend', label: '周末代码（演示版忽略）', type: 'text', default: '1', hint: '本演示版固定按周六+周日计算，忽略该参数' },
+      { key: 'weekend', label: '周末代码（演示版忽略）', type: 'number', default: '1', hint: '本演示版固定按周六+周日计算，忽略该参数' },
       { key: 'holidays', label: '节假日（演示版忽略）', type: 'text', default: '', hint: '本演示版忽略此列表' },
     ],
     template: '=WORKDAY.INTL({start_date},{days},{weekend},{holidays})',

@@ -42,6 +42,7 @@ const normdistEntry: FunctionEntry = {
       { label: 'ok 累积', type: 'ok', values: {}, expect: '0.908789', note: 'P(X≤42)。' },
       { label: '非法：标准差≤0', type: 'error', values: { sd: '0' }, expect: '#NUM!', note: '标准差必须 >0。' },
       { label: '非法：cum 不是布尔', type: 'error', values: { cum: 'MAYBE' }, expect: '#VALUE!', note: 'cum 只能 TRUE/FALSE。' },
+          { label: '密度（不累积）', type: 'ok', values: { cum: 'FALSE' }, expect: '0.10934', note: 'cum=FALSE 时返回概率密度 0.10934。' },
     ],
   },
   meta: { updatedAt: '2026-08-31', status: 'published', customEdited: false },

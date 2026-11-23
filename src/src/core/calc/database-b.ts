@@ -17,8 +17,8 @@ import { parseCriterion } from './criteria';
  *   dstdev / dstdevp / dvar / dvarp
  *
  * 这些函数都取 数据库区域 + 条件区域 + 字段，先按条件筛选行，再对字段列聚合。
- * 复用 DSUM 的「切片 + 按条件表筛选」思路；条件单元格统一走 parseCriterion()
- * （文本条件需带引号，如 "水果"；比较条件如 ">9" 也带引号），与 criteria.ts 一致。
+ * 复用 DSUM 的「切片 + 按条件表筛选」思路；条件单元格统一走 parseCriterion(..., 'cell')
+ * （单元格里的文本/比较符不需要引号：水果、>9、*果* 都直接认；带引号的旧写法仍兼容）。
  *
  * 条件区：同一行多条件 = 逻辑「与」(AND)；分多行 = 逻辑「或」(OR)。
  * 错误：field 不存在 → #VALUE!；条件区域为空 → #VALUE!；区域非法 → #REF!；
@@ -166,7 +166,7 @@ function prepare(ctx: CalcContext): Prepared {
           continue; // 该格留空 = 不约束此列
         }
         const dbCol = dbHeader.indexOf(String(fname).trim());
-        const criterion = parseCriterion(String(cval), sheet);
+        const criterion = parseCriterion(String(cval), sheet, 'cell');
         if (criterion.failure !== null) {
           return { error: fail(criterion.failure), header: dbHeader, rows: dbRows, targetCol, matched: [] };
         }

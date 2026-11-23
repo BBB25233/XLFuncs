@@ -158,7 +158,6 @@ const seriesumEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'x', label: 'x（输入值）', type: 'number', default: '2' },
@@ -169,11 +168,12 @@ const seriesumEntry: FunctionEntry = {
       { key: 'coefficient3', label: '系数3', type: 'number', default: '3' },
       { key: 'coefficient4', label: '系数4（可选）', type: 'number', default: '' },
     ],
-    template: '=SERIESSUM({x},{n},{m},{coefficient1})',
+    template: '=SERIESSUM({x},{n},{m},{coefficient1},{coefficient2},{coefficient3},{coefficient4})',
     cases: [
       { label: 'SERIESSUM(2,0,1,[1,2,3]) → 17', type: 'ok', values: { x: '2', n: '0', m: '1', coefficient1: '1', coefficient2: '2', coefficient3: '3' }, expect: '17', note: '1·2⁰ + 2·2¹ + 3·2² = 1 + 4 + 12 = 17。' },
       { label: 'SERIESSUM(1,0,1,[1,2,3]) → 6', type: 'ok', values: { x: '1', n: '0', m: '1', coefficient1: '1', coefficient2: '2', coefficient3: '3' }, expect: '6', note: '1·1⁰ + 2·1¹ + 3·1² = 1 + 2 + 3 = 6。' },
       { label: '文本系数 → #VALUE!', type: 'error', values: { x: '2', n: '0', m: '1', coefficient1: 'abc', coefficient2: '2' }, expect: '#VALUE!', note: '系数含文本会报 #VALUE!。' },
+          { label: 'SERIESSUM(2,1,1,[1,2,3]) → 34', type: 'ok', values: { x: '2', n: '1', m: '1', coefficient1: '1', coefficient2: '2', coefficient3: '3' }, expect: '34', note: '1·2¹ + 2·2² + 3·2³ = 2 + 8 + 24 = 34。' },
     ],
   },
   meta: {

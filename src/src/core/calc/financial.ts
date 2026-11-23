@@ -59,7 +59,8 @@ export const pmtCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
     val = -(pv + fv) / nper;
   } else {
     const pow = Math.pow(1 + rate, nper);
-    val = (rate * (fv + pv * pow)) / ((1 + rate * type) * (pow - 1));
+    // Excel 口径：贷款（pv 为正）的每期付款是负数（现金流出）
+    val = -(rate * (fv + pv * pow)) / ((1 + rate * type) * (pow - 1));
   }
   if (!Number.isFinite(val)) {
     return numErr('算出来的每期付款不是有效数字', '请检查利率、期数、本金是否填得过大或不合理。');
@@ -141,7 +142,7 @@ export const nperCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
     if (denom === 0) {
       return div0Err('分母为 0，期数算不出来', '当前利率/付款组合无解，请调整参数。');
     }
-    const ratio = (fv + pmt * t) / denom;
+    const ratio = (pmt * t - fv * rate) / denom;
     if (!(ratio > 0)) {
       return numErr('对数里出现了非正数，期数无解', '请确认现金流方向（pmt 与 fv 一正一负），让方程有实数解。');
     }

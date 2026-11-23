@@ -127,7 +127,6 @@ const arabicEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '罗马数字文本', type: 'text', default: '"XIV"' },
@@ -137,6 +136,7 @@ const arabicEntry: FunctionEntry = {
       { label: 'ARABIC("XIV") → 14', type: 'ok', values: { text: '"XIV"' }, expect: '14', note: 'XIV = 10 + 4 = 14。' },
       { label: 'ARABIC("MMXIV") → 2014', type: 'ok', values: { text: '"MMXIV"' }, expect: '2014', note: 'MMXIV = 2000 + 14 = 2014。' },
       { label: '非法字符 XA → #VALUE!', type: 'error', values: { text: '"XA"' }, expect: '#VALUE!', note: 'A 不是罗马数字字符，报 #VALUE!。' },
+          { label: 'ARABIC("MCMXC") → 1990', type: 'ok', values: { text: '"MCMXC"' }, expect: '1990', note: 'MCMXC = 1000 + 900 + 90 = 1990。' },
     ],
   },
   meta: {

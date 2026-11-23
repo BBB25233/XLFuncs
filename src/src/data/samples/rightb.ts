@@ -107,7 +107,6 @@ const rightbEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '文本', type: 'text', default: '"Excel中文"' },

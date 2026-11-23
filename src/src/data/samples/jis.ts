@@ -32,9 +32,10 @@ const jisEntry: FunctionEntry = {
     template: '=JIS({t})',
     cases: [
       { label: '半角转全角', type: 'ok', values: {}, expect: 'ＡＢＣ', note: '半角字母转成对应的全角字母。' },
-      { label: '缺少文本', type: 'error', values: { t: '' }, expect: '#VALUE!', note: 'JIS 需要一个文本参数。' },
-      { label: '只输入半角空格', type: 'error', values: { t: ' ' }, expect: '#VALUE!', note: '空格会被当成空参数，JIS 依然报「缺少文本」。' },
-      { label: '只输入制表符', type: 'error', values: { t: '\t' }, expect: '#VALUE!', note: '只剩一个制表符时同样是空文本，先把要转换的字符补进去。' },
+      { label: '空格转全角空格', type: 'ok', values: { t: ' ' }, expect: '　', note: '半角空格转全角空格。' },
+      { label: '数字转全角', type: 'ok', values: { t: '123' }, expect: '１２３', note: '数字同样按半角 ASCII 转全角。' },
+      { label: '空文本返回空串', type: 'ok', values: { t: '' }, expect: '', note: 'JIS("") 合法，返回空串。' },
+      { label: '超过 255 字符 → #VALUE!', type: 'error', values: { t: 'A'.repeat(256) }, expect: '#VALUE!', note: '超过 255 字符直接报错。' },
     ],
   },
   meta: { updatedAt: '2026-08-31', status: 'published', customEdited: false },

@@ -32,7 +32,7 @@ const ceilingMathEntry: FunctionEntry = {
     min: '2013',
     label: '需 Excel 2013 及以上（含 Microsoft 365）；旧版用 CEILING。',
     notes:
-      'CEILING.MATH 是 CEILING 的现代替代：默认远离 0 方向进位，负数多一个 mode 参数控制方向。第三参数 mode 非 0 时，负数改为朝 0 方向（绝对值变小）舍入。',
+      'CEILING.MATH 是 CEILING 的现代替代：默认朝 +∞ 进位，负数多一个 mode 参数控制方向。第三参数 mode 非 0 时，负数改为朝 0 方向（绝对值变小）舍入。',
   },
   oneLiner: '向上进到最近的指定倍数',
   summary:
@@ -49,7 +49,7 @@ const ceilingMathEntry: FunctionEntry = {
         desc: '要向上舍入的原始数字。',
         accepts: 'A2 · 23 · 12.3。',
         ifOmitted: '必填。',
-        tip: '正负都接受，正数向上变大、负数默认也向上（更负）。',
+        tip: '正负都接受；正数向上变大，负数默认朝 0（绝对值变小）。',
         example: 'A2',
         pitfallRank: 2,
       },
@@ -70,16 +70,16 @@ const ceilingMathEntry: FunctionEntry = {
         zh: '模式',
         en: 'mode',
         required: false,
-        desc: '仅对负数生效：0（默认）=远离 0 向上（更负）；任意非 0=朝 0 方向（绝对值变小）。',
+        desc: '仅对负数生效：0（默认）=朝 0 方向（绝对值变小）；任意非 0=远离 0（更负）。',
         accepts: '0 · 1 · -1。',
-        ifOmitted: '省略或 0：负数按远离 0 方向舍入。',
+        ifOmitted: '省略或 0：负数按朝 0 方向舍入。',
         tip: '正数不受 mode 影响；只想控制负数方向才填。',
         example: '0',
       },
     ],
   },
   returnValue:
-    '返回向上（远离 0）舍入到 significance 倍数的结果；负数默认也更负，mode 非 0 时改为朝 0。',
+    '返回朝 +∞ 舍入到 significance 倍数的结果；负数默认朝 0，mode 非 0 时改为更负。',
   examples: [
     {
       title: '示例 1：进到最近的 5（装箱）',
@@ -101,12 +101,12 @@ const ceilingMathEntry: FunctionEntry = {
     },
     {
       title: '示例 3：负数方向（mode 参数）',
-      scene: '负数默认更负，但有时想让它朝 0（绝对值变小）进。',
+      scene: '负数默认朝 0（绝对值变小），想让它更负时用 mode。',
       dataTsv: CEIL_NEG_TSV,
       dataAnchor: 'A1',
       formula: '=CEILING.MATH(A2,1,1)',
-      result: '默认 =CEILING.MATH(-4.3,1) → -5（远离0更负）；加 mode 非0 的 =CEILING.MATH(-4.3,1,1) → -4（朝0）',
-      explanation: 'mode 只管负数：默认更负，非 0 朝 0。正数两种写法结果一样。',
+      result: '默认 =CEILING.MATH(-4.3,1) → -4（朝0）；加 mode 非0 的 =CEILING.MATH(-4.3,1,1) → -5（远离0更负）',
+      explanation: 'mode 只管负数：默认朝 0（-4.3→-4），非 0 更负（-4.3→-5）。正数两种写法结果一样。',
     },
   ],
   pitfalls: [
@@ -117,9 +117,9 @@ const ceilingMathEntry: FunctionEntry = {
       level: 'mid',
     },
     {
-      title: '负数默认更负，和直觉「向上」相反',
-      reason: '默认 mode 0，负数远离 0 即更负（-4.3 → -5）。',
-      fix: '想负数朝 0 进，加第三参数非 0：=CEILING.MATH(A2,1,1)。',
+      title: '负数默认朝 0，和直觉「更负」相反',
+      reason: '默认 mode 0，负数朝 0 即 -4.3 → -4。',
+      fix: '想负数更负，加第三参数非 0：=CEILING.MATH(A2,1,1)。',
       level: 'high',
     },
     {
@@ -149,16 +149,15 @@ const ceilingMathEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '3.7', placeholder: '如 3.7' },
       { key: 'significance', label: '倍数', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=CEILING.MATH(A2,B2)',
+    template: '=CEILING.MATH({number},{significance})',
     cases: [
       { label: '向上进到整数', type: 'ok', values: { number: '3.7', significance: '1' }, expect: '4', note: 'CEILING.MATH(3.7,1)=4' },
-      { label: '负数远离 0', type: 'ok', values: { number: '-3.7', significance: '1' }, expect: '-4', note: '负值也更负：-4' },
+      { label: '负数朝 0 进位', type: 'ok', values: { number: '-3.7', significance: '1' }, expect: '-3', note: '负值朝 0：-3.7→-3' },
       { label: '进到 5 的倍数', type: 'ok', values: { number: '23', significance: '5' }, expect: '25', note: 'CEILING.MATH(23,5)=25' },
       { label: '数字非数字', type: 'error', values: { number: 'abc', significance: '1' }, expect: '#VALUE!', note: '文本参数报错' },
     ],

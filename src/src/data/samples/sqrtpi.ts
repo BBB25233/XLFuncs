@@ -58,7 +58,7 @@ const sqrtpiEntry: FunctionEntry = {
       scene: '确认 SQRTPI 到底在算什么，用等价式对比一遍。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=SQRT(A3*PI())',
+      formula: '=SQRT(A4*PI())',
       result: '5.3174（与 =SQRTPI(9) 结果一致）',
       explanation: 'SQRTPI(x) = SQRT(x × π)。两者完全等价，手写式在旧版本或需要改写时同样可用。',
     },
@@ -113,12 +113,11 @@ const sqrtpiEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '1', placeholder: '如 1', hint: '必须 ≥ 0' },
     ],
-    template: '=SQRTPI(A2)',
+    template: '=SQRTPI({number})',
     cases: [
       { label: 'sqrtpi 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'SQRTPI(0)=0' },
       { label: 'sqrtpi 1', type: 'ok', values: { number: '1' }, expect: '1.772454', note: 'SQRTPI(1)=√π≈1.772454' },

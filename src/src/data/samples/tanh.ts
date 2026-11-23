@@ -112,12 +112,11 @@ const tanhEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=TANH(A2)',
+    template: '=TANH({number})',
     cases: [
       { label: '双曲正切 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'tanh(0)=0' },
       { label: '双曲正切 1', type: 'ok', values: { number: '1' }, expect: '0.761594', note: 'tanh(1)≈0.761594' },

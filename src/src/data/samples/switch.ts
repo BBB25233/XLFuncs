@@ -201,7 +201,7 @@ const switchEntry: FunctionEntry = {
         hint: '都不匹配时返回；留空则无匹配会 #N/A。',
       },
     ],
-    template: '=SWITCH(A2,"优",1,"良",2,"中",3,"其他")',
+    template: '=SWITCH({expression},{value1},{result1},{value2},{result2},{value3},{result3},{default})',
     cases: [
       {
         label: '命中第 1 对 → 1',

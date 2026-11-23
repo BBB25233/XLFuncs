@@ -121,12 +121,11 @@ const evenEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '3', placeholder: '如 3' },
     ],
-    template: '=EVEN(A2)',
+    template: '=EVEN({number})',
     cases: [
       { label: 'EVEN(1.5)', type: 'ok', values: { number: '1.5' }, expect: '2', note: 'EVEN(1.5)=2' },
       { label: 'EVEN(-1.5)', type: 'ok', values: { number: '-1.5' }, expect: '-2', note: 'EVEN(-1.5)=-2（远离0）' },

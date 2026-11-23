@@ -127,13 +127,12 @@ const atan2Entry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'y', label: 'y 坐标', type: 'number', default: '1', placeholder: '如 1' },
       { key: 'x', label: 'x 坐标', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=ATAN2(A2,B2)',
+    template: '=ATAN2({x},{y})',
     cases: [
       { label: 'atan2(1,1)', type: 'ok', values: { y: '1', x: '1' }, expect: '0.785398', note: 'atan2(1,1)≈0.785398（45°）' },
       { label: 'atan2(0,1)', type: 'ok', values: { y: '0', x: '1' }, expect: '0', note: 'atan2(0,1)=0' },

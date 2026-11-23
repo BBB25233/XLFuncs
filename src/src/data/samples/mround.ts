@@ -136,13 +136,12 @@ const mroundEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '10', placeholder: '如 10' },
       { key: 'multiple', label: '倍数', type: 'number', default: '3', placeholder: '如 3' },
     ],
-    template: '=MROUND(A2,B2)',
+    template: '=MROUND({number},{multiple})',
     cases: [
       { label: 'MROUND(10,3)', type: 'ok', values: { number: '10', multiple: '3' }, expect: '9', note: 'MROUND(10,3)=9' },
       { label: 'MROUND(11,3)', type: 'ok', values: { number: '11', multiple: '3' }, expect: '12', note: 'MROUND(11,3)=12' },

@@ -625,8 +625,8 @@ const pack: Record<string, FunctionEntry> = {
         dataTsv: '数据\n10\n20\n30\n40',
         dataAnchor: 'A1',
         formula: '=OFFSET($A$1,2,0)',
-        result: '返回 30（A1 下移 2 行即 A3）',
-        explanation: '起点 A1，下移 2 行、右移 0 列，停在 A3，返回 30。高度宽度都省略，只取单个格子。',
+        result: '返回 20（A1 下移 2 行即 A3，A2 才是第一条数据）',
+        explanation: '起点 A1（表头），下移 2 行、右移 0 列，停在 A3，返回 20。高度宽度都省略，只取单个格子。',
       },
       {
         title: '示例 2：动态取最近 3 行求和（滚动窗口）',

@@ -129,7 +129,6 @@ const replacebEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'old_text', label: '原文本', type: 'text', default: '"中文AB"' },

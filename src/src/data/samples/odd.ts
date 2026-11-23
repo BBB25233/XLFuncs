@@ -122,12 +122,11 @@ const oddEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '2', placeholder: '如 2' },
     ],
-    template: '=ODD(A2)',
+    template: '=ODD({number})',
     cases: [
       { label: 'ODD(2)', type: 'ok', values: { number: '2' }, expect: '3', note: 'ODD(2)=3' },
       { label: 'ODD(-2)', type: 'ok', values: { number: '-2' }, expect: '-3', note: 'ODD(-2)=-3（远离0）' },

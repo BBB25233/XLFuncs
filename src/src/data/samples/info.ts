@@ -101,7 +101,6 @@ const infoEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {
 
     },

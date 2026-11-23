@@ -102,7 +102,6 @@ const iserrEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {
 
     },

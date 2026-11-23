@@ -21,7 +21,7 @@ const gammainvEntry: FunctionEntry = {
     { key: 'alpha', zh: '形状', en: 'alpha', required: true, desc: '形状参数' },
     { key: 'beta', zh: '尺度', en: 'beta', required: true, desc: '尺度参数' }] },
   returnValue: '对应的 x 值',
-  examples: [{ title: '示例：伽马反函数', scene: '概率 0.5、形状 9、尺度 2', dataAnchor: 'B2', formula: '=GAMMAINV(0.5,9,2)', result: '约 17.6', explanation: '中位数附近。' },
+  examples: [{ title: '示例：伽马反函数', scene: '概率 0.5、形状 9、尺度 2', dataAnchor: 'B2', formula: '=GAMMAINV(0.5,9,2)', result: '约 17.34', explanation: '中位数附近。' },
     { title: '示例 2：求 95% 分位，定备件天数', scene: '同一台设备的故障间隔服从 Gamma（形状 2、尺度 3），仓库要求「95% 的情况下够用」，问要备多少天的量。', dataAnchor: 'B2', formula: '=GAMMAINV(0.95,2,3)', result: '约 14.23（天）', explanation: 'GAMMAINV 返回累积概率达到 95% 时对应的 x，和 GAMMADIST 互逆：把 14.23 代回 =GAMMADIST(14.23,2,3,TRUE) 会回到 0.95。' }],
   pitfalls: [{ title: '与 GAMMADIST 配对', reason: '两函数互逆。', fix: '已知概率求 x 用 GAMMAINV。', level: 'low' }],
   related: [{ id: 'gammadist', kind: 'companion', why: 'GAMMADIST 与本品类相关' },

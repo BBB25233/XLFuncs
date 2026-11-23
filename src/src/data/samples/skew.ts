@@ -61,7 +61,7 @@ const skewEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=SKEW(B2:B7)',
-      result: '约 2.24（明显右偏）',
+      result: '约 2.44（明显右偏）',
       explanation:
         '6 万那一个高值把右尾拉得很长，偏度远大于 0。这类数据用「平均月薪」汇报会明显高于大多数人的实际感受。',
     },

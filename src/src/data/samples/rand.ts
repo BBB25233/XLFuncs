@@ -110,7 +110,6 @@ const randEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [],
     template: '=RAND()',

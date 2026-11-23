@@ -7593,27 +7593,29 @@
   {
     "id": "pduration",
     "enName": "PDURATION",
-    "zhName": "价格久期",
+    "zhName": "达到目标值所需期数",
     "zhCommon": [
       "PDURATION",
-      "价格久期"
+      "所需期数"
     ],
     "alias": [
-      "增值期数"
+      "增值期数",
+      "到达目标期数"
     ],
     "keywords": [
       "pduration",
-      "久期",
+      "期数",
+      "复利",
       "投资"
     ],
     "category": "financial",
     "difficulty": 4,
     "usageLevel": 1,
     "minVersion": "all",
-    "oneLiner": "算价值翻倍所需期数",
+    "oneLiner": "算达到目标金额需要多少期",
     "status": "published",
-    "abbr": "jgjq",
-    "pinyin": "jiagejiuqi"
+    "abbr": "qss",
+    "pinyin": "suoxuqishu"
   },
   {
     "id": "pearson",

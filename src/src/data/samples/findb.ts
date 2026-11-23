@@ -118,7 +118,6 @@ const findbEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'find_text', label: '查找内容', type: 'text', default: '"中"' },

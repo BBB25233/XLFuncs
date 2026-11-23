@@ -32,9 +32,10 @@ const ascEntry: FunctionEntry = {
     template: '=ASC({t})',
     cases: [
       { label: '全角转半角', type: 'ok', values: {}, expect: 'ABC', note: '全角字母转成对应的半角字母。' },
-      { label: '缺少文本', type: 'error', values: { t: '' }, expect: '#VALUE!', note: 'ASC 需要一个文本参数。' },
-      { label: '只输入半角空格', type: 'error', values: { t: ' ' }, expect: '#VALUE!', note: '看起来有内容，其实去掉空格后是空的，ASC 仍然报「缺少文本」。' },
-      { label: '只输入制表符', type: 'error', values: { t: '\t' }, expect: '#VALUE!', note: '从表格复制单元格时只剩一个制表符，同样算空文本，要先把目标文字粘进来。' },
+      { label: '半角空格原样保留', type: 'ok', values: { t: ' ' }, expect: ' ', note: 'ASC 只换全角字符，空格是合法文本。' },
+      { label: '数字按文本处理', type: 'ok', values: { t: '123' }, expect: '123', note: '数字会先转成文本，原样返回。' },
+      { label: '空文本返回空串', type: 'ok', values: { t: '' }, expect: '', note: 'ASC("") 合法，返回空串。' },
+      { label: '超过 255 字符 → #VALUE!', type: 'error', values: { t: 'Ａ'.repeat(256) }, expect: '#VALUE!', note: 'Excel 的文本函数上限是 255 字符。' },
     ],
   },
   meta: { updatedAt: '2026-08-31', status: 'published', customEdited: false },

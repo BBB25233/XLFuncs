@@ -125,7 +125,6 @@ const eomonthEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'start_date', label: '开始日期', type: 'text', default: '2024-01-15', placeholder: '如 2024-01-15', hint: '作为基准的日期' },

@@ -50,9 +50,10 @@ const timevalueEntry: FunctionEntry = {
       scene: 'A 列是手打的文本时间，想算两个时间差多少小时。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=TIMEVALUE(A3)',
+      formula: '=TIMEVALUE(A4)',
       result: '0.77083（即 18:30:00）',
-      explanation: '转成时间小数后参与计算；TIMEVALUE(A3)-TIMEVALUE(A2) 再乘 24 得工时。',
+      explanation:
+        '18:30 对应 0.77083 天；换算成两个时间的间隔就写 (TIMEVALUE(A4)-TIMEVALUE(A2))*24，即 (0.77083-0.375)*24 = 9.5 小时。',
     },
     {
       title: '示例 2：和 NOW 比早晚',
@@ -114,7 +115,6 @@ const timevalueEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'time_text', label: '时间文本', type: 'text', default: '"13:30:00"' },

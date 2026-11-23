@@ -8,6 +8,7 @@ import { evaluateEntry } from '@/core/calc/registry';
 import { MESSAGES } from '@/storage/keys';
 import DataTable from '@/ui/components/DataTable';
 import CopyButton from '@/ui/components/CopyButton';
+import { tableOfCalc } from '@/ui/detail/tableOf';
 
 /**
  * 在线试算区（P0-07 / P0-08 / P0-09）。
@@ -28,17 +29,17 @@ const resolver: TableResolver = (id): TableLike | null => SAMPLE_TABLES[id];
 
 /** 试算用的示例数据表（让用户知道自己在算哪张表） */
 function SampleData({ entry }: { entry: FunctionEntry }): ReactElement | null {
-  const tableId = entry.calc.sampleTableId;
-  if (tableId === undefined) {
+  const table = tableOfCalc(entry);
+  if (table === null || table.header.length === 0) {
     return null;
   }
-  const table = SAMPLE_TABLES[tableId];
   return (
     <div className="mb-4">
       <p className="mb-2 text-xs text-ink-3">
-        试算数据：{table.name}（{table.columns.length} 列 · {table.rows.length} 行，表头占第 1 行）
+        试算数据：{table.name ?? '示例数据'}（{table.header.length} 列 · {table.rows.length} 行，
+        表头占第 1 行）
       </p>
-      <DataTable header={table.columns} rows={table.rows} dense />
+      <DataTable header={table.header} rows={table.rows} dense />
     </div>
   );
 }

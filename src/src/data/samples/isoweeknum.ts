@@ -59,7 +59,7 @@ const isoweeknumEntry: FunctionEntry = {
       scene: '想确认两套周号何时不一致。',
       dataTsv: '日期\n2024-12-31',
       dataAnchor: 'A1',
-      formula: '=ISOWEEKNUM(A2)&" / WEEKNUM(,2) "&WEEKNUM(A2,2)',
+      formula: '=ISOWEEKNUM(A2)&" / "&WEEKNUM(A2,2)',
       result: '1 / 53（跨年边界两者口径不同）',
       explanation: '2024-12-31 按 ISO 归入 2025 年第 1 周（返回 1），而 WEEKNUM(,2) 按自然年算成 2024 第 53 周——年初年末边界两者会显著不同，跨国/财务对接务必统一用 ISO。',
     },
@@ -69,7 +69,7 @@ const isoweeknumEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=ISOWEEKNUM(A2)',
-      result: '#NAME?（2010 及更早）',
+      result: '11（A2 是 2024-3-15；只有在 2010 及更早版本才报 #NAME?）',
       explanation: 'ISOWEEKNUM 是 2013 才加入；旧版可用 WEEKNUM(日期,21) 近似替代。',
     },
   ],
@@ -114,7 +114,6 @@ const isoweeknumEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'serial_number', label: '日期', type: 'text', default: '2024-01-01', placeholder: '如 2024-01-01', hint: '要算 ISO 周数的日期' },

@@ -78,9 +78,9 @@ const lookupEntry: FunctionEntry = {
       scene: '给一片区域，LOOKUP 自动用第一列查、最后一列返回。',
       dataTsv: '代码\t名称\t单价\nA1\t苹果\t5\nA2\t香蕉\t3\nA3\t橙子\t8',
       dataAnchor: 'A1',
-      formula: '=LOOKUP("A2",A2:C5)',
-      result: '返回「香蕉」（A2 所在行的最后一列名称）',
-      explanation: '数组形式默认查首列（代码）、返末列（本例末列是名称），所以返回「香蕉」。想返哪一列，就把那一列放到区域最右。',
+      formula: '=LOOKUP("A2",A2:B5)',
+      result: '返回「香蕉」（A2 所在行、区域最后一列的名称）',
+      explanation: '数组形式查区域首列（代码）、返回区域末列；把区域限定为 A2:B5，末列正好是名称，所以返回「香蕉」。想返哪一列，就把那一列放到区域最右。',
     },
     {
       title: '示例 3：近似匹配分档（经典用法）',
@@ -130,7 +130,7 @@ const lookupEntry: FunctionEntry = {
     template: '=LOOKUP({lookup_value},{lookup_vector},{result_vector})',
     cases: [
       { label: '默认：查香蕉的单价', type: 'ok', values: {}, expect: '3', note: '查找列找到「香蕉」在第 2 行，返回列同位置 = 3' },
-      { label: '省略返回列 → 返回查找值本身', type: 'ok', values: { lookup_value: '"苹果"', result_vector: '' }, expect: '苹果', note: '没给返回列时，直接返回查找列对应位置的值「苹果」' },
+      { label: '省略返回列 → 返回查找值本身', type: 'ok', values: { lookup_value: '"香蕉"', result_vector: '' }, expect: '香蕉', note: '没给返回列时，直接返回查找列对应位置的值「香蕉」' },
       { label: '找不到 → #N/A', type: 'error', values: { lookup_value: '"西瓜"' }, expect: '#N/A', note: '「西瓜」不在查找列里' },
       { label: '查找列非法 → #REF!', type: 'error', values: { lookup_vector: 'ZZZ' }, expect: '#REF!', note: 'ZZZ 不是合法区域引用' },
       { label: '返回列太短 → #N/A', type: 'error', values: { lookup_value: '"苹果"', result_vector: 'B2:B3' }, expect: '#N/A', note: '返回列只有 2 行，取不到第 3 行对应的位置' },

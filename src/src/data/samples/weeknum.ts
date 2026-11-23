@@ -124,7 +124,6 @@ const weeknumEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'serial_number', label: '日期', type: 'text', default: '2024-01-01', placeholder: '如 2024-01-01', hint: '要算第几周的日期' },

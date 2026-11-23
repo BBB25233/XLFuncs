@@ -111,12 +111,11 @@ const degreesEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '弧度', type: 'number', default: '1.5707963267948966', placeholder: '如 1.5708', hint: 'DEGREES 把弧度转成角度' },
     ],
-    template: '=DEGREES(A2)',
+    template: '=DEGREES({number})',
     cases: [
       { label: '弧度 → 角度', type: 'ok', values: { number: '1.5707963267948966' }, expect: '90', note: 'DEGREES(π/2)=90' },
       { label: '弧度 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'DEGREES(0)=0' },

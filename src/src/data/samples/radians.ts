@@ -114,12 +114,11 @@ const radiansEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '角度', type: 'number', default: '180', placeholder: '如 180', hint: 'RADIANS 把角度转成弧度' },
     ],
-    template: '=RADIANS(A2)',
+    template: '=RADIANS({number})',
     cases: [
       { label: '角度 → 弧度', type: 'ok', values: { number: '180' }, expect: '3.141593', note: 'RADIANS(180)=π≈3.141593' },
       { label: '角度 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'RADIANS(0)=0' },

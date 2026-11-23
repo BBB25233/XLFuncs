@@ -115,7 +115,7 @@ const sumEntry: FunctionEntry = {
       tableId: 'sales',
       dataAnchor: 'A1',
       formula: '=SUM(F2:F13)',
-      result: '12 笔金额加总，约 451400（具体看样表数据）',
+      result: '12 笔金额加总 = 398400（样表 F 列实际合计）',
       explanation:
         '直接框住金额那一列 F2:F13，SUM 会把里面所有数字加起来，空行和标题行自动跳过。',
     },
@@ -481,8 +481,8 @@ const sumproductEntry: FunctionEntry = {
       dataTsv: '科目\t得分\t权重\n语文\t80\t0.3\n数学\t90\t0.4\n英语\t70\t0.3',
       dataAnchor: 'A1',
       formula: '=SUMPRODUCT(B2:B4,C2:C4)/SUM(C2:C4)',
-      result: '(80×0.3+90×0.4+70×0.3)/1 = 83',
-      explanation: '先拿得分乘权重求和，再除以权重总和，得到加权平均分 83。',
+      result: '(80×0.3+90×0.4+70×0.3)/1 = 81',
+      explanation: '先拿得分乘权重求和，再除以权重总和，得到加权平均分 81。',
     },
   ],
   pitfalls: [

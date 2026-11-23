@@ -25,7 +25,26 @@ const xirrEntry: FunctionEntry = {
     { key: 'guess', zh: '猜测', en: 'guess', required: false, desc: '初始猜测，默认 0.1' }],
   },
   returnValue: '内部收益率',
-  examples: [{ title: '示例：不规则 IRR', scene: '投入与回款日期不同', dataAnchor: 'B2', formula: '=XIRR(B2:B5,C2:C5)', result: '按日期计算的内部收益率', explanation: '用实际天数折现。' }],
+  examples: [
+    {
+      title: '示例：不定期回款',
+      scene: '投入 1 万，四笔现金流日期不同',
+      dataAnchor: 'B2',
+      formula: '=XIRR(B2:B5,C2:C5)',
+      result: '约 0.5138',
+      explanation: '按实际天数折现求年化收益率。',
+      dataTsv: '现金流\t日期\n-10000\t2024-01-01\n4000\t2024-06-01\n5000\t2025-01-01\n6000\t2025-06-01',
+    },
+    {
+      title: '示例：等额回款三年',
+      scene: '投入 5000，三年各回 2500',
+      dataAnchor: 'B2',
+      formula: '=XIRR(B2:B5,C2:C5)',
+      result: '约 0.3701',
+      explanation: '回款间隔不等也能按天折算。',
+      dataTsv: '现金流\t日期\n-5000\t2024-01-01\n2500\t2024-09-01\n2500\t2025-05-01\n2500\t2026-01-01',
+    },
+  ],
   pitfalls: [{ title: '需一笔负现金流', reason: '全正或全负会 #NUM!。', fix: '至少一笔为负（投入）。', level: 'high' }],
   related: [{ id: 'irr', kind: 'companion', why: 'IRR 与本品类相关' },
     { id: 'mirr', kind: 'companion', why: 'MIRR 与本品类相关' },
@@ -38,13 +57,13 @@ const xirrEntry: FunctionEntry = {
         "key": "values",
         "label": "现金流",
         "type": "text",
-        "default": "\"-100,50,80,40\""
+        "default": "{-100,50,80,40}"
       },
       {
         "key": "dates",
         "label": "日期",
         "type": "text",
-        "default": "\"2024-01-01,2024-06-01,2025-01-01,2025-06-01\""
+        "default": "{45292,45444,45658,45809}"
       },
       {
         "key": "guess",
@@ -59,8 +78,8 @@ const xirrEntry: FunctionEntry = {
         "label": "标准案例",
         "type": "ok",
         "values": {
-          "values": "\"-100,50,80,40\"",
-          "dates": "\"2024-01-01,2024-06-01,2025-01-01,2025-06-01\"",
+          "values": "{-100,50,80,40}",
+          "dates": "{45292,45444,45658,45809}",
           "guess": "0.1"
         },
         "expect": "0.81947",
@@ -70,8 +89,8 @@ const xirrEntry: FunctionEntry = {
         "label": "另一组",
         "type": "ok",
         "values": {
-          "values": "\"-1000,500,500,500\"",
-          "dates": "\"2024-01-01,2025-01-01,2026-01-01,2027-01-01\"",
+          "values": "{-1000,500,500,500}",
+          "dates": "{45292,45658,46023,46388}",
           "guess": "0.1"
         },
         "expect": "0.233371",
@@ -81,8 +100,8 @@ const xirrEntry: FunctionEntry = {
         "label": "全为正",
         "type": "error",
         "values": {
-          "values": "\"100,50,80\"",
-          "dates": "\"2024-01-01,2024-06-01,2025-01-01\"",
+          "values": "{100,50,80}",
+          "dates": "{45292,45444,45658}",
           "guess": "0.1"
         },
         "expect": "#NUM!",
@@ -92,7 +111,7 @@ const xirrEntry: FunctionEntry = {
         "label": "数量不一致",
         "type": "error",
         "values": {
-          "values": "\"-100,50\"",
+          "values": "{-100,50}",
           "dates": "\"2024-01-01\"",
           "guess": "0.1"
         },
@@ -103,7 +122,7 @@ const xirrEntry: FunctionEntry = {
         "label": "非法日期",
         "type": "error",
         "values": {
-          "values": "\"-100,50\"",
+          "values": "{-100,50}",
           "dates": "\"abc,2024-06-01\"",
           "guess": "0.1"
         },

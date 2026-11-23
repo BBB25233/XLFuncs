@@ -112,12 +112,11 @@ const tanEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '弧度', type: 'number', default: '0.5', placeholder: '如 0.5', hint: 'TAN 只认弧度，角度需先 RADIANS()' },
     ],
-    template: '=TAN(A2)',
+    template: '=TAN({number})',
     cases: [
       { label: '正切 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'tan(0)=0' },
       { label: '正切 1', type: 'ok', values: { number: '1' }, expect: '1.557408', note: 'tan(1)≈1.557408' },

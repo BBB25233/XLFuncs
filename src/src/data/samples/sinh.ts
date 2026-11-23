@@ -57,7 +57,7 @@ const sinhEntry: FunctionEntry = {
       scene: '想确认 Excel 的 SINH 到底在算什么，用定义式手算一遍对比。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=(EXP(A3)-EXP(-A3))/2',
+      formula: '=(EXP(A4)-EXP(-A4))/2',
       result: '3.6269（与 =SINH(2) 结果完全一致）',
       explanation: 'SINH(x) 的定义就是 (eˣ − e⁻ˣ)/2，用 EXP 手算可以互相验证结果。',
     },
@@ -112,12 +112,11 @@ const sinhEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=SINH(A2)',
+    template: '=SINH({number})',
     cases: [
       { label: '双曲正弦 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'sinh(0)=0' },
       { label: '双曲正弦 1', type: 'ok', values: { number: '1' }, expect: '1.175201', note: 'sinh(1)≈1.175201' },

@@ -480,7 +480,7 @@ export const dbCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   if (month < 1 || month > 12) {
     return numErr('首年月数须在 1…12', 'month 必须在 1 到 12 之间。');
   }
-  const rate = 1 - Math.pow(salvage / cost, 1 / life);
+  const rate = Math.round((1 - Math.pow(salvage / cost, 1 / life)) * 1000) / 1000;
   let accumulated = 0;
   let result = 0;
   for (let p = 1; p <= per; p += 1) {
@@ -703,7 +703,7 @@ export const euroconvertCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 
 function parseNumberList(raw: string | undefined): number[] | null {
   if (raw === undefined) return null;
-  const s = stripQuotes(raw).inner;
+  const s = stripQuotes(raw).inner.replace(/^\{|\}$/g, '');
   const parts = s.split(',').map((x) => x.trim()).filter((x) => x !== '');
   if (parts.length === 0) return null;
   const nums = parts.map((p) => toNumber(p));

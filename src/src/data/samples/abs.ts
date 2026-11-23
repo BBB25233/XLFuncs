@@ -118,7 +118,6 @@ const absEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '-7', hint: '要取绝对值的数，可正可负' },

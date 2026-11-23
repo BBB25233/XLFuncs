@@ -19,11 +19,11 @@ const minuteEntry: FunctionEntry = {
   version: {
     min: 'all',
     label: '全版本可用（Excel 2003 起）',
-    notes: 'MINUTE 从时间里取出「分钟」部分，返回 0–59。参数是真时间/日期时间，文本时间要先 TIMEVALUE 化。',
+    notes: 'MINUTE 从时间里取出「分钟」部分，返回 0–59。文本时间（"13:30"）Excel 会自动识别，只有不像时间的文本才报 #VALUE!。',
   },
   oneLiner: '从时间中取出分钟数（0–59）',
   summary:
-    '拿到一个时间想单独用它的「分钟」做判断时，MINUTE 最方便。它只取分钟部分（13:30 → 30），不管小时秒。参数是真时间或日期时间；文本 "13:30" 要先 TIMEVALUE 转一下，否则报 #VALUE!。',
+    '拿到一个时间想单独用它的「分钟」做判断时，MINUTE 最方便。它只取分钟部分（13:30 → 30），不管小时秒。参数可以是真时间、日期时间，也可以直接是文本 "13:30"（Excel 会自动识别成时间）；只有不像时间的文本（如 "13点30"）才报 #VALUE!。',
   syntax: {
     patternCn: '=MINUTE(时间)',
     patternEn: '=MINUTE(serial_number)',
@@ -36,7 +36,7 @@ const minuteEntry: FunctionEntry = {
         desc: '一个真时间或日期时间（序列号），或其中单元格引用。',
         accepts: '时间单元格、NOW()、TIME(13,30,0)。',
         ifOmitted: '必填，省略公式不成立。',
-        tip: '⚠️ 文本时间直接喂会报 #VALUE!，先 TIMEVALUE 化。',
+        tip: '⚠️ 文本 "13:30" 能直接取（得 30）；写成 "13点30" 这类不像时间的文本才报 #VALUE!。',
         example: 'A2',
         pitfallRank: 1,
       },
@@ -63,20 +63,21 @@ const minuteEntry: FunctionEntry = {
       explanation: 'HOUR、MINUTE 分别取小时分钟，用 & 拼成中文标签。',
     },
     {
-      title: '示例 3：文本时间直接喂报错',
-      scene: '单元格里是文本 "13:30"。',
+      title: '示例 3：文本时间也能直接取分钟',
+      scene: '单元格里存的是文本 "13:30"（从系统导出、靠左对齐）。',
       dataTsv: '文本时刻\n13:30',
       dataAnchor: 'A1',
       formula: '=MINUTE(A2)',
-      result: '#VALUE!',
-      explanation: '文本时间不是真时间，先 TIMEVALUE(A2) 转成真时间再取分钟。',
+      result: '30',
+      explanation:
+        'Excel 会把 "13:30" 自动识别成时间，不用先 TIMEVALUE 也能取到 30。换成 "13点30" 这种写法才会报 #VALUE!。',
     },
   ],
   pitfalls: [
     {
-      title: '文本时间直接喂 MINUTE 报 #VALUE!',
-      reason: 'MINUTE 要真时间（序列号），文本 "13:30" 不是。',
-      fix: '先 TIMEVALUE(A2) 或把单元格改成真时间再取。',
+      title: '文本写法不像时间，报 #VALUE!',
+      reason: 'MINUTE 能识别 "13:30"，但识别不了 "13点30" 这类写法，直接报 #VALUE!。',
+      fix: '把文本改成带冒号的 "13:30" 或 "13:30:00"。',
       level: 'high',
       errorCode: '#VALUE!',
     },
@@ -112,7 +113,6 @@ const minuteEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value', label: '时间/序列号', type: 'text', default: '"13:30:00"' },

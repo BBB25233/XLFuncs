@@ -75,18 +75,18 @@ const dgetEntry: FunctionEntry = {
     {
       title: '示例 1：按名称取唯一记录',
       scene: '想知道「白菜」这一条的销售额。',
-      dataTsv: '名称\t类型\t销售额\t数量\t\t名称\n苹果\t水果\t1000\t10\t\t白菜\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\t数量\n水果\t>9\n类型\n蔬菜\n类型\n海鲜\n名称\n白菜\n数量\n12',
       dataAnchor: 'A1',
-      formula: '=DGET(A1:D5,"销售额",F1:F2)',
+      formula: '=DGET(A1:D5,"销售额",A12:A13)',
       result: '300',
       explanation: '按名称唯一命中「白菜」，取回 300。'
     },
     {
       title: '示例 2：按数值条件取唯一记录',
       scene: '数量正好是 12 的那一条（只有第二只苹果）。',
-      dataTsv: '名称\t类型\t销售额\t数量\t\t数量\n苹果\t水果\t1000\t10\t\t12\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\t数量\n水果\t>9\n类型\n蔬菜\n类型\n海鲜\n名称\n白菜\n数量\n12',
       dataAnchor: 'A1',
-      formula: '=DGET(A1:D5,"销售额",F1:F2)',
+      formula: '=DGET(A1:D5,"销售额",A14:A15)',
       result: '1200',
       explanation: '按数量 =12 唯一命中第二只苹果，取回 1200。'
     }

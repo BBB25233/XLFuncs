@@ -133,6 +133,7 @@ const slopeEntry: FunctionEntry = {
       { label: '回归斜率', type: 'ok', values: { known_ys: 'C2:C6', known_xs: 'B2:B6' }, expect: '10.4', note: '每增加1单位' },
       { label: '两组个数不一致', type: 'error', values: { known_ys: 'C2:C6', known_xs: 'B2:B5' }, expect: '#N/A', note: '行数不等' },
       { label: 'x 区域非法', type: 'error', values: { known_ys: 'C2:C6', known_xs: 'ZZZ' }, expect: '#REF!', note: '非法区域' },
+          { label: '前三个月回归', type: 'ok', values: { known_ys: 'C2:C4', known_xs: 'B2:B4' }, expect: '9.5', note: '样本缩短后拟合斜率略降。' },
     ],
   },
   meta: {

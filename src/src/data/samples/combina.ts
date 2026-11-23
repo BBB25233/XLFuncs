@@ -128,7 +128,6 @@ const combinaEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '总数 n', type: 'number', default: '4' },
@@ -139,6 +138,7 @@ const combinaEntry: FunctionEntry = {
       { label: 'COMBINA(4,3) → 20', type: 'ok', values: { number: '4', number2: '3' }, expect: '20', note: '可重复选取，等价于 COMBIN(6,3)=20。' },
       { label: '含负数 → #NUM!', type: 'error', values: { number: '-4', number2: '3' }, expect: '#NUM!', note: 'n 不能为负，报 #NUM!。' },
       { label: '文本 abc → #VALUE!', type: 'error', values: { number: 'abc', number2: '3' }, expect: '#VALUE!', note: '含文本会报 #VALUE!。' },
+          { label: 'COMBINA(5,2) → 15', type: 'ok', values: { number: '5', number2: '2' }, expect: '15', note: '等价于 COMBIN(6,2)=15。' },
     ],
   },
   meta: {

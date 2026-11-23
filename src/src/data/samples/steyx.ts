@@ -134,6 +134,7 @@ const steyxEntry: FunctionEntry = {
       { label: '预测标准误差', type: 'ok', values: { known_ys: 'C2:C6', known_xs: 'B2:B6' }, expect: '17.888544', note: '残差标准差' },
       { label: '两组个数不一致', type: 'error', values: { known_ys: 'C2:C6', known_xs: 'B2:B5' }, expect: '#N/A', note: '行数不等' },
       { label: 'y 区域非法', type: 'error', values: { known_ys: 'ZZZ', known_xs: 'B2:B6' }, expect: '#REF!', note: '非法区域' },
+          { label: '前三个月预测误差', type: 'ok', values: { known_ys: 'C2:C4', known_xs: 'B2:B4' }, expect: '12.247449', note: '样本变少后残差标准差下降。' },
     ],
   },
   meta: {

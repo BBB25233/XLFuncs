@@ -19,11 +19,11 @@ const secondEntry: FunctionEntry = {
   version: {
     min: 'all',
     label: '全版本可用（Excel 2003 起）',
-    notes: 'SECOND 从时间里取出「秒」部分，返回 0–59。参数是真时间/日期时间，文本时间要先 TIMEVALUE 化。',
+    notes: 'SECOND 从时间里取出「秒」部分，返回 0–59。文本时间（"13:30:45"）Excel 会自动识别，只有不像时间的文本才报 #VALUE!。',
   },
   oneLiner: '从时间中取出秒数（0–59）',
   summary:
-    '需要精确到秒时（比如打卡、计时、日志时间戳），SECOND 把时间的秒部分单独取出来（13:30:45 → 45）。参数是真时间或日期时间；文本 "13:30:45" 要先 TIMEVALUE 转一下，否则报 #VALUE!。',
+    '需要精确到秒时（比如打卡、计时、日志时间戳），SECOND 把时间的秒部分单独取出来（13:30:45 → 45）。参数可以是真时间、日期时间，也可以直接是文本 "13:30:45"（Excel 会自动识别成时间）；只有不像时间的文本（如 "13点30分45秒"）才报 #VALUE!。',
   syntax: {
     patternCn: '=SECOND(时间)',
     patternEn: '=SECOND(serial_number)',
@@ -36,7 +36,7 @@ const secondEntry: FunctionEntry = {
         desc: '一个真时间或日期时间（序列号），或其中单元格引用。',
         accepts: '时间单元格、NOW()、TIME(13,30,45)。',
         ifOmitted: '必填，省略公式不成立。',
-        tip: '⚠️ 文本时间直接喂会报 #VALUE!，先 TIMEVALUE 化。',
+        tip: '⚠️ 文本 "13:30:45" 能直接取（得 45）；写成 "13点30分45秒" 这类文本才报 #VALUE!。',
         example: 'A2',
         pitfallRank: 1,
       },
@@ -63,20 +63,21 @@ const secondEntry: FunctionEntry = {
       explanation: 'HOUR/MINUTE/SECOND 三者配合，用 & 和冒号拼回时刻文字。',
     },
     {
-      title: '示例 3：文本时间直接喂报错',
-      scene: '单元格里是文本 "13:30:45"。',
+      title: '示例 3：文本时间也能直接取秒',
+      scene: '单元格里存的是文本 "13:30:45"（从系统导出、靠左对齐）。',
       dataTsv: '文本时刻\n13:30:45',
       dataAnchor: 'A1',
       formula: '=SECOND(A2)',
-      result: '#VALUE!',
-      explanation: '文本时间不是真时间，先 TIMEVALUE(A2) 转成真时间再取秒。',
+      result: '45',
+      explanation:
+        'Excel 会把 "13:30:45" 自动识别成时间，不用先 TIMEVALUE 也能取到 45。换成 "13点30分45秒" 这种写法才会报 #VALUE!。',
     },
   ],
   pitfalls: [
     {
-      title: '文本时间直接喂 SECOND 报 #VALUE!',
-      reason: 'SECOND 要真时间（序列号），文本 "13:30:45" 不是。',
-      fix: '先 TIMEVALUE(A2) 或把单元格改成真时间再取。',
+      title: '文本写法不像时间，报 #VALUE!',
+      reason: 'SECOND 能识别 "13:30:45"，但识别不了 "13点30分45秒" 这类写法，直接报 #VALUE!。',
+      fix: '把文本改成带冒号的 "13:30:45" 或 "13:30"。',
       level: 'high',
       errorCode: '#VALUE!',
     },
@@ -112,7 +113,6 @@ const secondEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value', label: '时间/序列号', type: 'text', default: '"13:30:45"' },

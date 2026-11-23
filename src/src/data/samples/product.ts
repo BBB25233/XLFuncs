@@ -126,7 +126,6 @@ const productEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number1', label: '数字1', type: 'number', default: '2' },
@@ -140,6 +139,7 @@ const productEntry: FunctionEntry = {
       { label: 'PRODUCT(2,3,4) → 24', type: 'ok', values: { number1: '2', number2: '3', number3: '4' }, expect: '24', note: '2×3×4 = 24。' },
       { label: 'PRODUCT(0,5) → 0', type: 'ok', values: { number1: '0', number2: '5' }, expect: '0', note: '只要有一个 0，乘积就是 0。' },
       { label: '文本 abc → #VALUE!', type: 'error', values: { number1: 'abc', number2: '3', number3: '4' }, expect: '#VALUE!', note: '含文本会报 #VALUE!。' },
+          { label: 'PRODUCT(1.5,4,2) → 12', type: 'ok', values: { number1: '1.5', number2: '4', number3: '2' }, expect: '12', note: '小数同样适用，1.5×4×2 = 12。' },
     ],
   },
   meta: {

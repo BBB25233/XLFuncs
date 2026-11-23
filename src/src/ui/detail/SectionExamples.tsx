@@ -1,13 +1,12 @@
 import type { ReactElement } from 'react';
-import type { CellValue, ExampleItem, FunctionEntry } from '@/types';
-import { SAMPLE_TABLES } from '@/data/sampleTables';
+import type { FunctionEntry } from '@/types';
 import { buildCopyPayload, buildFormulaPayload } from '@/core/tsv';
-import { parseTsv } from '@/core/tsv';
 import SectionTitle from '@/ui/components/SectionTitle';
 import CodeBlock from '@/ui/components/CodeBlock';
 import DataTable from '@/ui/components/DataTable';
 import CopyButton from '@/ui/components/CopyButton';
 import { EditableText } from '@/ui/detail/EditBar';
+import { tableOfExample } from '@/ui/detail/tableOf';
 
 /**
  * 板块④：真实示例。
@@ -23,23 +22,6 @@ export interface SectionExamplesProps {
     key: 'title' | 'scene' | 'formula' | 'result' | 'explanation' | 'dataTsv',
     value: string,
   ) => void;
-}
-
-/** 取示例的数据表：优先三张样表，其次 dataTsv */
-function tableOf(example: ExampleItem): { header: string[]; rows: CellValue[][] } | null {
-  if (example.dataTsv !== undefined && example.dataTsv !== '') {
-    const parsed = parseTsv(example.dataTsv);
-    if (parsed.length === 0) {
-      return null;
-    }
-    const [header, ...body] = parsed;
-    return { header, rows: body as CellValue[][] };
-  }
-  if (example.tableId !== undefined) {
-    const table = SAMPLE_TABLES[example.tableId];
-    return { header: table.columns, rows: table.rows };
-  }
-  return null;
 }
 
 export default function SectionExamples({
@@ -61,7 +43,7 @@ export default function SectionExamples({
       <SectionTitle index={4} title="真实示例" />
       <div className="flex flex-col gap-4">
         {entry.examples.map((example, index) => {
-          const table = tableOf(example);
+          const table = tableOfExample(example);
           const tsvRows: string[][] =
             table === null
               ? []

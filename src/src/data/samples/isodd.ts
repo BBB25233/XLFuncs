@@ -103,7 +103,6 @@ const isoddEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {
 
     },

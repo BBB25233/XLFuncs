@@ -21,7 +21,7 @@ const chidistEntry: FunctionEntry = {
     { key: 'df', zh: '自由度', en: 'deg_freedom', required: true, desc: '自由度' }] },
   returnValue: '右尾概率',
   examples: [
-    { title: '示例：卡方右尾', scene: 'x=3、df=5', dataAnchor: 'B2', formula: '=CHIDIST(3,5)', result: '约 0.6999', explanation: 'P(X≥3 | df=5)。' },
+    { title: '示例：卡方右尾', scene: 'x=3、df=5', dataAnchor: 'B2', formula: '=CHIDIST(3,5)', result: '约 0.7000', explanation: 'P(X≥3 | df=5)。' },
     {
       title: '示例 2：三个常用 5% 临界值代进去会得到什么',
       scene: '卡方检验算完统计量要换 p 值再和 0.05 比。3.84、11.07、18.31 是三个常用的 5% 临界值，正好用来确认口径。',

@@ -123,7 +123,6 @@ const valuetotextEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value', label: '值', type: 'text', default: '"123"' },

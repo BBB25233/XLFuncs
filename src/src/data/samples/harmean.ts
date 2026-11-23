@@ -70,7 +70,7 @@ const harmeanEntry: FunctionEntry = {
       dataTsv: '批次\t买入价\n1\t10\n2\t12.5\n3\t8',
       dataAnchor: 'A1',
       formula: '=HARMEAN(B2:B4)',
-      result: '约 9.87 元',
+      result: '约 9.84 元',
       explanation:
         '每批金额相同（等额买入）时，平均成本是调和平均；若每批买入的**份额**相同，才用算术平均。',
     },

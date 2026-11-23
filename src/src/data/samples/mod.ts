@@ -128,7 +128,6 @@ const modEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number1', label: '被除数', type: 'number', default: '3' },

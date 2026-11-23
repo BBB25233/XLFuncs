@@ -310,16 +310,31 @@ export const percentrankCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   return ok(rp, formatNumber(roundedRp));
 };
 
-/** PHONETIC · 提取文本（本实现仅回显首格文字，不存储假名） */
+/**
+ * PHONETIC · 提取文本（本实现仅回显原文，不存储假名）
+ * Excel 只接受「区域引用」；数字格与空格子会被跳过，多格区域按行拼接。
+ */
 export const phoneticCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
-  const raw = ctx.args.ref ?? '';
+  const raw = (ctx.args.ref ?? '').trim();
+  if (raw === '') {
+    return fail(make(ERROR_CODES.VALUE, '缺少引用区域', 'PHONETIC 需要单元格引用，如 A2:A4。'));
+  }
+  if (!/^\$?[A-Za-z]{1,3}\$?\d+(?::\$?[A-Za-z]{1,3}\$?\d+)?$/.test(raw)) {
+    return fail(make(ERROR_CODES.VALUE, '参数必须是单元格引用', '不能直接写文本，请改用 A2 这样的引用。'));
+  }
   const sh = sliceSheet(ctx.sheet, raw);
-  if (!sh || sh.rows.length === 0) {
+  if (!sh) {
     return fail(make(ERROR_CODES.REF, '引用的区域不存在或写法不对。', '区域写成「左上角:右下角」，如 A2:A2。'));
   }
-  const cell = sh.rows[0]?.[0] ?? null;
-  const txt = cell === null ? '' : stripQuotes(String(cell)).inner;
-  return ok(txt, txt);
+  let out = '';
+  for (const row of sh.rows) {
+    for (const cell of row) {
+      if (cell === null || cell === undefined) continue;
+      if (typeof cell !== 'string') continue; // 数字/布尔会被 PHONETIC 跳过
+      out += stripQuotes(cell).inner;
+    }
+  }
+  return ok(out, out);
 };
 
 /** POISSON · 泊松分布 */

@@ -50,7 +50,7 @@ const bahttextEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=BAHTTEXT(A3)',
-      result: 'หนึ่งบาท（泰文：一铢）',
+      result: 'หนึ่งบาทถ้วน（泰文：一铢整）',
       explanation: '整数只读出铢，不出现萨当。',
     },
     {
@@ -91,7 +91,6 @@ const bahttextEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '1234.5' },

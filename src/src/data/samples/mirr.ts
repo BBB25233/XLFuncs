@@ -25,7 +25,25 @@ const mirrEntry: FunctionEntry = {
     { key: 'reinvest', zh: '再投资率', en: 'reinvest_rate', required: true, desc: '回款再投资收益率' }],
   },
   returnValue: '修正内部收益率',
-  examples: [{ title: '示例：MIRR', scene: '融资 10%、再投资 12%', dataAnchor: 'B2', formula: '=MIRR(B2:B5,0.1,0.12)', result: '按两率修正的收益率', explanation: '比 IRR 更贴近现实。' }],
+  examples: [
+    {
+      title: '示例：修正内部收益率',
+      scene: '投入 1 万，融资 10%、再投资 12%',
+      dataAnchor: 'B2',
+      formula: '=MIRR(B2:B5,0.1,0.12)',
+      result: '约 0.1515',
+      explanation: '正负现金流分别按两个利率折现。',
+      dataTsv: '现金流\n-10000\n3000\n4200\n6800',
+    },
+    {
+      title: '示例：更低的两率',
+      scene: '同现金流，融资 8%、再投资 10%',
+      dataAnchor: 'B2',
+      formula: '=MIRR({-10000,3000,4200,6800},0.08,0.1)',
+      result: '约 0.1460',
+      explanation: '再投资率下降，MIRR 随之下降。',
+    },
+  ],
   pitfalls: [{ title: '需正负现金流都有', reason: '缺一类会 #DIV/0!。', fix: '确保有投入也有回款。', level: 'mid' }],
   related: [{ id: 'irr', kind: 'companion', why: 'IRR 与本品类相关' },
     { id: 'xirr', kind: 'companion', why: 'XIRR 与本品类相关' },
@@ -38,7 +56,7 @@ const mirrEntry: FunctionEntry = {
         "key": "values",
         "label": "现金流",
         "type": "text",
-        "default": "\"-120000,39000,30000,21000,37000\""
+        "default": "{-120000,39000,30000,21000,37000}"
       },
       {
         "key": "finance",
@@ -59,22 +77,22 @@ const mirrEntry: FunctionEntry = {
         "label": "标准案例",
         "type": "ok",
         "values": {
-          "values": "\"-120000,39000,30000,21000,37000\"",
+          "values": "{-120000,39000,30000,21000,37000}",
           "finance": "0.1",
           "reinvest": "0.12"
         },
-        "expect": "0.069914",
+        "expect": "0.062522",
         "note": ""
       },
       {
         "label": "另一组",
         "type": "ok",
         "values": {
-          "values": "\"-100,20,30,40,50\"",
+          "values": "{-100,20,30,40,50}",
           "finance": "0.08",
           "reinvest": "0.1"
         },
-        "expect": "0.111272",
+        "expect": "0.119231",
         "note": ""
       },
       {

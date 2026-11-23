@@ -75,18 +75,18 @@ const daverageEntry: FunctionEntry = {
     {
       title: '示例 1：按类型筛选',
       scene: '统计「水果」的平均值。',
-      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\n苹果\t水果\t1000\t10\t\t水果\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\t数量\n水果\t>9\n类型\n蔬菜\n类型\n海鲜',
       dataAnchor: 'A1',
-      formula: '=DAVERAGE(A1:D5,"销售额",F1:F2)',
+      formula: '=DAVERAGE(A1:D5,"销售额",A6:A7)',
       result: '1000',
       explanation: '水果有三行（1000、800、1200），平均=1000。'
     },
     {
       title: '示例 2：多条件',
       scene: '「水果且数量>9」的平均值。',
-      dataTsv: '名称\t类型\t销售额\t数量\t\t类型\t数量\n苹果\t水果\t1000\t10\t\t水果\t>9\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\n"水果"\n类型\n"蔬菜"\n类型\n"海鲜"',
+      dataTsv: '名称\t类型\t销售额\t数量\n苹果\t水果\t1000\t10\n橙子\t水果\t800\t8\n白菜\t蔬菜\t300\t20\n苹果\t水果\t1200\t12\n类型\t数量\n水果\t>9\n类型\n蔬菜\n类型\n海鲜',
       dataAnchor: 'A1',
-      formula: '=DAVERAGE(A1:D5,"销售额",F1:G2)',
+      formula: '=DAVERAGE(A1:D5,"销售额",A6:B7)',
       result: '1100',
       explanation: '水果且数量>9 只剩 1000、1200，平均=1100。'
     }

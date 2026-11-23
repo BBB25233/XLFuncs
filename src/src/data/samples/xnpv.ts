@@ -25,7 +25,26 @@ const xnpvEntry: FunctionEntry = {
     { key: 'dates', zh: '日期', en: 'dates', required: true, desc: '与各现金流对应的日期区域' }],
   },
   returnValue: '按日期折现的净现值（数字）',
-  examples: [{ title: '示例：不定期回款', scene: '三笔回款日期不同', dataAnchor: 'B2', formula: '=XNPV(0.09,B2:B4,C2:C4)', result: '按实际天数折现的现值之和', explanation: '每笔按距首期的实际天数折现。' }],
+  examples: [
+    {
+      title: '示例：按日折现净现值',
+      scene: '折现率 9%，投入 1 万后两笔回款',
+      dataAnchor: 'B2',
+      formula: '=XNPV(0.09,B2:B4,C2:C4)',
+      result: '约 -3253.45',
+      explanation: 'C 列 45292 等为日期序列值（45292=2024-01-01）。',
+      dataTsv: '现金流\t日期序列\n-10000\t45292\n3000\t45444\n4200\t45658',
+    },
+    {
+      title: '示例：回款更早的项目',
+      scene: '投入 5000，两笔回款',
+      dataAnchor: 'B2',
+      formula: '=XNPV(0.09,B2:B4,C2:C4)',
+      result: '约 -49.09',
+      explanation: '回款越早，折现损失越小，净现值接近 0。',
+      dataTsv: '现金流\t日期序列\n-5000\t45292\n2600\t45536\n2800\t45778',
+    },
+  ],
   pitfalls: [{ title: '日期须升序且对应', reason: 'dates 与 values 行数、顺序必须一一对应。', fix: '核对两个区域行数一致。', level: 'mid' }],
   related: [{ id: 'npv', kind: 'companion', why: 'NPV 与本品类相关' },
     { id: 'xirr', kind: 'companion', why: 'XIRR 与本品类相关' },
@@ -44,13 +63,13 @@ const xnpvEntry: FunctionEntry = {
         "key": "values",
         "label": "现金流",
         "type": "text",
-        "default": "\"-100,50,80,40\""
+        "default": "{-100,50,80,40}"
       },
       {
         "key": "dates",
         "label": "日期",
         "type": "text",
-        "default": "\"2024-01-01,2024-06-01,2025-01-01,2025-06-01\""
+        "default": "{45292,45444,45658,45809}"
       }
     ],
     "template": "=XNPV({rate},{values},{dates})",
@@ -60,8 +79,8 @@ const xnpvEntry: FunctionEntry = {
         "type": "ok",
         "values": {
           "rate": "0.09",
-          "values": "\"-100,50,80,40\"",
-          "dates": "\"2024-01-01,2024-06-01,2025-01-01,2025-06-01\""
+          "values": "{-100,50,80,40}",
+          "dates": "{45292,45444,45658,45809}"
         },
         "expect": "57.01822",
         "note": ""
@@ -71,8 +90,8 @@ const xnpvEntry: FunctionEntry = {
         "type": "ok",
         "values": {
           "rate": "0.05",
-          "values": "\"-100,50,80,40\"",
-          "dates": "\"2024-01-01,2024-06-01,2025-01-01,2025-06-01\""
+          "values": "{-100,50,80,40}",
+          "dates": "{45292,45444,45658,45809}"
         },
         "expect": "62.503664",
         "note": ""

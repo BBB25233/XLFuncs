@@ -142,7 +142,6 @@ const decimalEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '数字文本', type: 'text', default: '"FF"' },

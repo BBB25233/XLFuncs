@@ -99,7 +99,7 @@ const networkdaysIntlEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=NETWORKDAYS.INTL("2024-3-15","2024-4-15",7)',
-      result: '23（排除每周五六）',
+      result: '22（排除每周五六）',
       explanation: '用数字代码 7 表示周五、周六为周末，自动跳过。',
     },
   ],
@@ -144,12 +144,11 @@ const networkdaysIntlEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'start_date', label: '开始日期', type: 'text', default: '2024-01-01', placeholder: '如 2024-01-01', hint: '区间起点' },
       { key: 'end_date', label: '结束日期', type: 'text', default: '2024-01-31', placeholder: '如 2024-01-31', hint: '区间终点' },
-      { key: 'weekend', label: '周末代码（演示版忽略）', type: 'text', default: '1', hint: '本演示版固定按周六+周日计算，忽略该参数' },
+      { key: 'weekend', label: '周末代码（演示版忽略）', type: 'number', default: '1', hint: '本演示版固定按周六+周日计算，忽略该参数' },
       { key: 'holidays', label: '节假日（演示版忽略）', type: 'text', default: '', hint: '本演示版忽略此列表' },
     ],
     template: '=NETWORKDAYS.INTL({start_date},{end_date},{weekend},{holidays})',

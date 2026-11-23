@@ -121,7 +121,6 @@ const multinomialEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number1', label: '数字1', type: 'number', default: '2' },
@@ -135,6 +134,7 @@ const multinomialEntry: FunctionEntry = {
       { label: 'MULTINOMIAL(2,3,4) → 1260', type: 'ok', values: { number1: '2', number2: '3', number3: '4' }, expect: '1260', note: '9!/(2!3!4!) = 362880/288 = 1260。' },
       { label: '含负数 -1 → #NUM!', type: 'error', values: { number1: '2', number2: '-1', number3: '4' }, expect: '#NUM!', note: '参数不能为负，报 #NUM!。' },
       { label: '文本 abc → #VALUE!', type: 'error', values: { number1: 'abc', number2: '3', number3: '4' }, expect: '#VALUE!', note: '含文本会报 #VALUE!。' },
+          { label: 'MULTINOMIAL(1,2,3) → 60', type: 'ok', values: { number1: '1', number2: '2', number3: '3' }, expect: '60', note: '6!/(1!2!3!) = 720/12 = 60。' },
     ],
   },
   meta: {

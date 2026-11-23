@@ -111,7 +111,6 @@ const properEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '文本', type: 'text', default: '"hello world"' },

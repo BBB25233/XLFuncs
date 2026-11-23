@@ -24,8 +24,8 @@ const npvEntry: FunctionEntry = {
     { key: 'value', zh: '现金流', en: 'value1,[value2]…', required: true, desc: '按顺序的各期现金流' }],
   },
   returnValue: '净现值（数字）',
-  examples: [{ title: '示例：三年项目评估', scene: '后三年分别回款 3000/4200/6800，折现 10%', dataAnchor: 'B2', formula: '=NPV(0.1,B2:B4)', result: '约 10765.7', explanation: '三笔现金流折到今天相加。' },
-    { title: '示例：含期初投入', scene: '期初先投 10000', dataAnchor: 'B1', formula: '=B1+NPV(0.1,B2:B4)', result: '约 765.7', explanation: 'NPV 从第 1 期起算，期初投入要单独加减。' }],
+  examples: [{ title: '示例：三年项目评估', scene: '后三年分别回款 3000/4200/6800，折现 10%', dataTsv: '-10000\n3000\n4200\n6800', dataAnchor: 'B1', formula: '=NPV(0.1,B2:B4)', result: '约 11307.3', explanation: '三笔现金流折到今天相加。' },
+    { title: '示例：含期初投入', scene: '期初先投 10000', dataTsv: '-10000\n3000\n4200\n6800', dataAnchor: 'B1', formula: '=B1+NPV(0.1,B2:B4)', result: '1307.3（= -10000 + 11307.3）', explanation: 'NPV 从第 1 期起算，期初投入要单独加减。' }],
   pitfalls: [{ title: '期初投入被多折一期', reason: 'NPV 默认现金流从第 1 期开始，把期初投入也放进去会多折一次。', fix: '期初投入单列：=B1+NPV(rate,后续)。', level: 'high' }],
   related: [{ id: 'irr', kind: 'companion', why: 'IRR 与本品类相关' },
     { id: 'xnpv', kind: 'companion', why: 'XNPV 与本品类相关' },
@@ -44,7 +44,7 @@ const npvEntry: FunctionEntry = {
         "key": "value",
         "label": "现金流",
         "type": "text",
-        "default": "\"3000,4200,6800\""
+        "default": "{3000,4200,6800}"
       }
     ],
     "template": "=NPV({rate},{value})",
@@ -54,7 +54,7 @@ const npvEntry: FunctionEntry = {
         "type": "ok",
         "values": {
           "rate": "0.1",
-          "value": "\"3000,4200,6800\""
+          "value": "{3000,4200,6800}"
         },
         "expect": "11307.287754",
         "note": ""

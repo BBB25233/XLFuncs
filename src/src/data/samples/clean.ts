@@ -59,16 +59,16 @@ const cleanEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=TRIM(CLEAN(A2))',
-      result: '先清控制符再去多余空格，得到干净文本',
+      result: 'ABC',
       explanation:
         'CLEAN 管不可打印字符、TRIM 管多余空格，两者职责不同，清洗流程通常两个都要用。',
     },
     {
       title: '示例 3：清不掉 CHAR(160) 不换行空格',
       scene: '网页复制的数据里有一种特殊空格，TRIM 和 CLEAN 都去不掉。',
-      dataTsv: '内容\nABC\u00A0\nXYZ',
+      dataTsv: '内容',
       dataAnchor: 'A1',
-      formula: '=SUBSTITUTE(A2,CHAR(160),"")',
+      formula: '=SUBSTITUTE("ABC"&CHAR(160),CHAR(160),"")',
       result: 'ABC（用 SUBSTITUTE 精确替换掉不换行空格）',
       explanation:
         'CHAR(160) 是常见的不换行空格（Unicode 里的 NBSP），CLEAN 覆盖不到，必须用 SUBSTITUTE + CHAR(160) 处理。',
@@ -113,7 +113,6 @@ const cleanEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '文本', type: 'text', default: '"Hello\x07World"' },

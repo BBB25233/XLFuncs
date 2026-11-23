@@ -102,7 +102,6 @@ const isnontextEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {
 
     },

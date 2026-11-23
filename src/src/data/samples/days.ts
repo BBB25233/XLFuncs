@@ -124,7 +124,6 @@ const daysEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'end', label: '结束日', type: 'text', default: '"2024-3-15"' },

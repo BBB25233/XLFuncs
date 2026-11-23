@@ -23,7 +23,7 @@ const arraytotextEntry: FunctionEntry = {
   },
   oneLiner: '把一片区域或数组转成一个文本字符串（紧凑或严格两种格式）',
   summary:
-    'ARRAYTOTEXT 把整个区域/数组压成一个文本字符串，便于快照、记录或导出。format=0 是紧凑模式（行内逗号、行间分号，如 "1,2;3,4"）；format=1 是严格模式（加引号、转义，数组结构一目了然）。常配合 TEXTJOIN/LET 做数据导出。',
+    'ARRAYTOTEXT 把整个区域/数组压成一个文本字符串，便于快照、记录或导出。format=0 是紧凑模式（所有元素用「, 」连成一串，如 "1, 2, 3, 4"）；format=1 是严格模式（加引号、用分号分行，数组结构一目了然）。常配合 TEXTJOIN/LET 做数据导出。',
   syntax: {
     patternCn: '=ARRAYTOTEXT(数组, [格式])',
     patternEn: '=ARRAYTOTEXT(array, [format])',
@@ -61,8 +61,8 @@ const arraytotextEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=ARRAYTOTEXT(A2:B3)',
-      result: '1,2;3,4',
-      explanation: '行内用逗号、行间用分号，紧凑无多余字符。',
+      result: '1, 2, 3, 4',
+      explanation: '紧凑模式把所有元素按「, 」连成一串，二维区域也不会用分号分行。',
     },
     {
       title: '示例 2：严格模式（带引号）',
@@ -103,7 +103,6 @@ const arraytotextEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value1', label: '值1', type: 'text', default: '"a"' },

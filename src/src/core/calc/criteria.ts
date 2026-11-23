@@ -196,9 +196,17 @@ function makeFailure(failure: CalcFailure): Criterion {
 
 /**
  * 解析一个条件字符串。
- * 忘了加引号是最常见的错：除了纯数字，其他写法不带半角双引号一律 #NAME?。
+ *
+ * - `mode = 'formula'`（默认）：条件写在公式参数里，Excel 要求除纯数字外必须带半角双引号，
+ *   裸写 `水果` 或 `>10000` 一律 #NAME?（SUMIF / COUNTIF 家族口径）。
+ * - `mode = 'cell'`：条件写在单元格里（D 函数家族的条件区），单元格内容本身就是值，
+ *   `水果`、`>9`、`*果*` 都不需要引号；带引号的旧写法继续兼容。
  */
-export function parseCriterion(raw: string, sheet: Sheet): Criterion {
+export function parseCriterion(
+  raw: string,
+  sheet: Sheet,
+  mode: 'formula' | 'cell' = 'formula',
+): Criterion {
   const { inner, quoted } = stripQuotes(raw);
 
   if (inner === '') {
@@ -233,9 +241,8 @@ export function parseCriterion(raw: string, sheet: Sheet): Criterion {
     const op = withOp[1];
     const rest = withOp[2].trim();
 
-    // 忘了加引号：只要在带比较符的条件下没有用引号包住整段，Excel 就报 #NAME?
-    // （纯数字可省略引号，如 ">10000" 必须带引号，裸写 >10000 一律报错）
-    if (!quoted || rest === '') {
+    // 忘了加引号：公式参数里裸写 `>10000` 一律 #NAME?；单元格口径下这是正常写法
+    if (mode === 'formula' && (!quoted || rest === '')) {
       return makeFailure(explain('criteria', ERROR_CODES.NAME, 'unquoted_operator'));
     }
 
@@ -259,7 +266,7 @@ export function parseCriterion(raw: string, sheet: Sheet): Criterion {
   }
 
   // ---------- 无比较符：纯数字 / 通配符 / 纯文本 ----------
-  if (!quoted && !isNumeric(inner)) {
+  if (mode === 'formula' && !quoted && !isNumeric(inner)) {
     return makeFailure(explain('criteria', ERROR_CODES.NAME, 'unquoted_text'));
   }
   if (isNumeric(inner)) {

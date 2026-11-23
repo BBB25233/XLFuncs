@@ -113,12 +113,11 @@ const acosEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '0.5', placeholder: '如 0.5', hint: '必须在 [-1,1]' },
     ],
-    template: '=ACOS(A2)',
+    template: '=ACOS({number})',
     cases: [
       { label: '反余弦 1', type: 'ok', values: { number: '1' }, expect: '0', note: 'acos(1)=0' },
       { label: '反余弦 0.5', type: 'ok', values: { number: '0.5' }, expect: '1.047198', note: 'acos(0.5)≈1.047198（60°）' },

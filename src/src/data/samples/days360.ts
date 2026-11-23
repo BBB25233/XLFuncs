@@ -133,7 +133,6 @@ const days360Entry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'start_date', label: '开始日', type: 'text', default: '"2024-1-1"' },

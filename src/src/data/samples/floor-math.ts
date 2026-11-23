@@ -32,7 +32,7 @@ const floorMathEntry: FunctionEntry = {
     min: '2013',
     label: '需 Excel 2013 及以上（含 Microsoft 365）；旧版用 FLOOR。',
     notes:
-      'FLOOR.MATH 是 FLOOR 的现代替代：默认朝 0 方向舍入（去尾），负数多一个 mode 参数控制方向。mode 非 0 时负数改为远离 0（更负）。',
+      'FLOOR.MATH 是 FLOOR 的现代替代：默认朝 -∞ 舍入，负数多一个 mode 参数控制方向。mode 非 0 时负数改为远离 0（更负）。',
   },
   oneLiner: '向下舍到最近的指定倍数',
   summary:
@@ -49,7 +49,7 @@ const floorMathEntry: FunctionEntry = {
         desc: '要向下舍入的原始数字。',
         accepts: 'A2 · 23 · -12.3。',
         ifOmitted: '必填。',
-        tip: '正数变小、负数默认也朝 0（绝对值变小）。',
+        tip: '正数变小、负数默认朝 -∞（更负）。',
         example: 'A2',
         pitfallRank: 2,
       },
@@ -70,16 +70,16 @@ const floorMathEntry: FunctionEntry = {
         zh: '模式',
         en: 'mode',
         required: false,
-        desc: '仅对负数生效：0（默认）=朝 0 方向（绝对值变小）；非 0=远离 0（更负）。',
+        desc: '仅对负数生效：0（默认）=朝 -∞（更负）；非 0=朝 0（绝对值变小）。',
         accepts: '0 · 1 · -1。',
-        ifOmitted: '省略或 0：负数朝 0 去尾。',
+        ifOmitted: '省略或 0：负数朝 -∞ 舍去。',
         tip: '正数不受 mode 影响；要控制负数方向才填。',
         example: '0',
       },
     ],
   },
   returnValue:
-    '返回朝 0 方向（去尾）舍入到 significance 倍数的结果；负数默认绝对值变小，mode 非 0 时改为更负。',
+    '返回朝 -∞ 舍入到 significance 倍数的结果；负数默认更负，mode 非 0 时改为朝 0。',
   examples: [
     {
       title: '示例 1：去尾到 5（能装几整箱）',
@@ -101,12 +101,12 @@ const floorMathEntry: FunctionEntry = {
     },
     {
       title: '示例 3：负数方向（mode 参数）',
-      scene: '负数默认朝 0（绝对值变小），有时想让它更负。',
+      scene: '负数默认更负，有时想让它朝 0（绝对值变小）。',
       dataTsv: FLOOR_NEG_TSV,
       dataAnchor: 'A1',
       formula: '=FLOOR.MATH(A2,1,1)',
-      result: '默认 =FLOOR.MATH(-4.3,1) → -4（朝0）；加 mode 非0 的 =FLOOR.MATH(-4.3,1,1) → -5（远离0）',
-      explanation: 'mode 只管负数：默认朝 0（-4.3→-4），非 0 更负（-4.3→-5）。',
+      result: '默认 =FLOOR.MATH(-4.3,1) → -5（更负）；加 mode 非0 的 =FLOOR.MATH(-4.3,1,1) → -4（朝0）',
+      explanation: 'mode 只管负数：默认更负（-4.3→-5），非 0 朝 0（-4.3→-4）。',
     },
   ],
   pitfalls: [
@@ -117,8 +117,8 @@ const floorMathEntry: FunctionEntry = {
       level: 'mid',
     },
     {
-      title: '负数默认朝 0（绝对值变小），和「向下」直觉相反',
-      reason: '默认 mode 0，负数朝 0 即 -4.3 → -4。',
+      title: '负数默认更负，和「朝 0」直觉相反',
+      reason: '默认 mode 0，负数朝 -∞ 即 -4.3 → -5。',
       fix: '想负数更负，加第三参数非 0：=FLOOR.MATH(A2,1,1)。',
       level: 'high',
     },
@@ -149,16 +149,15 @@ const floorMathEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '3.7', placeholder: '如 3.7' },
       { key: 'significance', label: '倍数', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=FLOOR.MATH(A2,B2)',
+    template: '=FLOOR.MATH({number},{significance})',
     cases: [
       { label: '向下去尾到整数', type: 'ok', values: { number: '3.7', significance: '1' }, expect: '3', note: 'FLOOR.MATH(3.7,1)=3' },
-      { label: '负数朝 0', type: 'ok', values: { number: '-3.7', significance: '1' }, expect: '-3', note: '负值朝 0：-3' },
+      { label: '负数向 -∞ 舍去', type: 'ok', values: { number: '-3.7', significance: '1' }, expect: '-4', note: '负值更负：-3.7→-4' },
       { label: '去尾到 5 的倍数', type: 'ok', values: { number: '17', significance: '5' }, expect: '15', note: 'FLOOR.MATH(17,5)=15' },
       { label: '数字非数字', type: 'error', values: { number: 'abc', significance: '1' }, expect: '#VALUE!', note: '文本参数报错' },
     ],

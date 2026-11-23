@@ -19,11 +19,11 @@ const hourEntry: FunctionEntry = {
   version: {
     min: 'all',
     label: '全版本可用（Excel 2003 起）',
-    notes: 'HOUR 从时间（或日期时间）里取出「小时」部分，返回 0–23。参数是真时间/日期时间，文本时间要先 TIMEVALUE 化。',
+    notes: 'HOUR 从时间（或日期时间）里取出「小时」部分，返回 0–23。文本时间（"13:30"）Excel 会自动识别，只有不像时间的文本才报 #VALUE!。',
   },
   oneLiner: '从时间中取出小时数（0–23）',
   summary:
-    '拿到一个时间想单独用它的「小时」做判断或分组时，HOUR 最方便。它只取小时部分（13:30 → 13），不管分钟秒。参数是真时间或日期时间；如果是文本写的 "13:30" 要先 TIMEVALUE 转一下，否则报 #VALUE!。',
+    '拿到一个时间想单独用它的「小时」做判断或分组时，HOUR 最方便。它只取小时部分（13:30 → 13），不管分钟秒。参数可以是真时间、日期时间，也可以直接是文本写的 "13:30"（Excel 会自动识别成时间）；只有不像时间的文本（如 "13点30"、"abc"）才报 #VALUE!。',
   syntax: {
     patternCn: '=HOUR(时间)',
     patternEn: '=HOUR(serial_number)',
@@ -36,7 +36,7 @@ const hourEntry: FunctionEntry = {
         desc: '一个真时间或日期时间（序列号），或其中的单元格引用。',
         accepts: '时间单元格、NOW()、TIME(13,30,0)。',
         ifOmitted: '必填，省略公式不成立。',
-        tip: '⚠️ 文本时间 "13:30" 直接喂会报 #VALUE!，先 TIMEVALUE 化。',
+        tip: '⚠️ 文本 "13:30" 能直接取（得 13）；写成 "13点30" 或 "abc" 这类不像时间的文本才报 #VALUE!。',
         example: 'A2',
         pitfallRank: 1,
       },
@@ -63,20 +63,21 @@ const hourEntry: FunctionEntry = {
       explanation: 'NOW() 给当前时间，HOUR 取小时，小于 12 即上午。',
     },
     {
-      title: '示例 3：文本时间直接喂报错',
-      scene: '单元格里是文本 "13:30"。',
+      title: '示例 3：文本时间也能直接取小时',
+      scene: '单元格里存的是文本 "13:30"（从系统导出的，靠左对齐）。',
       dataTsv: '文本时刻\n13:30',
       dataAnchor: 'A1',
       formula: '=HOUR(A2)',
-      result: '#VALUE!',
-      explanation: '文本时间不是真时间，要先 TIMEVALUE(A2) 转成真时间再取小时。',
+      result: '13',
+      explanation:
+        'Excel 会把 "13:30" 这种带冒号的文本自动识别成时间，所以不用先 TIMEVALUE 也能取到 13。换成 "13点30" 或 "abc" 这种不像时间的文本才会报 #VALUE!。',
     },
   ],
   pitfalls: [
     {
-      title: '文本时间直接喂 HOUR 报 #VALUE!',
-      reason: 'HOUR 要真时间（序列号），文本 "13:30" 不是。',
-      fix: '先 TIMEVALUE(A2) 或把单元格改成真时间再取。',
+      title: '文本写法不像时间，报 #VALUE!',
+      reason: 'HOUR 能识别 "13:30"，但识别不了 "13点30"、"abc" 这类写法，直接报 #VALUE!。',
+      fix: '把文本改成带冒号的 "13:30" 或 "13:30:00"；实在改不了就先 SUBSTITUTE 把「点」换成「:」。',
       level: 'high',
       errorCode: '#VALUE!',
     },
@@ -112,7 +113,6 @@ const hourEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value', label: '时间/序列号', type: 'text', default: '"13:30:00"' },

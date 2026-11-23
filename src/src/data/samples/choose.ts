@@ -120,7 +120,6 @@ const chooseEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'index_num', label: '序号', type: 'number', default: '2' },

@@ -145,7 +145,6 @@ const replaceEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'old_text', label: '原文', type: 'text', default: '"abcdef"' },

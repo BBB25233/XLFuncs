@@ -135,13 +135,12 @@ const randbetweenEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'bottom', label: '下界', type: 'number', default: '1', placeholder: '如 1', hint: '必须为整数' },
       { key: 'top', label: '上界', type: 'number', default: '10', placeholder: '如 10', hint: '必须为整数' },
     ],
-    template: '=RANDBETWEEN(A2,B2)',
+    template: '=RANDBETWEEN({bottom},{top})',
     cases: [
       { label: '1 到 10 随机整数', type: 'ok', values: { bottom: '1', top: '10' }, expect: '5', note: '自定义断言：结果在 [1,10] 且为整数（不比对 display）' },
       { label: '非整数下界', type: 'error', values: { bottom: '1.5', top: '10' }, expect: '#VALUE!', note: 'RANDBETWEEN 要求整数' },

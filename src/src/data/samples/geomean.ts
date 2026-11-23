@@ -60,7 +60,7 @@ const geomeanEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=GEOMEAN(B2:B4)',
-      result: '1.1289（即年均增长 12.89%）',
+      result: '1.1292（即年均增长 12.92%）',
       explanation:
         '连乘 1.2×1.5×0.8 = 1.44，开三次方得 1.1289。这才是真实的年均复合增长率。',
     },

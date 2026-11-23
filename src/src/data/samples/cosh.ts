@@ -112,12 +112,11 @@ const coshEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=COSH(A2)',
+    template: '=COSH({number})',
     cases: [
       { label: '双曲余弦 0', type: 'ok', values: { number: '0' }, expect: '1', note: 'cosh(0)=1' },
       { label: '双曲余弦 1', type: 'ok', values: { number: '1' }, expect: '1.543081', note: 'cosh(1)≈1.543081' },

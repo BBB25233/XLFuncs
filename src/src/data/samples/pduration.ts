@@ -1,22 +1,22 @@
 import type { FunctionEntry } from '@/types';
 
-/** PDURATION · 价格久期（financial 类 B9 批次） */
+/** PDURATION · 达到目标值所需期数（financial 类 B9 批次） */
 
 const pdurationEntry: FunctionEntry = {
   id: 'pduration',
   enName: 'PDURATION',
-  zhName: '价格久期',
-  zhCommon: ['PDURATION', '价格久期'],
-  alias: ['增值期数'],
+  zhName: '达到目标值所需期数',
+  zhCommon: ['PDURATION', '所需期数'],
+  alias: ['增值期数', '到达目标期数'],
   category: 'financial',
-  abbr: 'jgjq',
-  pinyin: 'jiagejiuqi',
-  keywords: ['pduration', '久期', '投资'],
+  abbr: 'qss',
+  pinyin: 'suoxuqishu',
+  keywords: ['pduration', '期数', '复利', '投资'],
   difficulty: 4,
   usageLevel: 1,
-  version: { min: 'all', label: 'Excel 2003 起全版本可用' },
-  oneLiner: '算价值翻倍所需期数',
-  summary: 'PDURATION 返回在给定利率下，投资从现值增长到目标值所需的期数，类似对数久期。',
+  version: { min: 'all', label: 'Excel 2013 起可用' },
+  oneLiner: '算达到目标金额需要多少期',
+  summary: 'PDURATION 返回在给定利率下，投资从现值增长到目标值所需的期数，按复利计算。',
   syntax: {
     patternCn: '=PDURATION(利率, 现值, 终值)',
     patternEn: '=PDURATION(rate, pv, fv)',
@@ -25,7 +25,24 @@ const pdurationEntry: FunctionEntry = {
     { key: 'fv', zh: '终值', en: 'fv', required: true, desc: '目标价值' }],
   },
   returnValue: '所需期数',
-  examples: [{ title: '示例：翻倍期数', scene: '年率 5%、100→200', dataAnchor: 'B2', formula: '=PDURATION(0.05,100,200)', result: '约 14.2（年）', explanation: 'LN(2)/LN(1.05)。' }],
+  examples: [
+    {
+      title: '示例：达到目标金额所需期数',
+      scene: '利率 5%，100 增长到 200',
+      dataAnchor: 'B2',
+      formula: '=PDURATION(0.05,100,200)',
+      result: '约 14.2',
+      explanation: '按复利计算翻倍所需年数。',
+    },
+    {
+      title: '示例：4% 利率增长 50%',
+      scene: '现值 100、终值 150',
+      dataAnchor: 'B2',
+      formula: '=PDURATION(0.04,100,150)',
+      result: '约 10.34',
+      explanation: '利率越低，达到目标所需期数越多。',
+    },
+  ],
   pitfalls: [{ title: '与 DURATION 不同', reason: 'PDURATION 是投资增值期数，非债券久期。', fix: '债券久期用 DURATION。', level: 'low' }],
   related: [{ id: 'rri', kind: 'companion', why: 'RRI 与本品类相关' },
     { id: 'duration', kind: 'companion', why: 'DURATION 与本品类相关' },

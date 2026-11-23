@@ -125,7 +125,6 @@ const sumsqEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number1', label: '数字1', type: 'number', default: '3' },
@@ -138,6 +137,8 @@ const sumsqEntry: FunctionEntry = {
     cases: [
       { label: 'SUMSQ(3,4) → 25', type: 'ok', values: { number1: '3', number2: '4' }, expect: '25', note: '3² + 4² = 9 + 16 = 25。' },
       { label: '文本 abc → #VALUE!', type: 'error', values: { number1: 'abc', number2: '4' }, expect: '#VALUE!', note: '含文本会报 #VALUE!。' },
+          { label: 'SUMSQ(-2,3) → 13', type: 'ok', values: { number1: '-2', number2: '3' }, expect: '13', note: '负数先平方再加：4 + 9 = 13。' },
+      { label: 'SUMSQ(0.5,0.5) → 0.5', type: 'ok', values: { number1: '0.5', number2: '0.5' }, expect: '0.5', note: '0.25 + 0.25 = 0.5。' },
     ],
   },
   meta: {

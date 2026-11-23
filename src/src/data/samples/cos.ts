@@ -111,12 +111,11 @@ const cosEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '弧度', type: 'number', default: '0.5', placeholder: '如 0.5', hint: 'COS 只认弧度，角度需先 RADIANS()' },
     ],
-    template: '=COS(A2)',
+    template: '=COS({number})',
     cases: [
       { label: '余弦 0.5', type: 'ok', values: { number: '0.5' }, expect: '0.877583', note: 'cos(0.5)≈0.877583' },
       { label: '余弦 0', type: 'ok', values: { number: '0' }, expect: '1', note: 'cos(0)=1' },

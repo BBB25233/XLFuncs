@@ -136,6 +136,7 @@ const rsqEntry: FunctionEntry = {
       { label: '广告费解释销售额', type: 'ok', values: { known_ys: 'C2:C6', known_xs: 'B2:B6' }, expect: '0.991202', note: 'R²' },
       { label: '两组个数不一致', type: 'error', values: { known_ys: 'C2:C6', known_xs: 'B2:B5' }, expect: '#N/A', note: '行数不等' },
       { label: 'x 区域非法', type: 'error', values: { known_ys: 'C2:C6', known_xs: 'ZZZ' }, expect: '#REF!', note: '非法区域' },
+          { label: '前三个月拟合优度', type: 'ok', values: { known_ys: 'C2:C4', known_xs: 'B2:B4' }, expect: '0.991758', note: 'R² 仍接近 1，线性关系很强。' },
     ],
   },
   meta: {

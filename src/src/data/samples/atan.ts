@@ -111,12 +111,11 @@ const atanEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '0.5', placeholder: '如 0.5' },
     ],
-    template: '=ATAN(A2)',
+    template: '=ATAN({number})',
     cases: [
       { label: '反正切 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'atan(0)=0' },
       { label: '反正切 0.5', type: 'ok', values: { number: '0.5' }, expect: '0.463648', note: 'atan(0.5)≈0.463648' },

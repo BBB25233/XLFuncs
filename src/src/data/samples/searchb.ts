@@ -81,7 +81,7 @@ const searchbEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=SEARCHB(B3,A3)',
-      result: '字节位置（* 匹配中间任意字符）',
+      result: '7（* 匹配中间任意字符，返回字节位置 7）',
       explanation: '* 代表任意多个字符，可模糊捕获子串位置。',
     },
   ],
@@ -118,7 +118,6 @@ const searchbEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'find_text', label: '查找内容', type: 'text', default: '"a"' },

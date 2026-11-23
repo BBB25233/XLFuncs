@@ -51,20 +51,18 @@ const islogicalEntry: FunctionEntry = {
   returnValue: '是逻辑值 TRUE，否则 FALSE。',
   examples: [
     {
-      title: '示例 1：真值',
-      scene: 'A2=TRUE。',
-      dataTsv: '值\nTRUE',
+      title: '示例 1：直接传逻辑值',
+      scene: '参数本身就是一个真布尔值。',
       dataAnchor: 'A1',
-      formula: '=ISLOGICAL(A2)',
+      formula: '=ISLOGICAL(TRUE)',
       result: 'TRUE',
       explanation: 'TRUE 是逻辑值。'
     },
     {
-      title: '示例 2：文本不算',
-      scene: 'A2="TRUE"。',
-      dataTsv: '值\nTRUE',
+      title: '示例 2：带引号的文本不算',
+      scene: '参数是文本 "TRUE"，长得像逻辑值但不是。',
       dataAnchor: 'A1',
-      formula: '=ISLOGICAL(A2)',
+      formula: '=ISLOGICAL("TRUE")',
       result: 'FALSE',
       explanation: '带引号的 "TRUE" 是文本，不是逻辑值。'
     }

@@ -89,9 +89,9 @@ const numbervalueEntry: FunctionEntry = {
       scene: '文本是「1,234.56」，想稳妥转数。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=NUMBERVALUE(A3,".","")',
+      formula: '=NUMBERVALUE(A3,".",",")',
       result: '1234.56',
-      explanation: '点作小数、不指定千位分隔符（空串），同样得到正确数值。',
+      explanation: '点作小数、逗号作千分位（必须显式给出，否则文本里出现的千分位会被判为非法），同样得到正确数值。',
     },
   ],
   pitfalls: [
@@ -133,7 +133,6 @@ const numbervalueEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'text', label: '文本', type: 'text', default: '"1,234.56"' },

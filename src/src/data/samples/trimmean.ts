@@ -71,8 +71,8 @@ const trimmeanEntry: FunctionEntry = {
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=AVERAGE(B2:B11)',
-      result: '8.63（被那个 2 分拉低了约 0.53 分）',
-      explanation: 'TRIMMEAN 得 9.16、AVERAGE 得 8.63，一个极端值就造成半分以上的差距。',
+      result: '8.53（被那个 2 分拉低了约 0.63 分）',
+      explanation: 'TRIMMEAN 得 9.16、AVERAGE 得 8.53，一个极端值就造成 0.6 分以上的差距。',
     },
     {
       title: '示例 3：剔除比例写太大导致数据被砍光',

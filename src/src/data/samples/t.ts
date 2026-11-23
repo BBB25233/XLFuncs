@@ -111,7 +111,6 @@ const tEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'value', label: '值', type: 'text', default: '"Hello"' },

@@ -113,12 +113,11 @@ const asinEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '0.5', placeholder: '如 0.5', hint: '必须在 [-1,1]' },
     ],
-    template: '=ASIN(A2)',
+    template: '=ASIN({number})',
     cases: [
       { label: '反正弦 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'asin(0)=0' },
       { label: '反正弦 0.5', type: 'ok', values: { number: '0.5' }, expect: '0.523599', note: 'asin(0.5)≈0.523599（30°）' },

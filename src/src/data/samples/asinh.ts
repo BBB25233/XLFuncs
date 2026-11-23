@@ -114,12 +114,11 @@ const asinhEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数值', type: 'number', default: '1', placeholder: '如 1' },
     ],
-    template: '=ASINH(A2)',
+    template: '=ASINH({number})',
     cases: [
       { label: '反双曲正弦 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'asinh(0)=0' },
       { label: '反双曲正弦 1', type: 'ok', values: { number: '1' }, expect: '0.881374', note: 'asinh(1)≈0.881374' },

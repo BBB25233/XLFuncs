@@ -1,6 +1,6 @@
 import type { CalcContext, CalcHandler, CalcOutcome } from '@/types';
 import { ERROR_CODES, make } from '@/core/errors';
-import { ok, fail, stripQuotes } from './types';
+import { ok, fail, stripQuotes, isQuoted } from './types';
 import { toNumber, formatNumber, numericValues } from './helpers';
 import { sliceSheet } from '@/core/ref';
 import {
@@ -118,13 +118,33 @@ function sampleVar(v: number[]): number {
 
 /* ============================ 文本函数 ============================ */
 
+/** ASC / DBCS / JIS 的入参上限：Excel 这几个函数最多处理 255 个字符，超了直接 #VALUE! */
+const MAX_TEXT = 255;
+
+/**
+ * 读取「一个文本参数」。返回 null 表示根本没有传参（要报 #VALUE!）。
+ * 注意：Excel 的 `ASC("")`、`ASC(" ")` 都合法，所以只有「参数不存在」才算缺参，
+ * 空串和纯空格都要原样保留，不能 trim 掉。
+ */
+function readTextArg(raw: string | undefined): string | null {
+  if (raw === undefined) {
+    return null;
+  }
+  if (isQuoted(raw)) {
+    return stripQuotes(raw).inner;
+  }
+  return raw;
+}
+
 /** ASC：全角 ASCII（U+FF01..U+FF5E）→ 半角（U+0021..U+007E） */
 export const ascCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
-  const raw = (ctx.args.t ?? '').trim();
-  if (raw === '') {
+  const inner = readTextArg(ctx.args.t);
+  if (inner === null) {
     return fail(make(ERROR_CODES.VALUE, '缺少要转换的文本', 'ASC 需要一个文本参数，如 =ASC("ＡＢＣ")。'));
   }
-  const { inner } = stripQuotes(raw);
+  if (inner.length > MAX_TEXT) {
+    return fail(make(ERROR_CODES.VALUE, '文本超过 255 个字符', 'ASC 最多处理 255 个字符，超长请先分段。'));
+  }
   let out = '';
   for (const ch of inner) {
     const c = ch.codePointAt(0) as number;
@@ -139,11 +159,13 @@ export const ascCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 
 /** DBCS：半角 ASCII（U+0021..U+007E）→ 全角（U+FF01..U+FF5E） */
 export const dbcsCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
-  const raw = (ctx.args.t ?? '').trim();
-  if (raw === '') {
+  const inner = readTextArg(ctx.args.t);
+  if (inner === null) {
     return fail(make(ERROR_CODES.VALUE, '缺少要转换的文本', 'DBCS 需要一个文本参数，如 =DBCS("ABC")。'));
   }
-  const { inner } = stripQuotes(raw);
+  if (inner.length > MAX_TEXT) {
+    return fail(make(ERROR_CODES.VALUE, '文本超过 255 个字符', 'DBCS 最多处理 255 个字符，超长请先分段。'));
+  }
   let out = '';
   for (const ch of inner) {
     const c = ch.codePointAt(0) as number;
@@ -160,11 +182,13 @@ export const dbcsCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 
 /** JIS：同 DBCS（半角 → 全角） */
 export const jisCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
-  const raw = (ctx.args.t ?? '').trim();
-  if (raw === '') {
+  const inner = readTextArg(ctx.args.t);
+  if (inner === null) {
     return fail(make(ERROR_CODES.VALUE, '缺少要转换的文本', 'JIS 需要一个文本参数，如 =JIS("ABC")。'));
   }
-  const { inner } = stripQuotes(raw);
+  if (inner.length > MAX_TEXT) {
+    return fail(make(ERROR_CODES.VALUE, '文本超过 255 个字符', 'JIS 最多处理 255 个字符，超长请先分段。'));
+  }
   let out = '';
   for (const ch of inner) {
     const c = ch.codePointAt(0) as number;
@@ -569,7 +593,9 @@ export const lognordistCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   if (mean === null) return fail(make(ERROR_CODES.VALUE, 'mean 不是数字', '第 2 参数 mean 必须是数字。'));
   const sd = numArg(ctx.args, 'sd');
   if (sd === null) return fail(make(ERROR_CODES.VALUE, 'sd 不是数字', '第 3 参数 sd 必须是数字。'));
-  const cum = parseBool(ctx.args.cum);
+  // LOGNORMDIST 是 Excel 的老兼容函数：名义上只有 3 个参数，只算累积概率。
+  // 传第 4 个参数属于扩展用法，省略时按 TRUE（累积）处理。
+  const cum = ctx.args.cum === undefined ? true : parseBool(ctx.args.cum);
   if (cum === null) return fail(make(ERROR_CODES.VALUE, '第 4 参数不是逻辑值', 'cumulative 填 TRUE 或 FALSE。'));
   if (x <= 0 || sd <= 0) {
     return fail(make(ERROR_CODES.NUM, '参数超出合法范围', '需满足 x>0、sd>0。'));

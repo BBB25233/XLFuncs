@@ -143,7 +143,6 @@ const addressEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'row_num', label: '行号', type: 'number', default: '3' },

@@ -125,7 +125,6 @@ const lcmEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number1', label: '数字1', type: 'number', default: '5' },

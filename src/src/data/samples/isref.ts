@@ -51,20 +51,18 @@ const isrefEntry: FunctionEntry = {
   returnValue: '是引用 TRUE，否则 FALSE。',
   examples: [
     {
-      title: '示例 1：区域引用',
-      scene: 'A2=A1:B2。',
-      dataTsv: '引用\n=A1:B2',
+      title: '示例 1：直接传区域引用',
+      scene: '参数写成 A1:B2 这样的引用。',
       dataAnchor: 'A1',
-      formula: '=ISREF(A2)',
+      formula: '=ISREF(A1:B2)',
       result: 'TRUE',
-      explanation: 'A2 存的是引用。'
+      explanation: '区域引用是引用类型。'
     },
     {
       title: '示例 2：普通文本',
-      scene: 'A2="abc"。',
-      dataTsv: '引用\nabc',
+      scene: '参数是文本 "abc"。',
       dataAnchor: 'A1',
-      formula: '=ISREF(A2)',
+      formula: '=ISREF("abc")',
       result: 'FALSE',
       explanation: '文本不是引用。'
     }

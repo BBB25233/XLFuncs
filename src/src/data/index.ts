@@ -1,12 +1,17 @@
 import type { CategoryId, CatalogRow, SearchEntry } from '@/types';
 import rawCatalog from './catalog.json';
+import rawRelated from './related.json';
 
 /**
  * 数据层门面：把 catalog.json 派生为搜索索引、分类计数、按 id 查元信息。
  * 只做派生，**不加载正文**（正文在 packs/ 里按需 import，见 F28 分包加载）。
+ *
+ * related.json 是由 scripts/gen-related-index.mjs 从 packs/samples 里抽出的关联 id 表，
+ * 只有 id、没有正文，用来让列表页和搜索页也能露出「相关推荐」。
  */
 
 const catalog = rawCatalog as unknown as CatalogRow[];
+const relatedIds = rawRelated as unknown as Record<string, string[]>;
 
 /**
  * 按常用度降序排列的目录。
@@ -28,6 +33,7 @@ export const catalogIndex: SearchEntry[] = sortedCatalog.map((row) => ({
   category: row.category,
   oneLiner: row.oneLiner,
   status: row.status,
+  relatedIds: relatedIds[row.id] ?? [],
 }));
 
 /** id → 索引条目 */

@@ -361,6 +361,11 @@ export interface SearchEntry {
   category: CategoryId;
   oneLiner: string;
   status: EntryStatus;
+  /**
+   * 关联函数 id（来自 related.json 的轻量索引，便于列表页/搜索页直接露出推荐）。
+   * 详情页仍以 packs 里的完整 RelatedItem（含 kind/why）为准。
+   */
+  relatedIds?: string[];
 }
 
 /* =========================================================================

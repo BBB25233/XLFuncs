@@ -80,7 +80,7 @@ const fixedEntry: FunctionEntry = {
       scene: '不需要逗号分隔时（如生成编号）。',
       dataTsv: TSV,
       dataAnchor: 'A1',
-      formula: '=FIXED(A3,2,TRUE)',
+      formula: '=FIXED(A4,2,TRUE)',
       result: '12345.60',
       explanation: '第 3 个参数 TRUE 去掉千分位，12345.6 补零成 12345.60。',
     },
@@ -133,7 +133,6 @@ const fixedEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '数字', type: 'number', default: '1234.567' },

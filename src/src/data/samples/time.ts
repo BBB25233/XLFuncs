@@ -132,7 +132,6 @@ const timeEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'hour', label: '时', type: 'number', default: '12' },

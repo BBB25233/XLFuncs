@@ -116,12 +116,11 @@ const sinEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '弧度', type: 'number', default: '0.5', placeholder: '如 0.5', hint: 'SIN 只认弧度，角度需先 RADIANS()' },
     ],
-    template: '=SIN(A2)',
+    template: '=SIN({number})',
     cases: [
       { label: '正弦 0.5', type: 'ok', values: { number: '0.5' }, expect: '0.479426', note: 'sin(0.5)≈0.479426' },
       { label: '正弦 0', type: 'ok', values: { number: '0' }, expect: '0', note: 'sin(0)=0' },

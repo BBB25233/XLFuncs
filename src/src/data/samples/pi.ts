@@ -111,7 +111,6 @@ const piEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [],
     template: '=PI()',

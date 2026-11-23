@@ -22,7 +22,7 @@ const hypgeomdistEntry: FunctionEntry = {
     { key: 'ps', zh: '总体成功数', en: 'population_s', required: true, desc: '总体中成功数' },
     { key: 'np', zh: '总体数', en: 'number_pop', required: true, desc: '总体大小' }] },
   returnValue: '概率值',
-  examples: [{ title: '示例：超几何概率', scene: '总体 20 含 8 成功、抽 4 中 1', dataAnchor: 'B2', formula: '=HYPGEOMDIST(1,4,8,20)', result: '约 0.3635', explanation: 'C(8,1)×C(12,3)/C(20,4)。' },
+  examples: [{ title: '示例：超几何概率', scene: '总体 20 含 8 成功、抽 4 中 1', dataAnchor: 'B2', formula: '=HYPGEOMDIST(1,4,8,20)', result: '约 0.3633', explanation: 'C(8,1)×C(12,3)/C(20,4)。' },
     { title: '示例 2：抽检恰好发现 2 个次品', scene: '一批 20 个零件里有 8 个次品，质检不放回随机抽 4 个，问恰好抽到 2 个次品的概率，用来评估抽检方案。', dataAnchor: 'B2', formula: '=HYPGEOMDIST(2,4,8,20)', result: '约 0.3814', explanation: 'C(8,2)×C(12,2)/C(20,4) = 28×66/4845 ≈ 0.3814。抽一个少一个、不放回，所以用超几何；放回抽样才用 BINOMDIST。' }],
   pitfalls: [{ title: '不放回假设', reason: '与二项分布（放回）不同。', fix: '不放回用本函数。', level: 'mid' }],
   related: [{ id: 'binomdist', kind: 'companion', why: 'BINOMDIST 与本品类相关' },

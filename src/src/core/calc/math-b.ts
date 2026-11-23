@@ -282,7 +282,9 @@ export const ceilingMathCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
     return ok(0, '0');
   }
   const s = Math.abs(sig);
-  const result = n >= 0 ? Math.ceil(n / s) * s : Math.floor(n / s) * s;
+  // Excel 实测（2026-11-23）：默认负数朝 0 进位（-4.3 → -4）；mode 非 0 才远离 0（-5）
+  const mode = resolveNumber(args.mode ?? '', sheet) ?? 0;
+  const result = n < 0 && mode !== 0 ? Math.floor(n / s) * s : Math.ceil(n / s) * s;
   return ok(result, formatNumber(result));
 };
 
@@ -299,7 +301,9 @@ export const floorMathCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
     return ok(0, '0');
   }
   const s = Math.abs(sig);
-  const result = n >= 0 ? Math.floor(n / s) * s : Math.ceil(n / s) * s;
+  // Excel 实测：默认负数朝 -∞ 舍去（-4.3 → -5）；mode 非 0 才朝 0（-4）
+  const mode = resolveNumber(args.mode ?? '', sheet) ?? 0;
+  const result = n < 0 && mode !== 0 ? Math.ceil(n / s) * s : Math.floor(n / s) * s;
   return ok(result, formatNumber(result));
 };
 

@@ -76,22 +76,22 @@ const quartileIncEntry: FunctionEntry = {
         '进而算出下界 73.75−26.25=47.5、上界 91.25+26.25=117.5。超出这个范围的值可视作异常值。',
     },
     {
-      title: '示例 3：第二个参数写成 0.25 会报错',
-      scene: '把四分位当成百分位写（0.25），公式报错。',
+      title: '示例 3：第二个参数写成 0.25 会被截尾',
+      scene: '把四分位当成百分位写（0.25），结果悄悄变成最小值。',
       dataTsv: TSV,
       dataAnchor: 'A1',
       formula: '=QUARTILE.INC(A2:A9,0.25)',
-      result: '#NUM!（quart 必须是 0–4 的整数）',
-      explanation: '四分位用 1/2/3 表示，百分位才用 0.25/0.5/0.75。用混了就会报错。',
+      result: '60（Excel 不报错，把 0.25 向零截尾成 0，取最小值）',
+      explanation: '四分位用 1/2/3 表示，百分位才用 0.25/0.5/0.75。写错不报错、只返回错值，比报错更难发现。',
     },
   ],
   pitfalls: [
     {
       title: '把 quart 写成 0.25 这类小数',
-      reason: 'QUARTILE 的第二个参数是 0–4 的整数档位，不是 0–1 的小数比例。',
-      fix: 'Q1 写 1、中位数写 2、Q3 写 3；若想用小数比例，改去用 PERCENTILE.INC。',
+      reason:
+        '第二个参数是 0–4 的整数档位，不是 0–1 的比例。Excel 会把它向零截尾（0.25→0），不报错却返回最小值。',
+      fix: 'Q1 写 1、中位数写 2、Q3 写 3；想用小数比例改用 PERCENTILE.INC。',
       level: 'high',
-      errorCode: '#NUM!',
     },
     {
       title: '与 QUARTILE.EXC 混用导致 Q1/Q3 对不上',

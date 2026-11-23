@@ -211,11 +211,11 @@ export const andCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 
   const c1 = parseCondition(args.logical1 ?? '', sheet);
   if (!c1.ok) {
-    return failCond(c1.code, c1.scenario);
+      return failCond(c1.code, c1.scenario);
   }
   const c2 = parseCondition(args.logical2 ?? '', sheet);
   if (!c2.ok) {
-    return failCond(c2.code, c2.scenario);
+      return failCond(c2.code, c2.scenario);
   }
   return ok(c1.value && c2.value);
 };

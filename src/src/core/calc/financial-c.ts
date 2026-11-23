@@ -90,7 +90,7 @@ function couponContext(settlement: YMD, maturity: YMD, frequency: number, basis:
 /** 解析逗号分隔的数字列表（值/现金流） */
 function parseNumberList(raw: string | undefined): number[] | null {
   if (raw === undefined) return null;
-  const s = stripQuotes(raw).inner;
+  const s = stripQuotes(raw).inner.replace(/^\{|\}$/g, '');
   const parts = s.split(',').map((x) => x.trim()).filter((x) => x !== '');
   if (parts.length === 0) return null;
   const nums = parts.map((p) => toNumber(p));
@@ -101,7 +101,7 @@ function parseNumberList(raw: string | undefined): number[] | null {
 /** 解析逗号分隔的日期列表 → Excel 序列号数组 */
 function parseDateList(raw: string | undefined): number[] | null {
   if (raw === undefined) return null;
-  const s = stripQuotes(raw).inner;
+  const s = stripQuotes(raw).inner.replace(/^\{|\}$/g, '');
   const parts = s.split(',').map((x) => x.trim()).filter((x) => x !== '');
   if (parts.length === 0) return null;
   const out: number[] = [];
@@ -217,15 +217,14 @@ export const mirrCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   let num = 0;
   let den = 0;
   for (let i = 0; i < n; i += 1) {
-    const t = i + 1;
     const v = vals[i];
-    if (v > 0) num += v * Math.pow(1 + reinv, n - t);
-    else if (v < 0) den += -v / Math.pow(1 + fin, t);
+    if (v > 0) num += v * Math.pow(1 + reinv, n - 1 - i);
+    else if (v < 0) den += -v / Math.pow(1 + fin, i);
   }
   if (den === 0 || num < 0) {
     return numErr('MIRR 无解', '现金流组合导致分母为 0，请检查正负现金流。');
   }
-  const mirr = Math.pow(num / den, 1 / n) - 1;
+  const mirr = Math.pow(num / den, 1 / (n - 1)) - 1;
   if (!Number.isFinite(mirr)) {
     return numErr('MIRR 算不出来', '请检查融资率/再投资率。');
   }
@@ -299,8 +298,8 @@ export const ppmtCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
   if (!ipmtRes.ok) return ipmtRes;
   const pmtVal = pmtRes.value as number;
   const ipmtVal = ipmtRes.value as number;
-  // PPMT = -(PMT 正幅度) - IPMT(负) = Excel 符号（贷款为负）
-  const pp = -pmtVal - ipmtVal;
+  // PPMT = PMT − IPMT（两者都按 Excel 符号：支出为负）
+  const pp = pmtVal - ipmtVal;
   return ok(pp, formatNumber(pp));
 };
 

@@ -24,7 +24,25 @@ const fvscheduleEntry: FunctionEntry = {
     { key: 'schedule', zh: '利率序列', en: 'schedule', required: true, desc: '各期利率所在区域，如 B2:B4' }],
   },
   returnValue: '复利终值（数字）',
-  examples: [{ title: '示例：三档利率复利', scene: '每年利率不同', dataAnchor: 'B2', formula: '=FVSCHEDULE(1000,B2:B4)', result: '约 1157.6（1000×1.05×1.04×1.03）', explanation: '逐期连乘 (1+利率)。' }],
+  examples: [
+    {
+      title: '示例：三档利率复利',
+      scene: '本金 1000，利率逐年 5%/4%/3%',
+      dataAnchor: 'B2',
+      formula: '=FVSCHEDULE(1000,B2:B4)',
+      result: '约 1124.76',
+      explanation: '逐期连乘 (1+利率)。',
+      dataTsv: '利率\n0.05\n0.04\n0.03',
+    },
+    {
+      title: '示例：数组写法',
+      scene: '本金 1000，利率 2%/3%/4%',
+      dataAnchor: 'B2',
+      formula: '=FVSCHEDULE(1000,{0.02,0.03,0.04})',
+      result: '约 1092.62',
+      explanation: '利率序列也可直接写数组常量。',
+    },
+  ],
   pitfalls: [{ title: '利率区域含非数字', reason: 'schedule 里有文本会被当 0，结果偏小。', fix: '确保利率区域都是数字或 0。', level: 'mid' }],
   related: [{ id: 'fv', kind: 'companion', why: 'FV 与本品类相关' },
     { id: 'pv', kind: 'companion', why: 'PV 与本品类相关' },
@@ -34,7 +52,7 @@ const fvscheduleEntry: FunctionEntry = {
     ranges: {},
     fields: [
       { key: 'principal', label: '本金', type: 'number', default: '1000' },
-      { key: 'schedule', label: '利率序列', type: 'text', default: '"0.01,0.02,0.03"' },
+      { key: 'schedule', label: '利率序列', type: 'text', default: '{0.01,0.02,0.03}' },
     ],
     template: '=FVSCHEDULE({principal},{schedule})',
     cases: [

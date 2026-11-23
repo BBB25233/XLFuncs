@@ -75,7 +75,7 @@ const powerEntry: FunctionEntry = {
       dataTsv: CMP_TSV,
       dataAnchor: 'A1',
       formula: '=A2*POWER(1+B2,C2)',
-      result: '1000×(1.05)^3 ≈ 1157.63',
+      result: '1157.625（1000×(1.05)^3）',
       explanation: '复利就是「本金 × (1+利率)^年数」，POWER 负责把 (1+利率) 自乘年数这么多次。',
     },
     {
@@ -128,7 +128,6 @@ const powerEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '底数', type: 'number', default: '2' },

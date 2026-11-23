@@ -128,7 +128,6 @@ const combinEntry: FunctionEntry = {
   ],
   calc: {
     enabled: true,
-    sampleTableId: 'sales',
     ranges: {},
     fields: [
       { key: 'number', label: '总数 n', type: 'number', default: '5' },
