@@ -2,7 +2,7 @@
 
 [![函数总数](https://img.shields.io/badge/函数-414-4285F4)](https://github.com/BBB25233/XLFuncs/releases)
 [![分类](https://img.shields.io/badge/分类-12-34A853)](https://github.com/BBB25233/XLFuncs/releases)
-[![版本](https://img.shields.io/badge/版本-v1.4-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
+[![版本](https://img.shields.io/badge/版本-v1.5-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
 [![网页端](https://img.shields.io/badge/网页端-单文件离线-9AA0A6)](https://github.com/BBB25233/XLFuncs/releases)
 [![安卓端](https://img.shields.io/badge/安卓端-Capacitor%206-3DDC84)](https://github.com/BBB25233/XLFuncs/releases)
 [![构建](https://img.shields.io/badge/构建-CI%20自动发布-9AA0A6)](https://github.com/BBB25233/XLFuncs/actions)
@@ -30,6 +30,19 @@
 - **单文件离线（网页端）**：交付物是一个独立的 `index-v1.html`，**双击即可打开**，无需联网、无需安装。
 - **原生 App 体验（安卓端）**：返回键逐级回退、侧滑抽屉导航、字号可调、应用图标。
 - **零外部依赖**：页面不引用任何外部网络资源。
+
+---
+
+## 🆕 v1.5 更新
+
+- **试算区终于能看到数据表**：此前只有配了统一样表的函数才显示表，139 个函数的 `A2:A6` 是"看不见的数"。现在示例区与试算区共用 `tableOf` 取数，显示的表就是试算用的表。
+- **648 条试算用例逐条对照真实 Excel，不一致 0**：修掉 24 个模板把 `A2` 写死、`quoteIfText` 误给数组/布尔加引号，以及 `CEILING.MATH`/`FLOOR.MATH` 负数方向、`PMT` 符号、`PPMT`、`NPER`、`DB` 折旧率、`MIRR` 现金流时点等系统性偏差。
+- **财务 50 个函数补齐第 2 条示例**，`P3` 归零；13 个函数的试算用例补齐，`P4` 归零（6 个零参/只返错函数列豁免）。
+- **D 函数条件语法统一**：13 个数据库函数的条件区合并到一处，条件值不再需要包引号，与 Excel 一致。
+- **日期簇复核**：`HOUR("13:30")` 等 1 处真错修正，连带 `MINUTE`/`SECOND`/`WEEKDAY`；其余为台架假阳性。
+- **文本函数**：`ASC`/`DBCS`/`JIS` 补 255 字符上限与空串口径，`PHONETIC` 按引用逐格拼接；清掉 9 条假错误用例。
+- **关联推荐露出**：1289 条关联数据经轻量索引（16 KB）出现在函数卡片与搜索页底部。
+- **清理 105 个无关样表绑定**：试算改为回落到函数自己的示例表，参数默认值与表格终于对得上。
 
 ---
 
@@ -212,7 +225,7 @@ data/     数据层：414 条目录、12 个分类包、样板内容、三张样
 ## 👤 作者与版本
 
 - **作者 ID**：`BBB25`
-- **版本**：第一版 `v1.4` · 414 函数 / 12 分类 · 含公式解释器
+- **版本**：第一版 `v1.5` · 414 函数 / 12 分类 · 含公式解释器
 - **形态**：网页单文件（`index-v1.html`）+ 安卓 App（Capacitor 6）
 - **范围**：完整框架 + 全部函数的完整内容，均为「内容完整、可在线试算」的函数，无需等待后续补齐。
 
