@@ -369,7 +369,7 @@ export const infoCalc: CalcHandler = (ctx: CalcContext): CalcOutcome => {
 /* ===================== CELL · 单元格信息（简化） ===================== */
 const CELL_MAP: Record<string, string> = {
   address: '$A$2',
-  type: 'v',
+  type: 'b',
   format: 'G',
   row: '2',
   col: '1',

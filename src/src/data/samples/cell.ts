@@ -132,7 +132,7 @@ const cellEntry: FunctionEntry = {
     template: '=CELL({info_type},{ref})',
     cases: [
       { label: '默认：取地址', type: 'ok', values: {}, expect: '$A$2', note: 'info_type="address"，简化为固定返回 A2' },
-      { label: '类型=值', type: 'ok', values: { info_type: '"type"' }, expect: 'v', note: '单元格内容为值 → v' },
+      { label: '类型=空白', type: 'ok', values: { info_type: '"type"' }, expect: 'b', note: '示例表为空，A2 无内容 → b（空白）' },
       { label: '格式=常规', type: 'ok', values: { info_type: '"format"' }, expect: 'G', note: '常规格式码 G' },
       { label: '缺信息类型 → #VALUE!', type: 'error', values: { info_type: '' }, expect: '#VALUE!', note: 'info_type 必填' },
       { label: '未知类型 → #VALUE!', type: 'error', values: { info_type: '"xyz"' }, expect: '#VALUE!', note: '类型名不被识别' },
