@@ -60,4 +60,26 @@ describe('FormulaInput', () => {
 
     expect(html).toContain('#B45309');
   });
+
+  it('换行诊断的波浪线扩展到可见字符，并提供取消换行按钮', () => {
+    const html = renderToStaticMarkup(
+      createElement(FormulaInput, {
+        value: '=SUM(\nA1:A3)',
+        diagnostics: [
+          createDiagnostic('W412', {
+            start: 5,
+            end: 6,
+            fix: { label: '取消换行', start: 0, end: 12, text: '=SUM(A1:A3)' },
+          }),
+        ],
+        onChange: noop,
+        onFix: noop,
+      }),
+    );
+
+    expect(html).toContain('公式里有换行');
+    expect(html).toContain('wavy');
+    expect(html).toContain('(\nA</span>');
+    expect(html).toContain('取消换行');
+  });
 });

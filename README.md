@@ -2,7 +2,7 @@
 
 [![函数总数](https://img.shields.io/badge/函数-414-4285F4)](https://github.com/BBB25233/XLFuncs/releases)
 [![分类](https://img.shields.io/badge/分类-12-34A853)](https://github.com/BBB25233/XLFuncs/releases)
-[![版本](https://img.shields.io/badge/版本-v1.5-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
+[![版本](https://img.shields.io/badge/版本-v1.6-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
 [![网页端](https://img.shields.io/badge/网页端-单文件离线-9AA0A6)](https://github.com/BBB25233/XLFuncs/releases)
 [![安卓端](https://img.shields.io/badge/安卓端-Capacitor%206-3DDC84)](https://github.com/BBB25233/XLFuncs/releases)
 [![构建](https://img.shields.io/badge/构建-CI%20自动发布-9AA0A6)](https://github.com/BBB25233/XLFuncs/actions)
@@ -30,6 +30,21 @@
 - **单文件离线（网页端）**：交付物是一个独立的 `index-v1.html`，**双击即可打开**，无需联网、无需安装。
 - **原生 App 体验（安卓端）**：返回键逐级回退、侧滑抽屉导航、字号可调、应用图标。
 - **零外部依赖**：页面不引用任何外部网络资源。
+
+---
+
+## 🆕 v1.6 更新
+
+- **公式解释器重写引用模型**：此前只认单表 `A1`/`A:A`，跨表公式会被判成"非法字符"。现在支持：
+  - 跨表 `Sheet1!A1`、带引号表名 `'2026年6月统计'!K:K`、3D `Sheet1:Sheet3!A1`、外部工作簿 `[Book1.xlsx]Sheet1!A1`
+  - 整行 `1:1`、结构化引用 `表1[金额]` / `[@金额]` / `[[#All],[列]]`
+  - 定义名称（中英文）、数组常量 `{1,2;3,4}`、动态数组 `A1#` / `@A1:A3`
+  - 空参数 `SUM(1,,3)`、联合/交集引用、`LAMBDA` 立即调用、`_xlfn.` 前缀
+- **修好科学计数法**：`=1E5+1`、`=1.5E-3` 不再被误判为"多余内容"。
+- **降级而不是判错**：结构化表、定义名称、动态数组给出提示并照常出结构树；只有真语法错误才拦。
+- **换行按 Excel 空白语义处理**：断在名称/引用中间（如 `Shee⏎t1!`）会明确指出并画波浪线，可用「取消换行」一键修复；字符串内部的换行保持不变。
+- **逐步说明参数列自适应**：`条件区域1` 这类长参数名不再被固定宽度挤成两行。
+- 测试从 322 增至 **380**。
 
 ---
 
@@ -225,7 +240,7 @@ data/     数据层：414 条目录、12 个分类包、样板内容、三张样
 ## 👤 作者与版本
 
 - **作者 ID**：`BBB25`
-- **版本**：第一版 `v1.5` · 414 函数 / 12 分类 · 含公式解释器
+- **版本**：第一版 `v1.6` · 414 函数 / 12 分类 · 含公式解释器
 - **形态**：网页单文件（`index-v1.html`）+ 安卓 App（Capacitor 6）
 - **范围**：完整框架 + 全部函数的完整内容，均为「内容完整、可在线试算」的函数，无需等待后续补齐。
 

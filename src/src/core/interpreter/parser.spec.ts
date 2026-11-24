@@ -83,11 +83,13 @@ describe('parseWithDiagnostics（错误恢复）', () => {
     expect(result.diagnostics.some((item) => item.code === 'E204' || item.code === 'E205')).toBe(true);
   });
 
-  it('空参数给出 E203，AST 仍保留两个参数位', () => {
+  it('空参数给 W414 提示，AST 保留空的参数位', () => {
     const result = parseWithDiagnostics('=SUM(,A1)');
-    expect(result.diagnostics.map((item) => item.code)).toContain('E203');
+    expect(result.diagnostics.map((item) => item.code)).toContain('W414');
+    expect(result.diagnostics.every((item) => item.severity === 'warning')).toBe(true);
     if (result.ast?.kind === 'call') {
       expect(result.ast.args).toHaveLength(2);
+      expect(result.ast.args[0].kind).toBe('missing');
     }
   });
 

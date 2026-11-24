@@ -29,4 +29,27 @@ describe('StepList 长文本', () => {
 
     expect(html).toContain('break-words');
   });
+
+  it('参数名按内容自适应宽度，超长名称到上限后才换行', () => {
+    const base = explainFormula('=IF(A1=1,2,3)', new Map()).steps[0];
+    const html = renderToStaticMarkup(
+      createElement(StepList, {
+        steps: [
+          {
+            ...base,
+            rows: [
+              { k: '条件区域1', v: 'Sheet1!$C:$C' },
+              { k: '特别特别长的条件区域名称', v: 'Sheet1!$D:$D' },
+            ],
+          },
+        ],
+      }),
+    );
+
+    expect(html).toContain('条件区域1');
+    expect(html).toContain('特别特别长的条件区域名称');
+    expect(html).toContain('fit-content(10rem)');
+    expect(html).not.toContain('w-16');
+    expect(html).toContain('[overflow-wrap:anywhere]');
+  });
 });

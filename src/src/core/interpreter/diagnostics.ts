@@ -51,12 +51,22 @@ export const DIAGNOSTIC_CODES = {
 
   E301: { severity: 'error', title: '没有这个函数' },
   E302: { severity: 'error', title: '必填参数缺失' },
+  E206: { severity: 'error', title: '数组常量的每行列数要一致' },
+  E207: { severity: 'error', title: '单引号表名或字符串没有闭合' },
+  E208: { severity: 'error', title: '名称或引用中间不能换行' },
 
   W301: { severity: 'warning', title: '参数超过该函数的上限' },
   W401: { severity: 'warning', title: '省略第 4 个参数会按近似匹配处理' },
   W402: { severity: 'warning', title: '整列引用包含表头行' },
   W403: { severity: 'warning', title: '该函数暂未收录详细释义' },
   W405: { severity: 'warning', title: '含全角符号，Excel 中会报错' },
+  W407: { severity: 'warning', title: '表格结构化引用，仅解释，不参与试算' },
+  W408: { severity: 'warning', title: '名称引用，仅解释，不参与试算' },
+  W409: { severity: 'warning', title: '动态数组语法，仅解释，不参与试算' },
+  W411: { severity: 'warning', title: '含 _xlfn 前缀（新版函数导出标记），已按原名解释' },
+  W412: { severity: 'warning', title: '公式里有换行，已按空白处理' },
+  W413: { severity: 'warning', title: '当前区域用分号，Excel 中文版是逗号' },
+  W414: { severity: 'warning', title: '这里省略了一个参数，Excel 按空值处理' },
 } as const satisfies Record<string, CodeMeta>;
 
 export type DiagnosticCode = keyof typeof DIAGNOSTIC_CODES;

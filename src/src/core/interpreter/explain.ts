@@ -97,6 +97,20 @@ function visit(node: AstNode, callback: (current: AstNode) => void): void {
     case 'unary':
       visit(node.operand, callback);
       break;
+    case 'array':
+      node.rows.forEach((row) => row.forEach((item) => visit(item, callback)));
+      break;
+    case 'union':
+      node.items.forEach((item) => visit(item, callback));
+      break;
+    case 'intersection':
+      visit(node.left, callback);
+      visit(node.right, callback);
+      break;
+    case 'invoke':
+      visit(node.callee, callback);
+      node.args.forEach((item) => visit(item, callback));
+      break;
     default:
       break;
   }
@@ -175,7 +189,37 @@ export function explainParsed(ast: AstNode, entries: EntryMap, formula: string):
       return { kind: 'literal', text: node.value ? 'TRUE' : 'FALSE' };
     }
 
-    return { kind: 'literal', text: node.text };
+    if (node.kind === 'array') {
+      node.rows.forEach((row) => row.forEach(walk));
+      return { kind: 'literal', text: '{…}' };
+    }
+
+    if (node.kind === 'union') {
+      node.items.forEach(walk);
+      return { kind: 'literal', text: '(联合区域)' };
+    }
+
+    if (node.kind === 'intersection') {
+      walk(node.left);
+      walk(node.right);
+      return { kind: 'literal', text: '(交集区域)' };
+    }
+
+    if (node.kind === 'invoke') {
+      walk(node.callee);
+      node.args.forEach(walk);
+      return { kind: 'literal', text: '调用结果' };
+    }
+
+    if (node.kind === 'missing') {
+      return { kind: 'literal', text: '空参数' };
+    }
+
+    if (node.kind === 'name') {
+      return { kind: 'literal', text: node.text };
+    }
+
+    return { kind: 'literal', text: '' };
   }
 
   walk(ast);

@@ -35,13 +35,18 @@ export default function StepList({ steps, activeN }: StepListProps): ReactElemen
             )}
           </div>
 
-          <div className="mt-3 flex flex-col gap-1">
+          <div
+            className="mt-3 grid gap-x-3 gap-y-1 text-sm"
+            style={{ gridTemplateColumns: 'fit-content(10rem) minmax(0, 1fr)' }}
+          >
             {step.rows.map((row, index) => {
               const full = row.v;
               const shown = full.length > 46 ? truncateMiddle(full, 46) : full;
               return (
-                <div key={`${step.n}-${index}`} className="flex gap-3 text-sm">
-                  <span className="w-16 shrink-0 text-ink-3">{row.k}</span>
+                <div key={`${step.n}-${index}`} className="contents">
+                  <span className="min-w-0 break-words text-ink-3 [overflow-wrap:anywhere]">
+                    {row.k}
+                  </span>
                   <span
                     className="min-w-0 break-words text-ink [overflow-wrap:anywhere]"
                     title={shown === full ? undefined : full}

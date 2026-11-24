@@ -134,6 +134,20 @@ export function checkSemantics(ast: AstNode, options: SemanticCheckOptions): Dia
       case 'unary':
         visit(node.operand);
         break;
+      case 'array':
+        node.rows.forEach((row) => row.forEach(visit));
+        break;
+      case 'union':
+        node.items.forEach(visit);
+        break;
+      case 'intersection':
+        visit(node.left);
+        visit(node.right);
+        break;
+      case 'invoke':
+        visit(node.callee);
+        node.args.forEach(visit);
+        break;
       default:
         break;
     }

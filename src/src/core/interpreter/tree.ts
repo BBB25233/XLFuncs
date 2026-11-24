@@ -97,7 +97,17 @@ function labelOf(node: AstNode): string {
       return `"${node.value}"`;
     case 'boolean':
       return node.value ? 'TRUE' : 'FALSE';
-    default:
+    case 'array':
+      return '{数组}';
+    case 'missing':
+      return '空参数';
+    case 'union':
+      return '联合区域';
+    case 'intersection':
+      return '交集区域';
+    case 'invoke':
+      return '立即调用';
+    case 'name':
       return node.text;
   }
 }
@@ -146,7 +156,20 @@ export function buildTree(ast: AstNode, steps: ExplainStep[]): TreeNode {
           ? [convert(node.left, `${id}.0`), convert(node.right, `${id}.1`)]
           : node.kind === 'unary'
             ? [convert(node.operand, `${id}.0`)]
-            : [];
+            : node.kind === 'array'
+              ? node.rows.flatMap((row, rowIndex) =>
+                  row.map((item, cellIndex) => convert(item, `${id}.${rowIndex}.${cellIndex}`)),
+                )
+              : node.kind === 'union'
+                ? node.items.map((item, index) => convert(item, `${id}.${index}`))
+                : node.kind === 'intersection'
+                  ? [convert(node.left, `${id}.0`), convert(node.right, `${id}.1`)]
+                  : node.kind === 'invoke'
+                    ? [
+                        convert(node.callee, `${id}.0`),
+                        ...node.args.map((arg, index) => convert(arg, `${id}.${index + 1}`)),
+                      ]
+                    : [];
 
     const tree: TreeNode = {
       id,

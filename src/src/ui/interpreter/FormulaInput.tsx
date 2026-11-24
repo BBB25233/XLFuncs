@@ -28,8 +28,20 @@ function buildSegments(value: string, diagnostics: Diagnostic[]): ReactNode[] {
     if (item.start < cursor) {
       return;
     }
-    if (item.start > cursor) {
-      parts.push(value.slice(cursor, item.start));
+    let start = item.start;
+    let end = item.end;
+    // 只包住换行/空白的诊断，波浪线画在不可见字符上会看不见；
+    // 向左右各扩一个可见字符，保证用户能看到提示位置。
+    if (value.slice(start, end).trim() === '') {
+      if (start > 0) {
+        start -= 1;
+      }
+      if (end < value.length) {
+        end += 1;
+      }
+    }
+    if (start > cursor) {
+      parts.push(value.slice(cursor, start));
     }
     parts.push(
       <span
@@ -40,10 +52,10 @@ function buildSegments(value: string, diagnostics: Diagnostic[]): ReactNode[] {
           textUnderlineOffset: '2px',
         }}
       >
-        {value.slice(item.start, item.end)}
+        {value.slice(start, end)}
       </span>,
     );
-    cursor = item.end;
+    cursor = end;
   });
 
   parts.push(value.slice(cursor));

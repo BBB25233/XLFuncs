@@ -92,11 +92,14 @@ describe('错误边界', () => {
     expect(new Set(codes)).toEqual(new Set(['E102', 'E202', 'E204']));
   });
 
-  it('连续空参数逐个报 E203', () => {
+  it('连续空参数逐个给 W414，不当语法错误', () => {
     const result = parseWithDiagnostics('=SUM(,,1)');
-    expect(result.diagnostics.filter((item) => item.code === 'E203')).toHaveLength(2);
+    expect(result.diagnostics.filter((item) => item.code === 'W414')).toHaveLength(2);
+    expect(result.diagnostics.some((item) => item.severity === 'error')).toBe(false);
     if (result.ast?.kind === 'call') {
       expect(result.ast.args).toHaveLength(3);
+      expect(result.ast.args[0].kind).toBe('missing');
+      expect(result.ast.args[1].kind).toBe('missing');
     }
   });
 

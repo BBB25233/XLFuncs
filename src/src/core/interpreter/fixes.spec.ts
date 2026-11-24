@@ -64,11 +64,11 @@ describe('一键修复后必须能重新解析', () => {
     noErrors(fixed);
   });
 
-  it('E203 删掉多余的逗号', () => {
+  it('空参数不再需要修复，只提示 W414', () => {
     const source = '=SUM(,A1)';
-    const fixed = applyFix(source, firstFix(parseWithDiagnostics(source).diagnostics));
-    expect(fixed).toBe('=SUM(A1)');
-    noErrors(fixed);
+    const result = parseWithDiagnostics(source);
+    expect(result.diagnostics.map((item) => item.code)).toContain('W414');
+    expect(result.diagnostics.every((item) => item.severity === 'warning')).toBe(true);
   });
 
   it('E102 全角运算符转半角', () => {

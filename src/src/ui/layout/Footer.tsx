@@ -17,7 +17,7 @@ export default function Footer(): ReactElement {
           <span className="text-line">·</span>
           <span>作者 ID：BBB25</span>
         </div>
-        <p>v1.5 · 框架 + 414 个函数 · 作者 ID：BBB25</p>
+        <p>v1.6 · 框架 + 414 个函数 · 作者 ID：BBB25</p>
       </div>
     </footer>
   );
