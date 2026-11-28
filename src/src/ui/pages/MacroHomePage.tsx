@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import type { MacroKind } from '@/types';
@@ -6,9 +7,11 @@ import {
   MACRO_KINDS,
   macroByKind,
   macroCountByKind,
+  searchMacros,
 } from '@/data/macro';
 import { useMacroBundle } from '@/ui/hooks/useMacroBundle';
 import MacroCard from '@/ui/macro/MacroCard';
+import MacroSearchBox from '@/ui/macro/MacroSearchBox';
 import { MacroPackError, MacroPackLoading } from '@/ui/macro/MacroPackState';
 
 /**
@@ -41,6 +44,7 @@ const PATH_STEPS: Array<{ title: string; desc: string; ids: string[] }> = [
 
 export default function MacroHomePage(): ReactElement {
   const { status, bundle, error, retry } = useMacroBundle();
+  const [keyword, setKeyword] = useState('');
 
   if (status !== 'ready' || bundle === null) {
     return status === 'error' ? (
@@ -51,8 +55,12 @@ export default function MacroHomePage(): ReactElement {
   }
 
   const counts = macroCountByKind(bundle);
-  const recipes = macroByKind(bundle, 'recipe');
   const total = bundle.entries.length;
+  const hits = keyword.trim() === '' ? null : searchMacros(bundle, keyword, 999);
+  const hitIds = hits === null ? null : new Set(hits.map((entry) => entry.id));
+  const recipes = macroByKind(bundle, 'recipe').filter(
+    (entry) => hitIds === null || hitIds.has(entry.id),
+  );
 
   return (
     <div className="mx-auto max-w-content">
@@ -66,6 +74,15 @@ export default function MacroHomePage(): ReactElement {
           这里只教「怎么写、怎么避坑」，不提供在线运行宏——宏要跑在你自己电脑的 Excel 里。
         </p>
       </section>
+
+      <div className="mb-6">
+        <MacroSearchBox bundle={bundle} onKeywordChange={setKeyword} />
+        {hits === null ? null : (
+          <p className="mt-2 text-xs text-ink-3">
+            命中 {hits.length} 条{recipes.length === 0 && hits.length === 0 ? '，换个说法试试（如「筛选」「1004」）' : ''}
+          </p>
+        )}
+      </div>
 
       <div className="mb-6 rounded-card border border-line bg-bg-sub px-4 py-3">
         <p className="text-sm text-ink">
@@ -103,7 +120,9 @@ export default function MacroHomePage(): ReactElement {
           </section>
 
           {MACRO_KINDS.filter((kind) => kind.id !== 'recipe').map((kind) => {
-            const items = macroByKind(bundle, kind.id as MacroKind);
+            const items = macroByKind(bundle, kind.id as MacroKind).filter(
+              (entry) => hitIds === null || hitIds.has(entry.id),
+            );
             if (items.length === 0) {
               return null;
             }

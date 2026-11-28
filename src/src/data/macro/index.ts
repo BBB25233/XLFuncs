@@ -1,4 +1,5 @@
 import type { MacroEntry, MacroKind, MacroSearchEntry } from '@/types';
+import { query } from '@/core/search';
 import type { MacroBundle } from './bundle';
 
 /**
@@ -86,4 +87,23 @@ export function macroCountByKind(bundle: MacroBundle): Record<MacroKind, number>
     counts[entry.kind] += 1;
   }
   return counts;
+}
+
+/**
+ * 宏内搜索：给定 bundle 与关键词，按与全站一致的六级打分返回条目。
+ *
+ * 存在的意义：宏首页 / 速查表 / 详情页各自都要一个搜索框，
+ * 但三处不能各写一套匹配规则，否则同一个词在不同页面结果不同。
+ */
+export function searchMacros(bundle: MacroBundle, keyword: string, limit = 8): MacroEntry[] {
+  const kw = keyword.trim();
+  if (kw === '') {
+    return [];
+  }
+  const index = buildMacroIndex(bundle);
+  const hits = query(index, kw, limit);
+  const byId = new Map(bundle.entries.map((entry) => [entry.id, entry]));
+  return hits
+    .map((hit) => byId.get(hit.id))
+    .filter((entry): entry is MacroEntry => entry !== undefined);
 }

@@ -7,6 +7,7 @@ import { getMacro, KIND_NAME } from '@/data/macro';
 import CodeBlock from '@/ui/components/CodeBlock';
 import SectionTitle from '@/ui/components/SectionTitle';
 import { MacroHostBadge, MacroKindBadge, MacroLevelBadge } from '@/ui/macro/MacroBadges';
+import MacroSearchBox from '@/ui/macro/MacroSearchBox';
 import { MacroPackError, MacroPackLoading } from '@/ui/macro/MacroPackState';
 import { useMacroBundle } from '@/ui/hooks/useMacroBundle';
 
@@ -119,6 +120,10 @@ function DetailBody({ entry, bundle }: { entry: MacroEntry; bundle: MacroBundle 
         <span className="mx-1">/</span>
         <span>{KIND_NAME[entry.kind]}</span>
       </nav>
+
+      <div className="mb-4">
+        <MacroSearchBox bundle={bundle} compact placeholder="搜其它宏：Range、1004、删空行…" />
+      </div>
 
       <header className="mb-6">
         <div className="flex flex-wrap items-baseline gap-2">

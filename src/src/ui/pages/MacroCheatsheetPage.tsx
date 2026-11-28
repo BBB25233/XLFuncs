@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import type { MacroKind } from '@/types';
-import { KIND_NAME, MACRO_KINDS, macroByKind } from '@/data/macro';
+import { KIND_NAME, MACRO_KINDS, macroByKind, searchMacros } from '@/data/macro';
 import { useMacroBundle } from '@/ui/hooks/useMacroBundle';
 import { MacroPackError, MacroPackLoading } from '@/ui/macro/MacroPackState';
+import MacroSearchBox from '@/ui/macro/MacroSearchBox';
 import { useCopy } from '@/ui/clipboard/useCopy';
 
 /**
@@ -33,6 +35,7 @@ function CopyRow({ code, hint }: { code: string; hint: string }): ReactElement {
 
 export default function MacroCheatsheetPage(): ReactElement {
   const { status, bundle, error, retry } = useMacroBundle();
+  const [keyword, setKeyword] = useState('');
 
   if (status !== 'ready' || bundle === null) {
     return status === 'error' ? (
@@ -44,6 +47,16 @@ export default function MacroCheatsheetPage(): ReactElement {
 
   const total = bundle.entries.length;
   const builtinTotal = bundle.builtins.length;
+  const hits = keyword.trim() === '' ? null : searchMacros(bundle, keyword, 999);
+  const hitIds = hits === null ? null : new Set(hits.map((entry) => entry.id));
+  const builtinKeyword = keyword.trim().toLowerCase();
+  const builtins = bundle.builtins.filter(
+    (item) =>
+      builtinKeyword === '' ||
+      item.name.toLowerCase().includes(builtinKeyword) ||
+      item.syntax.toLowerCase().includes(builtinKeyword) ||
+      item.oneLiner.includes(keyword.trim()),
+  );
 
   return (
     <div className="mx-auto max-w-content">
@@ -55,8 +68,17 @@ export default function MacroCheatsheetPage(): ReactElement {
         写法只保留骨架，参数含义点条目名进详情看；内建函数没有详情页，按骨架填参数即可。所有内容在 Excel 上验证过，WPS 见首页说明。
       </p>
 
-      {MACRO_KINDS.filter((kind) => kind.id !== 'error').map((kind) => {
-        const items = macroByKind(bundle, kind.id as MacroKind);
+      <div className="mt-4">
+        <MacroSearchBox bundle={bundle} onKeywordChange={setKeyword} placeholder="搜速查表：Range、删空行、1004…" />
+        {hits === null ? null : (
+          <p className="mt-2 text-xs text-ink-3">命中 {hits.length} 条（内建函数 {builtins.length} 行）</p>
+        )}
+      </div>
+
+      {MACRO_KINDS.map((kind) => {
+        const items = macroByKind(bundle, kind.id as MacroKind).filter(
+          (entry) => hitIds === null || hitIds.has(entry.id),
+        );
         if (items.length === 0) {
           return null;
         }
@@ -119,7 +141,7 @@ export default function MacroCheatsheetPage(): ReactElement {
               </tr>
             </thead>
             <tbody>
-              {bundle.builtins.map((item) => (
+              {builtins.map((item) => (
                 <tr key={item.name} className="hairline-t align-top">
                   <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-ink">{item.name}</td>
                   <td className="px-3 py-2">
