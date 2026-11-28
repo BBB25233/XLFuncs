@@ -1,0 +1,703 @@
+[
+  {
+    "id": "jsa-application",
+    "enName": "JSA Application",
+    "zhName": "JSA Application 对象",
+    "alias": [
+      "Application",
+      "WorksheetFunction",
+      "应用对象"
+    ],
+    "keywords": [
+      "JSA Application",
+      "调用工作表函数",
+      "屏幕刷新"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Application.Version\nApplication.WorksheetFunction.Sum(range)\nApplication.ScreenUpdating = false",
+    "examples": [
+      {
+        "title": "读版本号与调用 Sum",
+        "code": "function 应用信息() {\n  const app = Application;\n  const s = Sheets.Item(1);\n  s.Range(\"A1\").Value2 = 1;\n  s.Range(\"A2\").Value2 = 2;\n  console.log(app.Version);\n  console.log(app.WorksheetFunction.Sum(s.Range(\"A1:A2\")));\n}",
+        "howToRun": "在第 1 个工作表按 F5，看控制台。",
+        "result": "输出 WPS/Excel 兼容版本号与 3。"
+      },
+      {
+        "title": "批量写入前关掉屏幕刷新",
+        "code": "function 快速写入() {\n  const app = Application;\n  const s = Sheets.Item(1);\n  app.ScreenUpdating = false;\n  for (let i = 1; i <= 100; i++) {\n    s.Range(\"A\" + i).Value2 = i;\n  }\n  app.ScreenUpdating = true;\n}",
+        "howToRun": "按 F5。",
+        "result": "A1:A100 一次写完，过程中界面不闪。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "ScreenUpdating 关了却没恢复，界面一直不刷新",
+        "reason": "异常或提前 return 会跳过恢复语句。",
+        "fix": "用 try/finally 保证恢复为 true。",
+        "level": "high"
+      },
+      {
+        "title": "把 WorksheetFunction 当普通 JS 函数直接调用",
+        "reason": "它是宿主注入的对象，不是全局函数。",
+        "fix": "写 Application.WorksheetFunction.Sum(...)。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 JSA 的 Application 与 VBA 完全同接口",
+        "reason": "WPS 只兼容常用成员，边缘接口可能缺失。",
+        "fix": "先在宏编辑器里试一个小例子，再批量改代码。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheetfunction",
+        "kind": "companion",
+        "why": "WorksheetFunction 的 VBA 用法。"
+      },
+      {
+        "id": "screenupdating",
+        "kind": "companion",
+        "why": "ScreenUpdating 的性能作用。"
+      }
+    ],
+    "oneLiner": "拿到应用级信息与工作表函数",
+    "summary": "Application 提供版本、屏幕刷新、WorksheetFunction 等入口。关掉 ScreenUpdating 必须用 try/finally 恢复，否则界面会一直不刷新。"
+  },
+  {
+    "id": "jsa-worksheets",
+    "enName": "JSA Worksheets",
+    "zhName": "JSA 工作表集合",
+    "alias": [
+      "Worksheets",
+      "工作表集合",
+      "Sheets.Item"
+    ],
+    "keywords": [
+      "JSA 遍历工作表",
+      "按名称取表",
+      "Worksheets.Count"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Worksheets.Item(1)\nWorksheets.Item(\"数据\")\nWorksheets.Count",
+    "examples": [
+      {
+        "title": "按序号和名称取表",
+        "code": "function 取表() {\n  const first = Worksheets.Item(1);\n  const data = Worksheets.Item(\"数据\");\n  console.log(first.Name);\n  console.log(data.Range(\"A1\").Value2);\n}",
+        "howToRun": "先建一个名为「数据」的工作表，按 F5。",
+        "result": "控制台输出第 1 个工作表名与「数据」表 A1 的值。"
+      },
+      {
+        "title": "遍历所有工作表并列出名字",
+        "code": "function 列表() {\n  const n = Worksheets.Count;\n  for (let i = 1; i <= n; i++) {\n    console.log(i, Worksheets.Item(i).Name);\n  }\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "按顺序打印每个工作表的序号与名称。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "工作表改名后仍按旧名称取，报下标越界",
+        "reason": "Item(\"旧名\") 找不到就报错。",
+        "fix": "用序号取，或先遍历 Name 匹配再取。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Worksheets 包含图表工作表",
+        "reason": "Worksheets 只含普通工作表，Charts 才是图表页。",
+        "fix": "要连图表页一起处理就用 Sheets。",
+        "level": "mid"
+      },
+      {
+        "title": "遍历时删除工作表，序号错位漏表",
+        "reason": "删除后后面的表会前移。",
+        "fix": "倒序删除，或先收集名称再逐个处理。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 对象成员。"
+      },
+      {
+        "id": "worksheets-collection",
+        "kind": "companion",
+        "why": "集合的 VBA 用法对照。"
+      }
+    ],
+    "oneLiner": "按序号或名称拿到工作表",
+    "summary": "Worksheets.Item 支持序号和名称，Count 给总数。改名后旧名称会失效；遍历中删除工作表要从后往前。"
+  },
+  {
+    "id": "jsa-offset-resize",
+    "enName": "Offset & Resize",
+    "zhName": "偏移与扩缩区域",
+    "alias": [
+      "Offset",
+      "Resize",
+      "区域偏移"
+    ],
+    "keywords": [
+      "JSA Offset",
+      "JSA Resize",
+      "动态区域"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1\").Offset(行偏移, 列偏移)\nRange(\"A1\").Resize(行数, 列数)",
+    "examples": [
+      {
+        "title": "从 A1 偏移到 C3",
+        "code": "function 偏移() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1\").Offset(2, 2);\n  r.Value2 = \"到了 C3\";\n  console.log(r.Address);\n}",
+        "howToRun": "按 F5。",
+        "result": "C3 被写入，控制台输出 $C$3。"
+      },
+      {
+        "title": "以起点扩成 3 行 2 列",
+        "code": "function 扩区域() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1\").Resize(3, 2);\n  r.Value2 = [[1, 2], [3, 4], [5, 6]];\n  console.log(r.Address);\n}",
+        "howToRun": "按 F5。",
+        "result": "A1:B3 写入 3×2 数据，输出 $A$1:$B$3。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Offset 偏移出工作表边界，报错",
+        "reason": "负数或过大偏移会超出可用区域。",
+        "fix": "偏移前判断目标行号、列号是否在 1 以上。",
+        "level": "high"
+      },
+      {
+        "title": "Resize 的行列与写入数组尺寸不一致",
+        "reason": "区域大小对不上会错位或报错。",
+        "fix": "先算 data.length / data[0].length，再 Resize。",
+        "level": "high"
+      },
+      {
+        "title": "把 Offset / Resize 当成修改原区域",
+        "reason": "它们返回新区域，原区域不变。",
+        "fix": "用返回值继续操作，别指望原对象被改。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "offset",
+        "kind": "companion",
+        "why": "Offset 的 VBA 用法对照。"
+      },
+      {
+        "id": "resize",
+        "kind": "companion",
+        "why": "Resize 的 VBA 用法对照。"
+      }
+    ],
+    "oneLiner": "在起点上挪位置、改大小",
+    "summary": "Offset 按行列偏移返回新区域，Resize 按行列数扩缩。两者都不改原区域，且都要防止越界与数组尺寸不匹配。"
+  },
+  {
+    "id": "jsa-usedrange",
+    "enName": "JSA UsedRange",
+    "zhName": "JSA 已用区域",
+    "alias": [
+      "UsedRange",
+      "已用区域",
+      "数据边界"
+    ],
+    "keywords": [
+      "JSA 找最后一行",
+      "UsedRange.Rows.Count",
+      "数据范围"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "ActiveSheet.UsedRange\nUsedRange.Rows.Count\nUsedRange.Address",
+    "examples": [
+      {
+        "title": "取已用区域的行数与地址",
+        "code": "function 看范围() {\n  const ws = ActiveSheet;\n  const ur = ws.UsedRange;\n  console.log(ur.Address);\n  console.log(ur.Rows.Count, ur.Columns.Count);\n}",
+        "howToRun": "在当前表随便填几格，按 F5。",
+        "result": "输出已用区域地址与行列数。"
+      },
+      {
+        "title": "按已用区域最后一行追加数据",
+        "code": "function 追加() {\n  const ws = ActiveSheet;\n  const last = ws.UsedRange.Row + ws.UsedRange.Rows.Count - 1;\n  ws.Range(\"A\" + (last + 1)).Value2 = \"新记录\";\n}",
+        "howToRun": "按 F5。",
+        "result": "在数据末行下面一行写入「新记录」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "UsedRange 包含只剩格式的空行，最后一行偏大",
+        "reason": "用过格式的空单元格也算已用。",
+        "fix": "以关键列为准，从下往上找第一个非空值。",
+        "level": "high"
+      },
+      {
+        "title": "把 UsedRange.Rows.Count 当成最后一行行号",
+        "reason": "Count 是行数，不是行号。",
+        "fix": "最后一行 = UsedRange.Row + Rows.Count - 1。",
+        "level": "high"
+      },
+      {
+        "title": "在空表上取 UsedRange，得到 A1 一行",
+        "reason": "空表也有默认已用区域。",
+        "fix": "先判断关键单元格是否为空，再决定是否追加。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "UsedRange 的 VBA 用法对照。"
+      },
+      {
+        "id": "end-xldown",
+        "kind": "companion",
+        "why": "另一种找最后一行的方法。"
+      }
+    ],
+    "oneLiner": "拿到当前表真正用到的范围",
+    "summary": "UsedRange 给已用区域，最后一行要用 Row + Rows.Count - 1 计算。只剩格式的空行会把范围撑大，关键业务要以关键列为准。"
+  },
+  {
+    "id": "jsa-find",
+    "enName": "JSA Find",
+    "zhName": "JSA 查找",
+    "alias": [
+      "Find",
+      "FindNext",
+      "查找"
+    ],
+    "keywords": [
+      "JSA 查找",
+      "Find 找不到",
+      "查找下一个"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "const cell = Range(\"A:A\").Find(\"值\");\nRange(\"A:A\").FindNext(cell)",
+    "examples": [
+      {
+        "title": "查第一个匹配并写值",
+        "code": "function 查找() {\n  const s = Sheets.Item(1);\n  const cell = s.Range(\"A:A\").Find(\"张三\");\n  if (cell) {\n    cell.Offset(0, 1).Value2 = 100;\n  } else {\n    alert(\"没找到\");\n  }\n}",
+        "howToRun": "A 列放几个姓名，按 F5。",
+        "result": "找到「张三」就在同行 B 列写 100。"
+      },
+      {
+        "title": "循环查找所有匹配",
+        "code": "function 找全部() {\n  const s = Sheets.Item(1);\n  const rng = s.Range(\"A:A\");\n  let cell = rng.Find(\"张三\");\n  while (cell) {\n    console.log(cell.Address);\n    cell = rng.FindNext(cell);\n  }\n}",
+        "howToRun": "A 列放多个「张三」，按 F5。",
+        "result": "控制台依次打印每个匹配地址。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不判断 null 就直接用，报「需要对象」",
+        "reason": "找不到时 Find 返回空。",
+        "fix": "先 if (cell) 再访问 Offset / Value2。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "FindNext 不传起点，死循环",
+        "reason": "每次从头查，永远返回第一个。",
+        "fix": "把上一次结果传给 FindNext。",
+        "level": "high"
+      },
+      {
+        "title": "只查一列却以为能搜整表",
+        "reason": "Find 只在指定区域内找。",
+        "fix": "要整表就用 Cells 或 UsedRange。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "find",
+        "kind": "companion",
+        "why": "Find 的 VBA 参数对照。"
+      },
+      {
+        "id": "find-next",
+        "kind": "companion",
+        "why": "FindNext 的循环写法。"
+      }
+    ],
+    "oneLiner": "在区域里找值并拿到单元格",
+    "summary": "Find 找不到返回空，必须先判空。循环查找要把上一次结果传给 FindNext，否则会一直命中第一个。"
+  },
+  {
+    "id": "jsa-autofilter",
+    "enName": "JSA AutoFilter",
+    "zhName": "JSA 自动筛选",
+    "alias": [
+      "AutoFilter",
+      "筛选",
+      "自动筛选"
+    ],
+    "keywords": [
+      "JSA 筛选",
+      "按条件筛选",
+      "取消筛选"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1:C10\").AutoFilter(字段序号, \"条件\")\nActiveSheet.AutoFilterMode = false",
+    "examples": [
+      {
+        "title": "按第 2 列大于 90 筛选",
+        "code": "function 筛选() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1:C10\");\n  r.AutoFilter(2, \">90\");\n}",
+        "howToRun": "A1:C10 有表头和数据，按 F5。",
+        "result": "第 2 列只显示大于 90 的行。"
+      },
+      {
+        "title": "取消当前表筛选",
+        "code": "function 取消筛选() {\n  const s = Sheets.Item(1);\n  if (s.AutoFilterMode) {\n    s.AutoFilterMode = false;\n  }\n}",
+        "howToRun": "先执行上一个宏，再执行这个。",
+        "result": "所有行恢复显示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "筛选区域没包含表头，字段序号错位",
+        "reason": "字段从区域最左侧算 1，表头也算在内。",
+        "fix": "区域从表头行开始选，字段序号按表头列数。",
+        "level": "high"
+      },
+      {
+        "title": "已有筛选时再设新条件，结果叠加",
+        "reason": "AutoFilter 会保留旧条件。",
+        "fix": "先 AutoFilterMode = false 清掉，再设新条件。",
+        "level": "mid"
+      },
+      {
+        "title": "数字条件写成数字而不是字符串，行为不一致",
+        "reason": "条件参数按文本解析。",
+        "fix": "统一写 \">90\" 这类字符串。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "autofilter",
+        "kind": "companion",
+        "why": "AutoFilter 的 VBA 用法。"
+      },
+      {
+        "id": "filter-to-new-sheet",
+        "kind": "companion",
+        "why": "把筛选结果复制到新表。"
+      }
+    ],
+    "oneLiner": "按列条件筛选数据",
+    "summary": "AutoFilter(字段序号, 条件字符串) 筛选，字段从区域最左侧算 1。重设条件前先取消旧筛选，避免条件叠加。"
+  },
+  {
+    "id": "jsa-sort",
+    "enName": "JSA Sort",
+    "zhName": "JSA 区域排序",
+    "alias": [
+      "Sort",
+      "排序",
+      "多列排序"
+    ],
+    "keywords": [
+      "JSA 排序",
+      "按列排序",
+      "表头排序"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1:C10\").Sort(Range(\"B2\"), 2)",
+    "examples": [
+      {
+        "title": "按 B 列降序排整表",
+        "code": "function 排序() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1:C10\");\n  r.Sort(s.Range(\"B2\"), 2);\n}",
+        "howToRun": "A1:C10 有表头，按 F5。",
+        "result": "整表按 B 列从大到小重排，行数据跟着走。"
+      },
+      {
+        "title": "按 B 列升序",
+        "code": "function 升序() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1:C10\");\n  r.Sort(s.Range(\"B2\"), 1);\n}",
+        "howToRun": "按 F5。",
+        "result": "整表按 B 列从小到大重排。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "排序区域只选了一列，其他列不跟着动",
+        "reason": "Sort 只重排指定区域。",
+        "fix": "区域要包含整行数据，从 A 列选到最后一列。",
+        "level": "high"
+      },
+      {
+        "title": "表头被当成数据一起排序",
+        "reason": "Header 参数没设对。",
+        "fix": "区域包含表头时确认 Header 为是，或用 Sort 对象显式设置。",
+        "level": "mid"
+      },
+      {
+        "title": "按文本列排序，10 排在 2 前面",
+        "reason": "文本按字符比较，不是数值。",
+        "fix": "先把列转成数值，或改用数值排序。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "sort",
+        "kind": "companion",
+        "why": "Sort 的 VBA 参数对照。"
+      },
+      {
+        "id": "multi-column-sort",
+        "kind": "companion",
+        "why": "多列排序配方。"
+      }
+    ],
+    "oneLiner": "按某一列重排整个数据区",
+    "summary": "Sort(Key, Order) 里 Order 1 升序、2 降序。区域必须包含整行数据，否则只排一列会把数据弄错位。"
+  },
+  {
+    "id": "jsa-numberformat",
+    "enName": "JSA NumberFormat",
+    "zhName": "JSA 数字格式",
+    "alias": [
+      "NumberFormat",
+      "数字格式",
+      "格式化"
+    ],
+    "keywords": [
+      "JSA 设置格式",
+      "百分比格式",
+      "日期格式"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1:A10\").NumberFormat = \"0.00\"\nRange(\"B1:B10\").NumberFormat = \"0.00%\"",
+    "examples": [
+      {
+        "title": "保留两位小数",
+        "code": "function 两位小数() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1:A10\").NumberFormat = \"0.00\";\n}",
+        "howToRun": "A 列填几个数字，按 F5。",
+        "result": "A1:A10 显示两位小数。"
+      },
+      {
+        "title": "百分比与日期格式",
+        "code": "function 其他格式() {\n  const s = Sheets.Item(1);\n  s.Range(\"B1:B5\").NumberFormat = \"0.00%\";\n  s.Range(\"C1:C5\").NumberFormat = \"yyyy-mm-dd\";\n}",
+        "howToRun": "B 列填 0.25，C 列填日期，按 F5。",
+        "result": "B 列显示 25.00%，C 列显示 2026-11-28 这类格式。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把格式代码写成中文描述，单元格显示成文本",
+        "reason": "NumberFormat 只认格式代码。",
+        "fix": "用 \"0.00\"、\"0.00%\"、\"yyyy-mm-dd\" 这类代码。",
+        "level": "high"
+      },
+      {
+        "title": "先设格式再写值，值被当成文本",
+        "reason": "文本格式下写入的数字不会参与计算。",
+        "fix": "先写值再设格式，或设完格式确认值类型。",
+        "level": "mid"
+      },
+      {
+        "title": "整列设置 NumberFormat，性能明显变慢",
+        "reason": "整列上百万单元格都要应用格式。",
+        "fix": "只对实际数据范围设置。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "NumberFormat 的 VBA 用法。"
+      },
+      {
+        "id": "text-to-columns",
+        "kind": "companion",
+        "why": "文本与数值转换。"
+      }
+    ],
+    "oneLiner": "改单元格显示的数字格式",
+    "summary": "NumberFormat 只改显示，不改底层值。格式代码用 \"0.00\"、\"0.00%\"、\"yyyy-mm-dd\" 这类写法，别写中文描述。"
+  },
+  {
+    "id": "jsa-interior",
+    "enName": "JSA Interior",
+    "zhName": "JSA 填充底色",
+    "alias": [
+      "Interior",
+      "底色",
+      "填充颜色"
+    ],
+    "keywords": [
+      "JSA 设置底色",
+      "Interior.Color",
+      "RGB"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1\").Interior.Color = RGB(255, 0, 0)",
+    "examples": [
+      {
+        "title": "把 A1 涂成红色",
+        "code": "function 涂红() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1\").Interior.Color = RGB(255, 0, 0);\n}",
+        "howToRun": "按 F5。",
+        "result": "A1 背景变红。"
+      },
+      {
+        "title": "按条件给整列上色",
+        "code": "function 条件上色() {\n  const s = Sheets.Item(1);\n  for (let i = 2; i <= 10; i++) {\n    const v = s.Range(\"B\" + i).Value2;\n    if (v < 60) {\n      s.Range(\"B\" + i).Interior.Color = RGB(255, 0, 0);\n    }\n  }\n}",
+        "howToRun": "B2:B10 填分数，按 F5。",
+        "result": "小于 60 的单元格变红。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "RGB 三个参数顺序写反，颜色不对",
+        "reason": "RGB(红, 绿, 蓝)，不是 蓝绿红。",
+        "fix": "按 R、G、B 顺序传 0–255。",
+        "level": "mid"
+      },
+      {
+        "title": "想清除底色却设成白色，深色主题下很突兀",
+        "reason": "白色是实色，不是「无填充」。",
+        "fix": "用 Interior.Pattern = -4142（xlNone）清除填充。",
+        "level": "mid"
+      },
+      {
+        "title": "逐格设置上千行，速度很慢",
+        "reason": "每次赋值都是一次宿主调用。",
+        "fix": "能批量就整块设置，或先关 ScreenUpdating。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "interior",
+        "kind": "companion",
+        "why": "Interior 的 VBA 用法。"
+      },
+      {
+        "id": "conditional-color",
+        "kind": "companion",
+        "why": "条件变色的配方。"
+      }
+    ],
+    "oneLiner": "改单元格背景色",
+    "summary": "Interior.Color 用 RGB(红, 绿, 蓝) 赋值。清除底色要用 Pattern = -4142，不是涂白；大批量上色前先关屏幕刷新。"
+  },
+  {
+    "id": "jsa-borders",
+    "enName": "JSA Borders",
+    "zhName": "JSA 单元格边框",
+    "alias": [
+      "Borders",
+      "边框",
+      "画框线"
+    ],
+    "keywords": [
+      "JSA 边框",
+      "Borders.LineStyle",
+      "加粗边框"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1:C3\").Borders.LineStyle = 1\nRange(\"A1:C3\").Borders.Weight = 2",
+    "examples": [
+      {
+        "title": "给区域画细实线",
+        "code": "function 画框() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1:C3\");\n  r.Borders.LineStyle = 1;\n  r.Borders.Weight = 2;\n}",
+        "howToRun": "按 F5。",
+        "result": "A1:C3 四周与内部都出现细实线。"
+      },
+      {
+        "title": "只给外圈加粗边框",
+        "code": "function 外框() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1:C3\");\n  r.BorderAround(1, 4);\n}",
+        "howToRun": "按 F5。",
+        "result": "区域外圈出现较粗实线，内部无框。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只设 LineStyle 不设 Weight，看起来仍很细",
+        "reason": "线型与粗细是两个属性。",
+        "fix": "按需要同时设 Weight（2 细、4 中粗）。",
+        "level": "mid"
+      },
+      {
+        "title": "想只加外框却用了 Borders，内部也画满",
+        "reason": "Borders 包含内部横竖线。",
+        "fix": "只加外圈用 BorderAround。",
+        "level": "high"
+      },
+      {
+        "title": "边框颜色在深色主题下看不清",
+        "reason": "只设了线型没设 Color。",
+        "fix": "必要时显式设 Borders.Color 或 BorderAround 的颜色参数。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "borders",
+        "kind": "companion",
+        "why": "Borders 的 VBA 用法。"
+      },
+      {
+        "id": "format-column",
+        "kind": "companion",
+        "why": "整列格式化的配方。"
+      }
+    ],
+    "oneLiner": "给区域加框线",
+    "summary": "Borders 会画内部与四周所有线，只加外圈用 BorderAround。线型 LineStyle 与粗细 Weight 要分别设置。"
+  }
+]

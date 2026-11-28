@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "runtime-32809",
+    "enName": "Run-time error 32809: Application-defined or object-defined error (clipboard/object)",
+    "zhName": "运行时错误 32809：剪贴板/对象状态异常",
+    "alias": [
+      "32809",
+      "剪贴板错误",
+      "对象状态异常",
+      "PasteSpecial 报错"
+    ],
+    "keywords": [
+      "32809",
+      "剪贴板报错",
+      "粘贴特殊报错",
+      "对象已失效",
+      "复制粘贴宏报错"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 32809\nErr.Description = \"应用程序定义或对象定义错误\"",
+    "examples": [
+      {
+        "title": "复现路径：剪贴板空时直接 PasteSpecial",
+        "code": "Sub 复现剪贴板错误()\n    On Error GoTo 处理\n    Application.CutCopyMode = False\n    Range(\"B1\").PasteSpecial xlPasteValues\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5（先清掉剪贴板，不要复制任何东西）。",
+        "result": "不同版本可能弹 32809 或 1004，Description 都是「应用程序定义或对象定义错误」。"
+      },
+      {
+        "title": "修法：不依赖剪贴板，直接赋值",
+        "code": "Sub 绕开剪贴板()\n    Range(\"B1\").Value = Range(\"A1\").Value\n    MsgBox \"已把 A1 的值写到 B1\"\nEnd Sub",
+        "howToRun": "A1 有值时按 F5。",
+        "result": "B1 直接得到 A1 的值，不需要 Copy/Paste，也就不会碰到 32809。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 32809 当成对象不存在去查引用",
+        "reason": "它更多是剪贴板/对象「状态」问题（空剪贴板、对象被删、受保护视图），不是缺引用。",
+        "fix": "先换直接赋值/直接调用；必须用剪贴板时，先 Copy 再 Paste，并检查 CutCopyMode。",
+        "level": "high",
+        "errorCode": "32809"
+      },
+      {
+        "title": "远程桌面/输入法/安全软件占用剪贴板",
+        "reason": "剪贴板是全局资源，其他程序抢走或清空后，PasteSpecial 就失败。",
+        "fix": "减少剪贴板依赖；批处理前提示用户不要复制别的内容。",
+        "level": "mid",
+        "errorCode": "32809"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Copy/PasteSpecial 都挂在 Range 上。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "剪贴板失败要能兜底，不能让整批处理中断。"
+      }
+    ],
+    "oneLiner": "剪贴板或对象状态不对导致的报错",
+    "summary": "32809 的触发点不唯一，最常见是剪贴板为空/被占用、对象已经失效、受保护视图里操作。它和 1004 经常互相串号，排查时优先看「是不是在依赖剪贴板或旧对象」。"
+  },
+  {
+    "id": "runtime-50289",
+    "enName": "Run-time error 50289: Project is protected",
+    "zhName": "运行时错误 50289：工程被保护",
+    "alias": [
+      "50289",
+      "工程被保护",
+      "Project is protected",
+      "VBProject 访问被拒"
+    ],
+    "keywords": [
+      "50289",
+      "工程被保护",
+      "VBProject 报错",
+      "VBA 工程密码",
+      "宏工程只读"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 50289\nErr.Description = \"工程被保护，不能修改\"",
+    "examples": [
+      {
+        "title": "复现路径：访问被密码保护的 VBProject",
+        "code": "Sub 复现50289()\n    On Error GoTo 处理\n    MsgBox ThisWorkbook.VBProject.Name\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "先在信任中心勾选「信任对 VBA 工程对象模型的访问」，再给本工作簿的 VBA 工程设密码（VBE → 工具 → 工程属性 → 保护），然后按 F5。",
+        "result": "访问工程被拒，弹出「50289 / 工程被保护」。"
+      },
+      {
+        "title": "修法：不做 VBProject 操作，改成读内容",
+        "code": "Sub 不碰工程只读数据()\n    On Error GoTo 处理\n    MsgBox \"工作表数：\" & ThisWorkbook.Worksheets.Count\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "正常显示工作表数量，不需要访问 VBProject。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把「工程密码」和「工作表保护」搞混",
+        "reason": "工程密码保护的是 VBA 代码，工作表保护保护的是单元格；50289 属于前者。",
+        "fix": "确认报错来自 VBProject 相关代码；需要访问时先解除工程密码。",
+        "level": "high",
+        "errorCode": "50289"
+      },
+      {
+        "title": "企业策略禁止访问 VBA 工程对象模型",
+        "reason": "即使没有密码，「信任对 VBA 工程对象模型的访问」被关也会失败（常见 1004/50289）。",
+        "fix": "在信任中心开启该选项（需管理员），或彻底避免依赖 VBProject。",
+        "level": "mid",
+        "errorCode": "50289"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "先弄清代码放在哪个模块，再判断要不要访问 VBProject。"
+      },
+      {
+        "id": "macro-security",
+        "kind": "companion",
+        "why": "宏安全与工程访问权限直接相关。"
+      }
+    ],
+    "oneLiner": "VBA 工程被密码或策略锁住",
+    "summary": "50289 只出现在「想通过代码访问 VBA 工程」时：读模块、改代码、数组件。普通读写单元格不会触发。多数场景根本不需要访问 VBProject，能绕就绕。"
+  },
+  {
+    "id": "runtime-2147024891",
+    "enName": "Error -2147024891 (0x80070005): Access is denied",
+    "zhName": "权限错误 -2147024891（0x80070005）",
+    "alias": [
+      "-2147024891",
+      "80070005",
+      "0x80070005",
+      "Access is denied",
+      "拒绝访问"
+    ],
+    "keywords": [
+      "-2147024891",
+      "80070005",
+      "拒绝访问",
+      "保存没权限",
+      "COM 权限错误"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = -2147024891\nHex(Err.Number) → 0x80070005（拒绝访问）",
+    "examples": [
+      {
+        "title": "先把负数错误号翻译成 HRESULT",
+        "code": "Sub 解码负错误号()\n    Dim n As Long\n    n = -2147024891\n    MsgBox \"完整：\" & Hex(n) & vbCrLf & \"后 8 位：\" & Right(Hex(n), 8)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示完整 16 位十六进制与后 8 位「80070005」——这就是「拒绝访问」。"
+      },
+      {
+        "title": "保存失败时给出人话，而不是甩错误号",
+        "code": "Sub 保存失败给人话()\n    On Error GoTo 处理\n    ThisWorkbook.SaveCopyAs ThisWorkbook.Path & \"\\备份.xlsx\"\n    Exit Sub\n处理:\n    Select Case Err.Number\n        Case 70, 1004\n            MsgBox \"目标位置不可写：换目录或改权限\"\n        Case Else\n            MsgBox Err.Number & \" / \" & Err.Description\n    End Select\nEnd Sub",
+        "howToRun": "把工作簿放到只读目录（或把目录设为只读）后按 F5。",
+        "result": "VBA 里常见的是 70/1004；日志里则可能记录成 -2147024891，本段统一提示权限问题。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为 VBA 一定会原样抛出 -2147024891",
+        "reason": "同一个权限问题，VBA 常显示 70 或 1004；负数 HRESULT 更多出现在 COM/自动化日志里。",
+        "fix": "捕获时同时判断 70、1004 和负数号；用 Hex 转成 8 位再查含义。",
+        "level": "high",
+        "errorCode": "-2147024891"
+      },
+      {
+        "title": "只改路径不改权限",
+        "reason": "0x80070005 是「拒绝访问」，不是「路径写错」；换十次路径也没用。",
+        "fix": "检查目录 ACL、文件只读属性、受控文件夹访问（勒索软件防护）。",
+        "level": "mid",
+        "errorCode": "80070005"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "保存/另存工作簿是最常见的权限入口。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "把 HRESULT 翻译成用户能懂的话。"
+      }
+    ],
+    "oneLiner": "0x80070005：拒绝访问",
+    "summary": "看到 -2147024891 先别慌，它等价于 0x80070005「拒绝访问」。VBA 里同一件事常报 70/1004，自动化或底层日志才给负数。处理方向只有一个：查目录/文件权限与只读属性，不是改代码。"
+  },
+  {
+    "id": "runtime-7",
+    "enName": "Run-time error 7: Out of memory",
+    "zhName": "运行时错误 7：内存不足",
+    "alias": [
+      "7",
+      "内存不足",
+      "Out of memory",
+      "数组太大"
+    ],
+    "keywords": [
+      "内存不足",
+      "运行时错误7",
+      "数组开太大",
+      "ReDim 报错",
+      "32 位 Office 内存"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 7\nErr.Description = \"内存不足\"",
+    "examples": [
+      {
+        "title": "复现路径：一次开一个超大数组",
+        "code": "Sub 复现内存不足()\n    On Error GoTo 处理\n    Dim a() As Double\n    ReDim a(1 To 50000000)\n    a(1) = 1\n    MsgBox \"开好了\"\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "32 位 Office 上按 F5 更容易复现；64 位机器可能只是变慢或成功，属于正常差异。",
+        "result": "失败时弹出「7 / 内存不足」；成功则显示「开好了」，请随即关掉不保存。"
+      },
+      {
+        "title": "修法：分批处理，别一次全装进内存",
+        "code": "Sub 分批处理()\n    Dim i As Long, total As Double\n    For i = 1 To 100000\n        total = total + Cells(i, 1).Value\n    Next i\n    MsgBox \"合计：\" & total\nEnd Sub",
+        "howToRun": "A 列有数据时按 F5（没有 10 万行也没关系，空值按 0 累加）。",
+        "result": "边读边算，内存占用恒定，不会因为数组太大报 7。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "一次性把整列读进数组",
+        "reason": "100 万行 × 多列 × Variant，内存很快就到几百 MB；32 位 Office 上限约 2 GB。",
+        "fix": "分批读（每 1 万行一批），或直接用工作表函数/循环流式处理。",
+        "level": "high",
+        "errorCode": "7"
+      },
+      {
+        "title": "字符串在循环里不断拼接",
+        "reason": "每次 `s = s & ...` 都会复制整串，长度翻倍时内存和时间一起爆。",
+        "fix": "改用数组收集，最后 Join；或写文件而不是全放内存。",
+        "level": "mid",
+        "errorCode": "7"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "数组类型与大小直接决定内存占用。"
+      },
+      {
+        "id": "redim",
+        "kind": "companion",
+        "why": "ReDim 大数组是 7 的常见复现点。"
+      }
+    ],
+    "oneLiner": "内存被一次性的大对象吃光",
+    "summary": "7 在现代 64 位 Excel 上不算常见，32 位更容易撞。根因通常是「一次读太多」或「字符串反复拼接」。分批处理、流式累加，比加大内存更有效。"
+  },
+  {
+    "id": "runtime-28",
+    "enName": "Run-time error 28: Out of stack space",
+    "zhName": "运行时错误 28：栈空间不足",
+    "alias": [
+      "28",
+      "栈空间不足",
+      "Out of stack space",
+      "递归死循环"
+    ],
+    "keywords": [
+      "栈空间不足",
+      "运行时错误28",
+      "递归没有出口",
+      "无限递归",
+      "事件互相触发"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 28\nErr.Description = \"栈空间不足\"",
+    "examples": [
+      {
+        "title": "最小复现：递归没有终止条件",
+        "code": "Sub 开始递归()\n    递归 1\nEnd Sub\n\nSub 递归(n As Long)\n    MsgBox n\n    递归 n + 1\nEnd Sub",
+        "howToRun": "按 F5 后立刻关掉不断弹出的消息框（或先注释 MsgBox 再跑）。",
+        "result": "递归越堆越深，最终弹出「28 / 栈空间不足」。"
+      },
+      {
+        "title": "修法：加终止条件",
+        "code": "Sub 有出口的递归()\n    倒数 3\nEnd Sub\n\nSub 倒数(n As Long)\n    If n <= 0 Then\n        MsgBox \"到底了\"\n        Exit Sub\n    End If\n    MsgBox n\n    倒数 n - 1\nEnd Sub",
+        "howToRun": "按 F5，依次关掉 3、2、1 的消息框。",
+        "result": "显示 3、2、1 后提示「到底了」，正常返回不报 28。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "递归忘了写出口，或出口永远不成立",
+        "reason": "每次调用都压一层栈，没有终止条件就会一直压到上限。",
+        "fix": "先写 `If 终止条件 Then Exit Sub`；用参数递减/递增保证一定到得了出口。",
+        "level": "high",
+        "errorCode": "28"
+      },
+      {
+        "title": "事件代码改单元格，又触发自己",
+        "reason": "Worksheet_Change 里写同一个单元格，会再次触发 Change，形成无限事件链。",
+        "fix": "改值前 `Application.EnableEvents = False`，改完再恢复为 True。",
+        "level": "mid",
+        "errorCode": "28"
+      }
+    ],
+    "related": [
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "过程调用与递归都走同一套栈。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "死递归时错误处理也可能被反复触发。"
+      }
+    ],
+    "oneLiner": "调用层数太深，栈被压满",
+    "summary": "28 几乎是递归/事件链失控的代名词。先找「谁在反复调用谁」：递归要有出口，事件里改单元格要关 EnableEvents。"
+  },
+  {
+    "id": "runtime-35",
+    "enName": "Compile error: Sub or Function not defined",
+    "zhName": "编译错误：Sub 或 Function 未定义",
+    "alias": [
+      "35",
+      "Sub or Function not defined",
+      "过程未定义",
+      "函数名拼错"
+    ],
+    "keywords": [
+      "过程未定义",
+      "函数名拼错",
+      "编译错误",
+      "找不到宏",
+      "Sub 未定义"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "编译错误：Sub or Function not defined\n（不是运行时 Err.Number，On Error 抓不到）",
+    "examples": [
+      {
+        "title": "最小复现：调用一个拼错的过程名",
+        "code": "Sub 复现过程未定义()\n    ' 下面这行编译就报错：Sub or Function not defined\n    拼错的过程名\nEnd Sub",
+        "howToRun": "按 F5 之前就会在编译阶段报错，代码根本不会运行。",
+        "result": "弹出编译错误「Sub or Function not defined」，并高亮「拼错的过程名」这一行。"
+      },
+      {
+        "title": "修法：改成真实存在的过程名",
+        "code": "Sub 调用正确过程()\n    打招呼\nEnd Sub\n\nSub 打招呼()\n    MsgBox \"你好\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "正常弹出「你好」，编译通过。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把编译错误当成运行时错误去 On Error",
+        "reason": "过程名不存在在编译阶段就失败，On Error 完全不起作用。",
+        "fix": "先修名字/引用，再谈错误处理；调试时用「调试 → 编译」提前暴露。",
+        "level": "high",
+        "errorCode": "35"
+      },
+      {
+        "title": "函数来自未勾选的引用库",
+        "reason": "名字没拼错，但所属库没在「工具 → 引用」里勾选，同样报未定义。",
+        "fix": "打开引用列表勾上对应库；不确定就改用后期绑定 CreateObject。",
+        "level": "mid",
+        "errorCode": "35"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "过程定义在哪个模块、作用域是否可见，决定能不能调用。"
+      },
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "Call 的写法与过程名解析规则在这里。"
+      }
+    ],
+    "oneLiner": "代码里调用了一个不存在的过程",
+    "summary": "35 是编译错误，不是运行时报错：VBA 在跑之前就发现「这个名字没有对应的 Sub/Function」。九成是拼写错，剩下一成是引用库没勾。"
+  },
+  {
+    "id": "runtime-48",
+    "enName": "Run-time error 48: Error loading DLL",
+    "zhName": "运行时错误 48：加载 DLL 错误",
+    "alias": [
+      "48",
+      "加载 DLL 错误",
+      "Error loading DLL",
+      "Declare 报错"
+    ],
+    "keywords": [
+      "加载DLL错误",
+      "运行时错误48",
+      "Declare 报错",
+      "API 声明",
+      "64 位 PtrSafe"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 48\nErr.Description = \"加载 DLL 错误\"",
+    "examples": [
+      {
+        "title": "复现路径：Declare 指向不存在的库",
+        "code": "Declare PtrSafe Function 不存在DLL函数 Lib \"不存在的库.dll\" () As Long\n\nSub 复现48()\n    On Error GoTo 处理\n    MsgBox 不存在DLL函数()\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "把两段都放进标准模块，按 F5。",
+        "result": "调用时找不到库，弹出「48 / 加载 DLL 错误」。"
+      },
+      {
+        "title": "修法：先确认库名与位数，再决定要不要 API",
+        "code": "Sub 能用内置函数就别声明API()\n    ' 大多数取系统时间/路径的需求，VBA 自带函数就够\n    MsgBox \"现在：\" & Now & vbCrLf & \"本文件：\" & ThisWorkbook.FullName\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "完全不需要 Declare，也就不会有 48。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "DLL 名字/路径写错，或依赖的库没装",
+        "reason": "Declare 只是声明，真正调用时才去加载库；库不存在就 48。",
+        "fix": "确认库名与系统位数；非必要不用 API，优先 VBA 内置函数。",
+        "level": "high",
+        "errorCode": "48"
+      },
+      {
+        "title": "32/64 位不匹配，或漏了 PtrSafe",
+        "reason": "64 位 Office 需要 `PtrSafe` 声明与正确的 LongPtr；旧写法可能直接编译失败或调用时 48。",
+        "fix": "按位数改写声明（`#If VBA7 Then ... PtrSafe ...`），并确保 DLL 位数与 Office 一致。",
+        "level": "mid",
+        "errorCode": "48"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "Declare 必须放在标准模块顶部。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "API 调用失败要能兜底，别让整段宏崩掉。"
+      }
+    ],
+    "oneLiner": "声明的外部库加载不进来",
+    "summary": "48 几乎只跟 `Declare`（Windows API/第三方 DLL）有关。普通业务宏不需要 API；非用不可时，库名、位数、PtrSafe 三样都要对。"
+  },
+  {
+    "id": "runtime-52",
+    "enName": "Run-time error 52: Bad file name or number",
+    "zhName": "运行时错误 52：文件名或编号错误",
+    "alias": [
+      "52",
+      "文件名或编号错误",
+      "Bad file name",
+      "非法文件名"
+    ],
+    "keywords": [
+      "文件名错误",
+      "运行时错误52",
+      "文件名含特殊字符",
+      "Open 报错",
+      "文件号错误"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 52\nErr.Description = \"文件名或编号错误\"",
+    "examples": [
+      {
+        "title": "最小复现：文件名里带 < >",
+        "code": "Sub 复现52()\n    On Error GoTo 处理\n    Open ThisWorkbook.Path & \"\\临时<>.txt\" For Output As #1\n    Close #1\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「52 / 文件名或编号错误」，因为 Windows 文件名不允许 < >。"
+      },
+      {
+        "title": "修法：先清洗文件名",
+        "code": "Sub 清洗文件名()\n    Dim s As String, i As Long\n    s = \"报表<2026>.txt\"\n    For i = 1 To Len(s)\n        If InStr(\"\\/:*?<>|\", Mid(s, i, 1)) > 0 Then Mid(s, i, 1) = \"_\"\n    Next i\n    MsgBox \"安全文件名：\" & s\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「报表_2026_.txt」，特殊字符被替换成下划线。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用单元格内容直接当文件名",
+        "reason": "单元格里常有 `/`、`:`、`*` 等字符，拼进路径就是 52。",
+        "fix": "写文件前统一清洗非法字符，并限制长度（含路径不超过约 260 字符）。",
+        "level": "high",
+        "errorCode": "52"
+      },
+      {
+        "title": "文件号被占用或用了非法编号",
+        "reason": "FreeFile 之前的固定编号可能已被占用；编号必须是有效整数。",
+        "fix": "一律用 `Dim n As Integer: n = FreeFile` 再 Open。",
+        "level": "mid",
+        "errorCode": "52"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "按单元格内容批量另存时最容易撞 52。"
+      },
+      {
+        "id": "on-error-goto",
+        "kind": "companion",
+        "why": "写入前捕获并提示具体哪个文件名不合法。"
+      }
+    ],
+    "oneLiner": "文件名不合法或文件号有问题",
+    "summary": "52 是「名字本身不能用作文件名」：非法字符、过长、空名、文件号乱用。批量导出时用单元格值命名，几乎必踩；先清洗再写。"
+  },
+  {
+    "id": "runtime-58",
+    "enName": "Run-time error 58: File already exists",
+    "zhName": "运行时错误 58：文件已存在",
+    "alias": [
+      "58",
+      "文件已存在",
+      "File already exists",
+      "Name 冲突"
+    ],
+    "keywords": [
+      "文件已存在",
+      "运行时错误58",
+      "重命名冲突",
+      "Name 报错",
+      "另存覆盖"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 58\nErr.Description = \"文件已存在\"",
+    "examples": [
+      {
+        "title": "最小复现：Name 改成已存在的文件名",
+        "code": "Sub 复现58()\n    Dim p As String, q As String\n    p = ThisWorkbook.Path & \"\\临时A.txt\": q = ThisWorkbook.Path & \"\\临时B.txt\"\n    Open p For Output As #1: Close #1\n    Open q For Output As #2: Close #2\n    On Error GoTo 处理\n    Name p As q\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "在工作簿目录可写时按 F5（会留下临时A/临时B两个文件，测完手动删）。",
+        "result": "弹出「58 / 文件已存在」：Name 不会覆盖已有文件。"
+      },
+      {
+        "title": "修法：先换一个不冲突的名字",
+        "code": "Sub 重名就加序号()\n    Dim p As String, q As String, i As Long\n    p = ThisWorkbook.Path & \"\\临时A.txt\"\n    q = ThisWorkbook.Path & \"\\临时B.txt\"\n    i = 1\n    Do While Dir(q) <> \"\"\n        q = ThisWorkbook.Path & \"\\临时B_\" & i & \".txt\"\n        i = i + 1\n    Loop\n    Name p As q\n    MsgBox \"已改名到 \" & q\nEnd Sub",
+        "howToRun": "先跑上例留下临时A，再按 F5。",
+        "result": "自动找不冲突的名字并改名成功。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为 Name 会像保存那样覆盖",
+        "reason": "`Name` 是重命名，目标存在就 58；它不会替你覆盖。",
+        "fix": "改名/移动前先 Dir 检查目标；要覆盖请先删目标或改用 SaveAs 的覆盖选项。",
+        "level": "high",
+        "errorCode": "58"
+      },
+      {
+        "title": "批量导出时固定文件名",
+        "reason": "每次都写同一个名字，第二次就 58（或 75）。",
+        "fix": "文件名带日期/序号/业务键，保证唯一。",
+        "level": "mid",
+        "errorCode": "58"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "批量另存为时 58 很常见。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "捕获后自动改名，别让整批导出停住。"
+      }
+    ],
+    "oneLiner": "要写的目标文件已经在了",
+    "summary": "58 专门指「目标已存在且操作不允许覆盖」，最常见于 `Name`、`MkDir`、部分 SaveAs 场景。解决不是删文件，而是让名字唯一或显式处理覆盖。"
+  },
+  {
+    "id": "runtime-62",
+    "enName": "Run-time error 62: Input past end of file",
+    "zhName": "运行时错误 62：输入超出文件尾",
+    "alias": [
+      "62",
+      "输入超出文件尾",
+      "Input past end of file",
+      "读空文件报错"
+    ],
+    "keywords": [
+      "输入超出文件尾",
+      "运行时错误62",
+      "Line Input 报错",
+      "读文件越界",
+      "EOF"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 62\nErr.Description = \"输入超出文件尾\"",
+    "examples": [
+      {
+        "title": "最小复现：空文件读第一行",
+        "code": "Sub 复现62()\n    Dim p As String, s As String\n    p = ThisWorkbook.Path & \"\\空.txt\"\n    Open p For Output As #1: Close #1\n    On Error GoTo 处理\n    Open p For Input As #1\n    Line Input #1, s: Close #1\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\n    Close #1\nEnd Sub",
+        "howToRun": "在工作簿目录可写时按 F5（会生成空.txt）。",
+        "result": "读不到内容，弹出「62 / 输入超出文件尾」。"
+      },
+      {
+        "title": "修法：循环前先判 EOF",
+        "code": "Sub 读到结尾就停()\n    Dim p As String, s As String\n    p = ThisWorkbook.Path & \"\\空.txt\"\n    Open p For Input As #1\n    Do While Not EOF(1)\n        Line Input #1, s\n        Debug.Print s\n    Loop\n    Close #1\n    MsgBox \"读完了\"\nEnd Sub",
+        "howToRun": "接着上例（空.txt 已存在）按 F5；也可先用记事本写两行再试。",
+        "result": "空文件直接提示「读完了」；有内容则逐行输出到立即窗口。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "循环读文件不判 EOF",
+        "reason": "文件读完还继续 Line Input，就报 62。",
+        "fix": "一律 `Do While Not EOF(文件号)`，读完立即 Close。",
+        "level": "high",
+        "errorCode": "62"
+      },
+      {
+        "title": "文件末尾有空的最后一行",
+        "reason": "文本末尾换行符会让最后一行是空串，循环次数比预期多一次。",
+        "fix": "读到空串就跳过，或用 `Len(Trim(s)) > 0` 过滤。",
+        "level": "mid",
+        "errorCode": "62"
+      }
+    ],
+    "related": [
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "读文件失败后要保证 Close，避免句柄泄漏。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "导入文本/CSV 是 62 的高频场景。"
+      }
+    ],
+    "oneLiner": "文件已经读到头了还在读",
+    "summary": "62 是典型的「读越界」：文件只有 3 行，你读了第 4 次。写法上永远用 EOF 判断，错误处理里记得 Close。"
+  },
+  {
+    "id": "runtime-94",
+    "enName": "Run-time error 94: Invalid use of Null",
+    "zhName": "运行时错误 94：无效使用 Null",
+    "alias": [
+      "94",
+      "无效使用 Null",
+      "Invalid use of Null",
+      "Null 赋值报错"
+    ],
+    "keywords": [
+      "无效使用Null",
+      "运行时错误94",
+      "单元格是空值",
+      "数据库 Null",
+      "IsNull"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 94\nErr.Description = \"无效使用 Null\"",
+    "examples": [
+      {
+        "title": "最小复现：把 Null 塞进 String",
+        "code": "Sub 复现94()\n    On Error GoTo 处理\n    Dim s As String\n    s = Null\n    MsgBox s\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「94 / 无效使用 Null」：String 不能装 Null。"
+      },
+      {
+        "title": "修法：用 Variant 接，再判 IsNull",
+        "code": "Sub 先判Null再转()\n    Dim v As Variant, s As String\n    v = Range(\"A1\").Value\n    If IsNull(v) Then\n        s = \"\"\n    Else\n        s = CStr(v)\n    End If\n    MsgBox \"值：\" & s\nEnd Sub",
+        "howToRun": "A1 留空 / 填内容各跑一次。",
+        "result": "空值显示「值：」不再报错；有值正常显示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "数据库/查找返回 Null 当空字符串用",
+        "reason": "Null 表示「没有值」，和 \"\" 不同；直接赋给 String 或拼接会 94。",
+        "fix": "用 Variant 接收，`If IsNull(v) Then` 后给默认值；或用 Nz 类函数。",
+        "level": "high",
+        "errorCode": "94"
+      },
+      {
+        "title": "Null 参与字符串拼接",
+        "reason": "`\"a\" & Null` 的结果仍是 Null，后续再当字符串用就 94。",
+        "fix": "拼接前统一 `v = IIf(IsNull(v), \"\", v)`。",
+        "level": "mid",
+        "errorCode": "94"
+      }
+    ],
+    "related": [
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "单元格取值的类型差异是 94 的入口。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "外部数据导入时 Null 很常见，要统一兜底。"
+      }
+    ],
+    "oneLiner": "把 Null 当普通值用了",
+    "summary": "94 只跟 Null 有关：Null 不是空字符串、不是 0，任何「当它有值」的操作都会失败。VBA 里用 Variant 接、IsNull 判断，是最稳的写法。"
+  },
+  {
+    "id": "runtime-429",
+    "enName": "Run-time error 429: ActiveX component can't create object",
+    "zhName": "运行时错误 429：不能创建对象",
+    "alias": [
+      "429",
+      "不能创建对象",
+      "ActiveX component can't create object",
+      "CreateObject 失败"
+    ],
+    "keywords": [
+      "不能创建对象",
+      "运行时错误429",
+      "CreateObject 报错",
+      "ProgID 不存在",
+      "组件没注册"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 429\nErr.Description = \"ActiveX 部件不能创建对象\"",
+    "examples": [
+      {
+        "title": "最小复现：ProgID 根本不存在",
+        "code": "Sub 复现429()\n    On Error GoTo 处理\n    Dim x As Object\n    Set x = CreateObject(\"不存在的组件.ProgID\")\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「429 / ActiveX 部件不能创建对象」。"
+      },
+      {
+        "title": "修法：确认 ProgID，并保留兜底路径",
+        "code": "Sub 创建前先兜底()\n    On Error GoTo 失败\n    Dim d As Object\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    d.Add \"a\", 1\n    MsgBox \"条目数：\" & d.Count\n    Exit Sub\n失败:\n    MsgBox \"组件不可用，改用 Collection\"\nEnd Sub",
+        "howToRun": "正常机器按 F5；组件被禁用的机器会进入失败分支。",
+        "result": "正常显示条目数；组件不可用时提示改用 Collection。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "ProgID 拼错或组件未安装",
+        "reason": "CreateObject 按名字找注册表里的组件，名字错/没装就是 429。",
+        "fix": "用正确的 ProgID（如 Scripting.Dictionary）；先在「引用」里确认库存在。",
+        "level": "high",
+        "errorCode": "429"
+      },
+      {
+        "title": "把 429 和 440 混着理解",
+        "reason": "429 是「创建阶段就失败」；440 是「创建后自动化过程出错」，排查点不同。",
+        "fix": "429 查 ProgID/注册；440 查组件状态与调用过程。",
+        "level": "mid",
+        "errorCode": "429"
+      }
+    ],
+    "related": [
+      {
+        "id": "macro-security",
+        "kind": "companion",
+        "why": "安全策略可能禁用外部组件创建。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "为外部组件准备降级方案。"
+      }
+    ],
+    "oneLiner": "系统里没有这个可创建的对象",
+    "summary": "429 发生在 `CreateObject`/`GetObject` 那一刻：名字找不到、组件没注册、被策略禁用。要么修组件，要么换 VBA 自带对象。"
+  },
+  {
+    "id": "runtime-449",
+    "enName": "Run-time error 449: Argument not optional",
+    "zhName": "运行时错误 449：参数不可选",
+    "alias": [
+      "449",
+      "参数不可选",
+      "Argument not optional",
+      "Offset 少参数"
+    ],
+    "keywords": [
+      "参数不可选",
+      "运行时错误449",
+      "Offset 报错",
+      "必填参数没传",
+      "函数少参数"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 449\nErr.Description = \"参数不可选\"",
+    "examples": [
+      {
+        "title": "最小复现：Offset 一个参数都不给",
+        "code": "Sub 复现449()\n    On Error GoTo 处理\n    MsgBox Range(\"A1\").Offset().Address\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「449 / 参数不可选」：Offset 至少要给行偏移。"
+      },
+      {
+        "title": "修法：把必填参数补上",
+        "code": "Sub 补上参数()\n    MsgBox \"下一格：\" & Range(\"A1\").Offset(1, 0).Address\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「下一格：$A$2」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把「可选参数」当成可以全不写",
+        "reason": "Offset 的列偏移可选，但行偏移必填；全空就 449。",
+        "fix": "查清哪些参数必填；不确定就两个都写 `Offset(1, 0)`。",
+        "level": "high",
+        "errorCode": "449"
+      },
+      {
+        "title": "自定义 Function 的必填参数没传",
+        "reason": "声明成 `Function F(a As Long)` 就必须传；调用 `F()` 会 449。",
+        "fix": "给参数加 `Optional` 与默认值，或调用时补上实参。",
+        "level": "mid",
+        "errorCode": "449"
+      }
+    ],
+    "related": [
+      {
+        "id": "offset",
+        "kind": "companion",
+        "why": "Offset 是 449 最典型的现场。"
+      },
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "调用时的实参个数要与声明一致。"
+      }
+    ],
+    "oneLiner": "必填参数没给值",
+    "summary": "449 是「这个参数不能省，你没传」。和 450（参数个数不对/多了）相对。看到它就回去数：声明里没有 Optional 的参数，一个都不能少。"
+  },
+  {
+    "id": "runtime-450",
+    "enName": "Run-time error 450: Wrong number of arguments or invalid property assignment",
+    "zhName": "运行时错误 450：参数个数不对",
+    "alias": [
+      "450",
+      "参数个数不对",
+      "Wrong number of arguments",
+      "Left 少参数"
+    ],
+    "keywords": [
+      "参数个数不对",
+      "运行时错误450",
+      "Left 少参数",
+      "函数参数多了",
+      "属性赋值错误"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 450\nErr.Description = \"参数个数错误或属性赋值无效\"",
+    "examples": [
+      {
+        "title": "最小复现：Left 只给一个参数",
+        "code": "Sub 复现450()\n    On Error GoTo 处理\n    MsgBox Left(\"abc\")\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「450 / 参数个数错误」：Left 需要「文本 + 长度」两个参数。"
+      },
+      {
+        "title": "修法：补齐参数",
+        "code": "Sub 参数补齐()\n    MsgBox \"前两个字符：\" & Left(\"abc\", 2)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「前两个字符：ab」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 450 和 449 搞反",
+        "reason": "449 是「少了必填参数」，450 是「个数不对（常常是多给/少给组合错）」。",
+        "fix": "对照函数签名数参数；不确定就用命名参数写清楚。",
+        "level": "high",
+        "errorCode": "450"
+      },
+      {
+        "title": "调用 Sub 时多加了括号",
+        "reason": "`Call 过程(参数)` 可以带括号；直接 `过程 (参数)` 会被当成表达式传参，容易个数错。",
+        "fix": "调用 Sub 用 `过程 参数` 或 `Call 过程(参数)`，二选一，别混。",
+        "level": "mid",
+        "errorCode": "450"
+      }
+    ],
+    "related": [
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "Call 与括号规则直接决定参数解析。"
+      },
+      {
+        "id": "msgbox",
+        "kind": "companion",
+        "why": "MsgBox 参数多，最易数错。"
+      }
+    ],
+    "oneLiner": "给函数的参数个数对不上签名",
+    "summary": "450 是调用现场「参数个数/赋值形式不对」。先看函数签名需要几个参数，再看自己传了几个；Sub 调用的括号写法也是高频坑。"
+  },
+  {
+    "id": "runtime-458",
+    "enName": "Compile error: Variable not defined",
+    "zhName": "编译错误：变量未定义",
+    "alias": [
+      "458",
+      "变量未定义",
+      "Variable not defined",
+      "Option Explicit 报错"
+    ],
+    "keywords": [
+      "变量未定义",
+      "编译错误",
+      "Option Explicit",
+      "变量名拼错",
+      "Dim 漏了"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "编译错误：Variable not defined\n（Option Explicit 打开时，未 Dim 就赋值会在这里被拦下）",
+    "examples": [
+      {
+        "title": "最小复现：Option Explicit 下拼错变量名",
+        "code": "Option Explicit\n\nSub 复现458()\n    Dim 合计 As Long\n    合记 = 10\n    MsgBox 合计\nEnd Sub",
+        "howToRun": "把这段放到模块顶部（含 Option Explicit），按 F5。",
+        "result": "编译阶段就报「Variable not defined」，并高亮「合记」。"
+      },
+      {
+        "title": "修法：声明或改正拼写",
+        "code": "Option Explicit\n\nSub 修好458()\n    Dim 合计 As Long\n    合计 = 10\n    MsgBox 合计\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "编译通过，显示 10。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "模块没写 Option Explicit，拼错变量悄悄变成新变量",
+        "reason": "没有强制声明时，`合记 = 10` 会新建一个 Variant，结果和预期完全不同但不报错。",
+        "fix": "所有模块顶部统一 `Option Explicit`，让拼写错误在编译期暴露。",
+        "level": "high",
+        "errorCode": "458"
+      },
+      {
+        "title": "变量声明在另一个过程里",
+        "reason": "过程级 Dim 只在本过程有效，别的过程看不见。",
+        "fix": "需要跨过程共享就提到模块顶部用 `Private`/`Public`，或作为参数传递。",
+        "level": "mid",
+        "errorCode": "458"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "Dim 的位置决定变量在哪些过程可见。"
+      },
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "过程级/模块级/全局作用域是 458 的根因。"
+      }
+    ],
+    "oneLiner": "用了没声明过的变量名",
+    "summary": "458 是编译错误，只在 `Option Explicit` 下出现——这恰恰是它的价值：把拼写错误从「算错数」变成「编译不过」。新模块默认就该开 Option Explicit。"
+  }
+]

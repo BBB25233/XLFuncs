@@ -1,0 +1,727 @@
+[
+  {
+    "id": "active-selection",
+    "enName": "Application.Selection",
+    "zhName": "当前选区",
+    "alias": [
+      "Selection",
+      "选区",
+      "当前选择"
+    ],
+    "keywords": [
+      "处理用户选中的区域",
+      "Selection 类型判断",
+      "多选区"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Selection           ' 当前选中的对象，可能是 Range/Shape/Chart\nSelection.Address   ' 选区的地址",
+    "examples": [
+      {
+        "title": "只处理选中的单元格区域",
+        "code": "Sub 给选区上色()\n    If TypeName(Selection) <> \"Range\" Then\n        MsgBox \"请先选中单元格区域\"\n        Exit Sub\n    End If\n    Selection.Interior.Color = vbYellow\nEnd Sub",
+        "howToRun": "选中一块单元格按 F5；再选中一个图表按 F5。",
+        "result": "选单元格时变黄；选图表时提示先选区域。"
+      },
+      {
+        "title": "多选区逐块统计",
+        "code": "Sub 选区合计()\n    Dim a As Range, total As Double\n    If TypeName(Selection) <> \"Range\" Then Exit Sub\n    For Each a In Selection.Areas\n        total = total + Application.Sum(a)\n    Next a\n    MsgBox total\nEnd Sub",
+        "howToRun": "按住 Ctrl 选两块区域，按 F5。",
+        "result": "弹出两块区域的合计。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不判类型，用户选了图表就报错",
+        "reason": "Selection 可能是 Shape、Chart、甚至多个对象。",
+        "fix": "先 TypeName(Selection) = \"Range\" 判断，或 On Error 兜底。",
+        "level": "high"
+      },
+      {
+        "title": "对多选区直接赋值，只写第一块",
+        "reason": "不连续选区不能整体赋值。",
+        "fix": "For Each Selection.Areas 逐块处理。",
+        "level": "high"
+      },
+      {
+        "title": "把 Selection 当成固定区域缓存起来",
+        "reason": "Selection 是实时引用，用户点一下就变。",
+        "fix": "需要固定就 Set r = Selection 先持有，或直接用地址。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "selection-clipboard",
+        "kind": "companion",
+        "why": "Selection 的概念条目。"
+      },
+      {
+        "id": "areas",
+        "kind": "companion",
+        "why": "多选区要按 Areas 拆。"
+      }
+    ],
+    "oneLiner": "用户当前选中的东西",
+    "summary": "Selection 不一定是单元格区域，可能是图表或形状。先判 TypeName，多选区再按 Areas 拆，别把它当固定区域。"
+  },
+  {
+    "id": "workbook-open",
+    "enName": "Workbooks.Open",
+    "zhName": "打开工作簿",
+    "alias": [
+      "Workbooks.Open",
+      "打开文件",
+      "Open"
+    ],
+    "keywords": [
+      "VBA 打开另一个工作簿",
+      "只读打开",
+      "批量打开文件"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Workbooks.Open Filename:=全路径, ReadOnly:=True, UpdateLinks:=0",
+    "examples": [
+      {
+        "title": "只读打开一个文件并取数",
+        "code": "Sub 只读取数()\n    Dim wb As Workbook, v As Variant\n    Set wb = Workbooks.Open(\"C:\\报表\\明细.xlsx\", ReadOnly:=True)\n    v = wb.Worksheets(1).Range(\"B2\").Value\n    wb.Close SaveChanges:=False\n    MsgBox v\nEnd Sub",
+        "howToRun": "路径换成真实文件，按 F5。",
+        "result": "弹窗显示 B2 的值，源文件没有被改动。"
+      },
+      {
+        "title": "打开时不更新外部链接",
+        "code": "Sub 不更新链接()\n    Dim wb As Workbook\n    Set wb = Workbooks.Open(\"C:\\报表\\汇总.xlsx\", UpdateLinks:=0)\n    MsgBox wb.Name\n    wb.Close SaveChanges:=False\nEnd Sub",
+        "howToRun": "文件带外部链接时按 F5。",
+        "result": "打开更快，不会弹更新链接的提示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只写文件名不写路径，按当前目录找，报 1004",
+        "reason": "Open 默认相对当前目录，不是文件所在目录。",
+        "fix": "拼全路径：ThisWorkbook.Path & \"\\文件名.xlsx\"。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "打开后忘了 Close，文件被锁住",
+        "reason": "Workbook 对象没释放，后续无法覆盖保存。",
+        "fix": "每个 Open 配一个 Close SaveChanges:=False，异常分支也要关。",
+        "level": "high"
+      },
+      {
+        "title": "打开了带宏文件，宏安全提示打断流程",
+        "reason": "xlsm 可能触发启用宏提示。",
+        "fix": "只读打开、或把文件放在受信任位置；不要在代码里绕安全设置。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Workbook 对象的概念条目。"
+      },
+      {
+        "id": "workbook-close",
+        "kind": "companion",
+        "why": "Open 必须配 Close。"
+      },
+      {
+        "id": "merge-workbooks",
+        "kind": "companion",
+        "why": "批量打开是汇总配方的核心。"
+      }
+    ],
+    "oneLiner": "用代码打开另一个文件",
+    "summary": "Workbooks.Open 要全路径，只读取数最安全。每个 Open 都要配 Close，异常路径也不能漏，否则文件会被锁。"
+  },
+  {
+    "id": "workbook-close",
+    "enName": "Workbook.Close",
+    "zhName": "关闭工作簿",
+    "alias": [
+      "Close",
+      "关闭文件",
+      "关闭工作簿"
+    ],
+    "keywords": [
+      "VBA 关闭文件",
+      "关闭不保存",
+      "关闭所有文件"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.Close SaveChanges:=False   ' 不保存关闭\nwb.Close SaveChanges:=True    ' 保存后关闭",
+    "examples": [
+      {
+        "title": "处理完关闭且不保存",
+        "code": "Sub 关文件()\n    Dim wb As Workbook\n    Set wb = Workbooks.Open(\"C:\\报表\\明细.xlsx\", ReadOnly:=True)\n    Debug.Print wb.Worksheets(1).Range(\"A1\").Value\n    wb.Close SaveChanges:=False\nEnd Sub",
+        "howToRun": "路径换成真实文件，按 F5。",
+        "result": "读完 A1 就关闭，源文件不变。"
+      },
+      {
+        "title": "关闭除当前簿之外的所有文件",
+        "code": "Sub 关其他()\n    Dim wb As Workbook\n    For Each wb In Workbooks\n        If wb.Name <> ThisWorkbook.Name Then wb.Close SaveChanges:=False\n    Next wb\nEnd Sub",
+        "howToRun": "多开几个文件后按 F5。",
+        "result": "其他文件全部关闭，当前宏所在簿保留。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不写 SaveChanges，弹出「是否保存」卡住",
+        "reason": "省略参数时 Excel 会询问用户。",
+        "fix": "明确写 SaveChanges:=False 或 True。",
+        "level": "high"
+      },
+      {
+        "title": "关闭宏所在工作簿，后面的代码全没了",
+        "reason": "ThisWorkbook.Close 会终止正在运行的宏。",
+        "fix": "别在流程中途关自己；要关就放在最后。",
+        "level": "high"
+      },
+      {
+        "title": "循环关闭时集合在变，漏关文件",
+        "reason": "For Each Workbooks 里边关边改集合。",
+        "fix": "倒序按索引关，或先收集名字再逐个关。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook-open",
+        "kind": "companion",
+        "why": "打开与关闭成对。"
+      },
+      {
+        "id": "workbook-save",
+        "kind": "companion",
+        "why": "关闭前是否保存的决策点。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Workbook 对象的概念条目。"
+      }
+    ],
+    "oneLiner": "关掉一个工作簿",
+    "summary": "Close 必须明确 SaveChanges，否则会弹询问。别在流程中途关掉宏所在簿，循环关闭要注意集合变化。"
+  },
+  {
+    "id": "workbook-save",
+    "enName": "Workbook.Save",
+    "zhName": "保存工作簿",
+    "alias": [
+      "Save",
+      "保存",
+      "保存当前簿"
+    ],
+    "keywords": [
+      "VBA 保存文件",
+      "保存不弹框",
+      "保存当前工作簿"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ThisWorkbook.Save      ' 保存（新文件会弹另存为）\nwb.Save",
+    "examples": [
+      {
+        "title": "改完数据立刻保存",
+        "code": "Sub 保存()\n    ThisWorkbook.Worksheets(1).Range(\"A1\").Value = Now\n    ThisWorkbook.Save\nEnd Sub",
+        "howToRun": "文件已保存过一次，按 F5。",
+        "result": "A1 写入时间并立即存盘。"
+      },
+      {
+        "title": "保存前先确认不是只读",
+        "code": "Sub 安全保存()\n    If ThisWorkbook.ReadOnly Then\n        MsgBox \"文件是只读打开，无法保存\"\n        Exit Sub\n    End If\n    ThisWorkbook.Save\nEnd Sub",
+        "howToRun": "只读打开文件后按 F5。",
+        "result": "提示只读，不会弹出保存失败。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "新文件直接 Save，弹出另存为对话框",
+        "reason": "从未保存过的文件没有路径。",
+        "fix": "新文件用 SaveAs 指定路径和格式。",
+        "level": "mid"
+      },
+      {
+        "title": "只读打开后 Save，报错",
+        "reason": "ReadOnly 工作簿不能写回原文件。",
+        "fix": "先判断 ReadOnly，或 SaveAs 到新路径。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Save 会保存所有打开的工作簿",
+        "reason": "Save 只作用于调用它的那个工作簿。",
+        "fix": "要全存就遍历 Workbooks 逐个 Save。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "save-as",
+        "kind": "companion",
+        "why": "新文件/换格式用 SaveAs。"
+      },
+      {
+        "id": "workbook-close",
+        "kind": "companion",
+        "why": "关闭前常先保存。"
+      },
+      {
+        "id": "workbook-path",
+        "kind": "companion",
+        "why": "判断是否已保存要看 Path。"
+      }
+    ],
+    "oneLiner": "把当前改动写回文件",
+    "summary": "Save 只保存调用它的那个工作簿，新文件会弹另存为，只读文件会失败。批量保存要逐个遍历。"
+  },
+  {
+    "id": "save-as",
+    "enName": "Workbook.SaveAs",
+    "zhName": "另存为",
+    "alias": [
+      "SaveAs",
+      "另存为",
+      "备份文件"
+    ],
+    "keywords": [
+      "另存为带日期文件名",
+      "备份一份",
+      "转 xlsx"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.SaveAs Filename:=路径, FileFormat:=xlOpenXMLWorkbook",
+    "examples": [
+      {
+        "title": "另存为带日期的备份",
+        "code": "Sub 备份()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\备份_\" & Format(Date, \"yyyy-mm-dd\") & \".xlsx\"\n    ThisWorkbook.SaveAs p, xlOpenXMLWorkbook\nEnd Sub",
+        "howToRun": "文件已保存，按 F5。",
+        "result": "同目录生成带日期的 xlsx 副本，当前工作簿切换为它。"
+      },
+      {
+        "title": "另存一份副本，当前簿不动",
+        "code": "Sub 存副本()\n    ThisWorkbook.SaveCopyAs ThisWorkbook.Path & \"\\副本.xlsx\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "生成副本文件，当前打开的还是原文件。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "SaveAs 后当前工作簿变成新文件，后续保存写错地方",
+        "reason": "SaveAs 会把当前工作簿切换到新路径。",
+        "fix": "只想留副本用 SaveCopyAs，别用 SaveAs。",
+        "level": "high"
+      },
+      {
+        "title": "FileFormat 和扩展名不匹配，弹格式警告",
+        "reason": "xlsx 扩展名配了 xls 格式会提示不兼容。",
+        "fix": "xlsx 用 xlOpenXMLWorkbook，xlsm 用 xlOpenXMLWorkbookMacroEnabled。",
+        "level": "high"
+      },
+      {
+        "title": "把带宏文件另存为 xlsx，宏全丢",
+        "reason": "xlsx 不保存 VBA 工程。",
+        "fix": "需要保留宏就用 xlsm 格式。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook-save",
+        "kind": "companion",
+        "why": "保存与另存为的区别。"
+      },
+      {
+        "id": "workbook-path",
+        "kind": "companion",
+        "why": "拼备份路径要用 Path。"
+      }
+    ],
+    "oneLiner": "存成另一个文件",
+    "summary": "SaveAs 会切换当前文件并可能丢宏，留副本要用 SaveCopyAs。FileFormat 必须和扩展名匹配：xlsx 无宏，xlsm 有宏。"
+  },
+  {
+    "id": "worksheets-collection",
+    "enName": "Workbook.Worksheets",
+    "zhName": "工作表集合",
+    "alias": [
+      "Worksheets",
+      "Sheets",
+      "工作表集合"
+    ],
+    "keywords": [
+      "遍历所有工作表",
+      "按名字取表",
+      "新建工作表"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.Worksheets(1)          ' 按序号\nwb.Worksheets(\"数据\")       ' 按名字\nwb.Worksheets.Count",
+    "examples": [
+      {
+        "title": "遍历并打印所有表名",
+        "code": "Sub 列表名()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        Debug.Print ws.Index, ws.Name\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5，看立即窗口。",
+        "result": "按顺序打印每张工作表的序号和名字。"
+      },
+      {
+        "title": "新建表并命名",
+        "code": "Sub 新建表()\n    Dim ws As Worksheet\n    Set ws = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))\n    ws.Name = \"汇总\"\n    ws.Range(\"A1\").Value = \"新建完成\"\n End Sub",
+        "howToRun": "确保没有同名「汇总」表，按 F5。",
+        "result": "最后一页后面新增「汇总」表并写标题。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 Worksheets 遍历，漏掉图表工作表",
+        "reason": "Worksheets 只含普通工作表，Charts 才含图表表。",
+        "fix": "要连图表表一起处理就用 Sheets。",
+        "level": "high"
+      },
+      {
+        "title": "按名字取表时名字不存在，报下标越界 9",
+        "reason": "Worksheets(\"不存在的表\") 直接抛错。",
+        "fix": "先 On Error Resume Next 判断，或遍历比对 Name。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "新建表重名，报 1004",
+        "reason": "同一簿内表名必须唯一。",
+        "fix": "命名前检查是否已存在，或加日期/序号后缀。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 对象的概念条目。"
+      },
+      {
+        "id": "sheet-directory",
+        "kind": "companion",
+        "why": "遍历表集合生成目录。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "集合挂在 Workbook 下。"
+      }
+    ],
+    "oneLiner": "一个工作簿里的所有表",
+    "summary": "Worksheets 只含普通工作表，Sheets 才含图表表。按名字取表不存在会报 9，新建重名会报 1004。"
+  },
+  {
+    "id": "workbook-names",
+    "enName": "Workbook.Names",
+    "zhName": "名称集合",
+    "alias": [
+      "Names",
+      "名称管理器",
+      "定义名称"
+    ],
+    "keywords": [
+      "列出所有定义名称",
+      "批量加名称",
+      "名称引用哪里"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.Names.Count\nwb.Names(\"税率\").RefersTo\nwb.Names.Add Name:=\"税率\", RefersTo:=\"=0.06\"",
+    "examples": [
+      {
+        "title": "列出所有名称和引用位置",
+        "code": "Sub 列名称()\n    Dim n As Name\n    For Each n In ThisWorkbook.Names\n        Debug.Print n.Name, n.RefersTo\n    Next n\nEnd Sub",
+        "howToRun": "工作簿里有定义名称时按 F5。",
+        "result": "打印每个名称及其指向的区域或常量。"
+      },
+      {
+        "title": "新增一个常量名称",
+        "code": "Sub 加名称()\n    ThisWorkbook.Names.Add Name:=\"税率\", RefersTo:=\"=0.06\"\n    MsgBox Range(\"A1\").Value * [税率]\nEnd Sub",
+        "howToRun": "A1 放金额，按 F5（名称已存在会报错）。",
+        "result": "名称「税率」可用，弹窗显示金额 × 0.06。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "同名名称重复添加，报错",
+        "reason": "同一作用域内名称必须唯一。",
+        "fix": "先检查 Names(\"税率\") 是否存在，存在就改 RefersTo。",
+        "level": "high"
+      },
+      {
+        "title": "搞不清名称作用域，工作簿级和工作表级同名打架",
+        "reason": "Name 可以挂在 Workbook，也可以挂在 Worksheet。",
+        "fix": "明确用 ThisWorkbook.Names 或 ws.Names；删除时看清作用域。",
+        "level": "high"
+      },
+      {
+        "title": "名称写成像单元格引用的字符串，Excel 拒绝",
+        "reason": "名称不能和 A1、R1C1 这类引用混淆。",
+        "fix": "用有意义的词（税率、单价），别用 A1、R2C3。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "named-range",
+        "kind": "companion",
+        "why": "名称与命名区域的概念条目。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Names 挂在 Workbook 下。"
+      }
+    ],
+    "oneLiner": "管理定义名称",
+    "summary": "Names 可列出、增加、改引用。名称有工作簿级和工作表级两种作用域，同名会打架；名称不能长得像单元格地址。"
+  },
+  {
+    "id": "workbook-path",
+    "enName": "Workbook.Path / FullName",
+    "zhName": "文件路径",
+    "alias": [
+      "Path",
+      "FullName",
+      "文件路径"
+    ],
+    "keywords": [
+      "取当前文件路径",
+      "拼同目录文件",
+      "文件名和目录"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.Path        ' 所在目录（未保存为空）\nwb.FullName    ' 含文件名的全路径\nwb.Name        ' 文件名",
+    "examples": [
+      {
+        "title": "取目录、文件名和全路径",
+        "code": "Sub 看路径()\n    Debug.Print ThisWorkbook.Path\n    Debug.Print ThisWorkbook.Name\n    Debug.Print ThisWorkbook.FullName\nEnd Sub",
+        "howToRun": "已保存的文件按 F5。",
+        "result": "分别打印目录、文件名、完整路径。"
+      },
+      {
+        "title": "在文件同目录建备份子文件夹",
+        "code": "Sub 建备份目录()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\备份\"\n    If Dir(p, vbDirectory) = \"\" Then MkDir p\n    MsgBox p\nEnd Sub",
+        "howToRun": "已保存的文件按 F5。",
+        "result": "同目录出现「备份」文件夹。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "文件没保存，Path 是空串，拼路径变成 \"\\备份\"",
+        "reason": "未保存的工作簿没有目录。",
+        "fix": "先判断 Len(Path)>0，或先 SaveAs。",
+        "level": "high"
+      },
+      {
+        "title": "用 Name 当路径拼，少了目录",
+        "reason": "Name 只有文件名，不含目录。",
+        "fix": "拼路径用 Path & \"\\\" & 文件名，或直接用 FullName。",
+        "level": "mid"
+      },
+      {
+        "title": "OneDrive/网络路径和本地缓存路径不一致",
+        "reason": "云端文件的 Path 可能是本地同步目录。",
+        "fix": "需要稳定标识就用 FullName，并注意同步状态。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Workbook 对象的路径属性。"
+      },
+      {
+        "id": "workbook-save",
+        "kind": "companion",
+        "why": "保存后才有 Path。"
+      },
+      {
+        "id": "export-pdf",
+        "kind": "companion",
+        "why": "导出 PDF 也要拼 Path。"
+      }
+    ],
+    "oneLiner": "取文件在哪、叫什么",
+    "summary": "Path 是目录、Name 是文件名、FullName 是全路径。未保存时 Path 为空，拼路径前必须先判断。"
+  },
+  {
+    "id": "worksheet-protect",
+    "enName": "Worksheet.Protect",
+    "zhName": "保护工作表",
+    "alias": [
+      "Protect",
+      "Unprotect",
+      "保护工作表",
+      "工作表保护"
+    ],
+    "keywords": [
+      "锁定工作表",
+      "防止改公式",
+      "保护密码"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.Protect Password:=\"密码\", UserInterfaceOnly:=True\nws.Unprotect Password:=\"密码\"",
+    "examples": [
+      {
+        "title": "保护表但允许筛选和排序",
+        "code": "Sub 保护()\n    With ActiveSheet\n        .Protect Password:=\"1234\", _\n            AllowFiltering:=True, AllowSorting:=True\n    End With\nEnd Sub",
+        "howToRun": "在要保护的表上按 F5。",
+        "result": "表被保护，但仍可筛选、排序，改单元格会提示。"
+      },
+      {
+        "title": "解除保护",
+        "code": "Sub 解除()\n    ActiveSheet.Unprotect Password:=\"1234\"\nEnd Sub",
+        "howToRun": "先跑上一个例子，再按 F5。",
+        "result": "保护解除，可以自由编辑。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为保护后 VBA 也写不进去",
+        "reason": "默认 VBA 也会被挡；要代码可写必须开 UserInterfaceOnly:=True。",
+        "fix": "Protect 时加 UserInterfaceOnly:=True，且每次打开工作簿要重新设一次。",
+        "level": "high"
+      },
+      {
+        "title": "密码区分大小写，Unprotect 解不开",
+        "reason": "VBA 的密码比较区分大小写。",
+        "fix": "密码统一大小写，或存在常量里复用。",
+        "level": "mid"
+      },
+      {
+        "title": "保护前没解锁单元格，用户什么都不能填",
+        "reason": "默认所有单元格 Locked=True，保护后全锁。",
+        "fix": "先把你允许填的单元格 Locked=False，再 Protect。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 对象的保护属性。"
+      },
+      {
+        "id": "worksheet-visible",
+        "kind": "companion",
+        "why": "隐藏和保护常一起做。"
+      }
+    ],
+    "oneLiner": "锁住表防误改",
+    "summary": "Protect 默认连 VBA 写入也挡，要开 UserInterfaceOnly。保护前先把允许输入的格子 Locked=False，密码还区分大小写。"
+  },
+  {
+    "id": "worksheet-visible",
+    "enName": "Worksheet.Visible",
+    "zhName": "工作表可见性",
+    "alias": [
+      "Visible",
+      "隐藏工作表",
+      "显示工作表"
+    ],
+    "keywords": [
+      "隐藏工作表",
+      "批量隐藏",
+      "深度隐藏"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.Visible = xlSheetVisible | xlSheetHidden | xlSheetVeryHidden",
+    "examples": [
+      {
+        "title": "隐藏除当前表外的所有表",
+        "code": "Sub 只留当前()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        If ws.Name <> ActiveSheet.Name Then ws.Visible = xlSheetHidden\n    Next ws\nEnd Sub",
+        "howToRun": "切到想保留的表，按 F5。",
+        "result": "其他表在标签栏消失，只剩当前表。"
+      },
+      {
+        "title": "显示所有隐藏表",
+        "code": "Sub 全显示()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        ws.Visible = xlSheetVisible\n    Next ws\nEnd Sub",
+        "howToRun": "有隐藏表时按 F5。",
+        "result": "所有普通工作表恢复显示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把唯一可见的表也隐藏，报 1004",
+        "reason": "工作簿至少要有一张可见工作表。",
+        "fix": "循环里跳过当前表，或先确保另一张可见。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "用了 xlSheetVeryHidden，右键也取消不了",
+        "reason": "深度隐藏只能在 VBA 里改回。",
+        "fix": "普通隐藏用 xlSheetHidden；VeryHidden 只给配置表用。",
+        "level": "high"
+      },
+      {
+        "title": "对隐藏表 Activate，报错",
+        "reason": "隐藏工作表不能激活。",
+        "fix": "先设 Visible=xlSheetVisible，再 Activate。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 对象的可见性属性。"
+      },
+      {
+        "id": "worksheet-protect",
+        "kind": "companion",
+        "why": "隐藏与保护常一起用。"
+      },
+      {
+        "id": "activesheet",
+        "kind": "companion",
+        "why": "活动表不能是隐藏表。"
+      }
+    ],
+    "oneLiner": "隐藏或显示工作表",
+    "summary": "Visible 三态：显示、隐藏、深度隐藏。不能隐藏唯一可见表，VeryHidden 在界面无法恢复，隐藏表也不能被激活。"
+  }
+]

@@ -1,0 +1,438 @@
+[
+  {
+    "id": "class-module",
+    "enName": "Class Module",
+    "zhName": "类模块",
+    "alias": [
+      "ClassModule",
+      "类模块",
+      "自定义类"
+    ],
+    "keywords": [
+      "VBA 类怎么建",
+      "Class Initialize",
+      "自定义对象"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "类模块里写 Private 字段 + Public Property/方法\nSet obj = New 类名",
+    "examples": [
+      {
+        "title": "定义一个订单类并计算含税价",
+        "code": "Private mAmount As Double\n\nPublic Property Let Amount(v As Double)\n    mAmount = v\nEnd Property\n\nPublic Function Total() As Double\n    Total = mAmount * 1.06\nEnd Function",
+        "howToRun": "插入类模块，改名 Order，粘贴代码；标准模块里 Set o = New Order。",
+        "result": "o.Amount = 100 后，o.Total 返回 106。"
+      },
+      {
+        "title": "用 Initialize 设置默认值",
+        "code": "Private mRate As Double\n\nPrivate Sub Class_Initialize()\n    mRate = 0.06\nEnd Sub\n\nPublic Property Get Rate() As Double\n    Rate = mRate\nEnd Property",
+        "howToRun": "新建实例后读 o.Rate。",
+        "result": "新对象默认税率 0.06，不必每次手动设。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "类模块里写 Public 字段，外部随意改坏",
+        "reason": "Public 变量没有校验入口。",
+        "fix": "字段用 Private，对外暴露 Property Let/Get 做校验。",
+        "level": "high"
+      },
+      {
+        "title": "把类模块当标准模块直接调用过程",
+        "reason": "类里的 Public 过程属于实例，不是全局函数。",
+        "fix": "先 Set obj = New 类名，再 obj.方法。",
+        "level": "mid"
+      },
+      {
+        "title": "类模块改名后代码里的 New 旧名报错",
+        "reason": "类型名和模块名必须一致。",
+        "fix": "改名后全局替换 New 旧名，或保留原模块名。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "模块与过程的基础。"
+      },
+      {
+        "id": "property-procedure",
+        "kind": "companion",
+        "why": "类里最常用 Property。"
+      },
+      {
+        "id": "object-property-method",
+        "kind": "companion",
+        "why": "对象模型基础。"
+      }
+    ],
+    "oneLiner": "自己定义一种对象",
+    "summary": "类模块把字段藏起来，用 Property 和 Methods 对外。字段 Private、入口做校验，才算真正用对类。"
+  },
+  {
+    "id": "property-procedure",
+    "enName": "Property Let / Get / Set",
+    "zhName": "属性过程",
+    "alias": [
+      "Property Get",
+      "Property Let",
+      "属性过程"
+    ],
+    "keywords": [
+      "VBA 属性怎么写",
+      "Property 校验",
+      "只读属性"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Public Property Get Name() As String\nPublic Property Let Name(v As String)\nPublic Property Set Obj(v As Object)",
+    "examples": [
+      {
+        "title": "只读属性：只给 Get",
+        "code": "Private mCount As Long\n\nPublic Property Get Count() As Long\n    Count = mCount\nEnd Property\n\nPublic Sub AddOne()\n    mCount = mCount + 1\nEnd Sub",
+        "howToRun": "类模块里写，外部只能读 o.Count，不能赋值。",
+        "result": "o.Count 可读；o.Count = 5 直接编译报错。"
+      },
+      {
+        "title": "Let 里做范围校验",
+        "code": "Private mAge As Long\n\nPublic Property Let Age(v As Long)\n    If v < 0 Or v > 150 Then Err.Raise 5, , \"年龄不合法\"\n    mAge = v\nEnd Property\n\nPublic Property Get Age() As Long\n    Age = mAge\nEnd Property",
+        "howToRun": "o.Age = -1 观察报错，o.Age = 30 正常。",
+        "result": "-1 触发「年龄不合法」，30 正常写入。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对象属性用 Let，编译报错",
+        "reason": "对象赋值必须用 Set。",
+        "fix": "对象属性配 Property Set，值属性配 Property Let。",
+        "level": "high"
+      },
+      {
+        "title": "Get 返回类型和 Let 参数类型不一致",
+        "reason": "同一属性两端的类型应匹配。",
+        "fix": "Get As T 对应 Let(v As T)，别一个 String 一个 Variant。",
+        "level": "mid"
+      },
+      {
+        "title": "只写 Let 不写 Get，外部读不到",
+        "reason": "没有 Get 就是只写属性。",
+        "fix": "需要读就补 Get；只读就只留 Get。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "class-module",
+        "kind": "companion",
+        "why": "属性通常写在类里。"
+      },
+      {
+        "id": "byref-vs-byval",
+        "kind": "companion",
+        "why": "参数传递方式。"
+      }
+    ],
+    "oneLiner": "给字段包一层读写入口",
+    "summary": "Property Get 负责读、Let 负责值写入、Set 负责对象写入。类型要对称，对象绝不能用 Let。"
+  },
+  {
+    "id": "arrays-vs-ranges",
+    "enName": "Array vs Range",
+    "zhName": "数组与区域",
+    "alias": [
+      "数组和单元格",
+      "Array vs Range",
+      "批量读写"
+    ],
+    "keywords": [
+      "数组比单元格快",
+      "二维数组",
+      "Range 转数组"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "v = Range(\"A1:C100\").Value     ' 一次读成二维数组\nRange(\"A1:C100\").Value = v     ' 一次写回",
+    "examples": [
+      {
+        "title": "一次读入数组再一次写回",
+        "code": "Sub 数组提速()\n    Dim v As Variant, i As Long, j As Long\n    v = Range(\"A1:C100\").Value\n    For i = 1 To UBound(v, 1)\n        For j = 1 To UBound(v, 2)\n            v(i, j) = v(i, j) * 2\n        Next j\n    Next i\n    Range(\"E1:G100\").Value = v\nEnd Sub",
+        "howToRun": "A1:C100 有数字，按 F5。",
+        "result": "E1:G100 得到翻倍后的值，全程只读写两次。"
+      },
+      {
+        "title": "看清数组下标从 1 开始",
+        "code": "Sub 看下标()\n    Dim v As Variant\n    v = Range(\"A1:B3\").Value\n    Debug.Print LBound(v, 1), UBound(v, 1)\n    Debug.Print LBound(v, 2), UBound(v, 2)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "打印 1/3 与 1/2，说明 Range.Value 是 1 基二维数组。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "逐格读写几千行，慢得明显",
+        "reason": "每次 Range 访问都跨 COM 边界。",
+        "fix": "整块读成数组，内存里算完再整块写回。",
+        "level": "high"
+      },
+      {
+        "title": "把一维数组直接赋给多列区域，形状不匹配",
+        "reason": "区域需要二维数组。",
+        "fix": "用 Application.Transpose 或构造二维数组。",
+        "level": "mid"
+      },
+      {
+        "title": "数组下标默认从 0 开始，和 Range 的 1 基混用",
+        "reason": "Split/Array 生成 0 基，Range.Value 是 1 基。",
+        "fix": "用 LBound/UBound，别硬写 0 或 1。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "static-vs-dynamic-array",
+        "kind": "companion",
+        "why": "数组声明与 ReDim。"
+      },
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Range 对象。"
+      },
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "批量提速的配套开关。"
+      }
+    ],
+    "oneLiner": "大批量数据先在内存里算",
+    "summary": "Range 逐格访问很慢，整块读成二维数组、算完一次写回才快。注意 Range 数组是 1 基，Split 出来是 0 基。"
+  },
+  {
+    "id": "variant-type",
+    "enName": "Variant Type",
+    "zhName": "Variant 类型",
+    "alias": [
+      "Variant",
+      "变体类型",
+      "万能类型"
+    ],
+    "keywords": [
+      "Variant 是什么",
+      "类型判断",
+      "TypeName"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dim v As Variant\nv = 100 : v = \"文本\" : v = Range(\"A1\")\nTypeName(v) / IsArray(v) / IsObject(v)",
+    "examples": [
+      {
+        "title": "用 TypeName 判断当前装的是什么",
+        "code": "Sub 看类型()\n    Dim v As Variant\n    v = 100: Debug.Print TypeName(v)\n    v = \"abc\": Debug.Print TypeName(v)\n    v = Range(\"A1\"): Debug.Print TypeName(v)\n End Sub",
+        "howToRun": "按 F5。",
+        "result": "依次打印 Integer、String、Range。"
+      },
+      {
+        "title": "从单元格取值先判空再算",
+        "code": "Sub 安全计算()\n    Dim v As Variant\n    v = Range(\"A1\").Value\n    If IsEmpty(v) Or Not IsNumeric(v) Then\n        MsgBox \"A1 不是数字\"\n    Else\n        MsgBox v * 2\n    End If\nEnd Sub",
+        "howToRun": "A1 分别留空、填文本、填数字。",
+        "result": "空/文本提示，数字弹双倍值。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 Variant 当具体类型用，运算时才报 13",
+        "reason": "Variant 运行时才暴露真实类型。",
+        "fix": "取值后先 IsNumeric/IsDate/TypeName 判断。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "Variant 存对象不用 Set，得到默认属性值",
+        "reason": "对象赋值必须 Set。",
+        "fix": "Set v = Range(\"A1\")，不要 v = Range(\"A1\")。",
+        "level": "high"
+      },
+      {
+        "title": "所有变量都声明 Variant，问题被拖到运行期",
+        "reason": "失去编译期类型检查。",
+        "fix": "已知类型就写明确类型，只有真需要才用 Variant。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "nothing-empty-null",
+        "kind": "companion",
+        "why": "Variant 的空值状态。"
+      },
+      {
+        "id": "date-precision",
+        "kind": "companion",
+        "why": "Variant 里的日期。"
+      },
+      {
+        "id": "arrays-vs-ranges",
+        "kind": "companion",
+        "why": "Range.Value 返回 Variant 数组。"
+      }
+    ],
+    "oneLiner": "能装任何东西的变量",
+    "summary": "Variant 方便但把类型问题拖到运行期。取值后先判断类型，对象要 Set，能写明确类型就别偷懒。"
+  },
+  {
+    "id": "nothing-empty-null",
+    "enName": "Nothing / Empty / Null",
+    "zhName": "空值三兄弟",
+    "alias": [
+      "Nothing",
+      "Empty",
+      "Null"
+    ],
+    "keywords": [
+      "空值判断",
+      "IsNothing",
+      "单元格为空"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "IsEmpty(v)   ' 未初始化的 Variant\nIsNull(v)    ' 数据库 Null\nobj Is Nothing   ' 对象未赋值",
+    "examples": [
+      {
+        "title": "分别判断三种空",
+        "code": "Sub 判空()\n    Dim a As Variant, b As Variant, o As Object\n    Debug.Print IsEmpty(a)\n    b = Null: Debug.Print IsNull(b)\n    Debug.Print o Is Nothing\n End Sub",
+        "howToRun": "按 F5。",
+        "result": "依次打印 True、True、True。"
+      },
+      {
+        "title": "单元格空值不等于空字符串",
+        "code": "Sub 单元格判空()\n    Dim v As Variant\n    v = Range(\"A1\").Value\n    If IsEmpty(v) Then\n        MsgBox \"真空\"\n    ElseIf v = \"\" Then\n        MsgBox \"空文本公式结果\"\n    End If\nEnd Sub",
+        "howToRun": "A1 留空，再改成 =\"\" 对比。",
+        "result": "留空弹「真空」；=\"\" 弹「空文本公式结果」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 = \"\" 判断空单元格，漏掉真空和 Null",
+        "reason": "空单元格 Value 是 Empty，不是 \"\"。",
+        "fix": "按场景用 IsEmpty / Len(v)=0 / IsNull。",
+        "level": "high"
+      },
+      {
+        "title": "对 Nothing 直接调方法，报 91",
+        "reason": "对象变量没 Set 就使用。",
+        "fix": "先 If Not obj Is Nothing Then。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "把 Null 参与运算，结果还是 Null",
+        "reason": "Null 有传染性。",
+        "fix": "先 IsNull 判断，或 Nz 式地替换成默认值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "variant-type",
+        "kind": "companion",
+        "why": "空值都装在 Variant 里。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "Nothing 引发的 91。"
+      }
+    ],
+    "oneLiner": "分清香、空字符串和空对象",
+    "summary": "Empty 是没初始化，Null 是数据库空，Nothing 是对象没赋值，\"\" 是空文本。判断方式各不一样，混用必踩坑。"
+  },
+  {
+    "id": "object-model-hierarchy",
+    "enName": "Excel Object Model",
+    "zhName": "对象模型层级",
+    "alias": [
+      "对象模型",
+      "Application Workbook Worksheet Range",
+      "Parent"
+    ],
+    "keywords": [
+      "Excel 对象层级",
+      "Range 属于谁",
+      "Parent 用法"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application → Workbook → Worksheet → Range\nRange.Parent 是 Worksheet，Worksheet.Parent 是 Workbook",
+    "examples": [
+      {
+        "title": "从 Range 一路往上找",
+        "code": "Sub 看层级()\n    Dim r As Range\n    Set r = Range(\"A1\")\n    Debug.Print r.Parent.Name\n    Debug.Print r.Parent.Parent.Name\n    Debug.Print r.Parent.Parent.Parent.Name\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "依次打印表名、工作簿名、Excel。"
+      },
+      {
+        "title": "写全层级，避免指错表",
+        "code": "Sub 全限定()\n    Application.ThisWorkbook.Worksheets(\"数据\").Range(\"A1\").Value = 1\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "无论当前激活哪个文件，都写进本工作簿的「数据」表。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只写 Range(\"A1\")，默认跟着活动表跑",
+        "reason": "省略层级时落在 ActiveSheet。",
+        "fix": "生产代码写全 Worksheets(\"表名\").Range(\"A1\")。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Range.Parent 是工作簿",
+        "reason": "Range 的父对象是 Worksheet。",
+        "fix": "要工作簿用 Range.Parent.Parent 或直接 ThisWorkbook。",
+        "level": "mid"
+      },
+      {
+        "title": "跨应用时还按 Excel 层级写",
+        "reason": "Word/PPT 的对象模型不同。",
+        "fix": "先明确应用，再按各自模型取对象。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "object-property-method",
+        "kind": "companion",
+        "why": "对象、属性、方法基础。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 层级。"
+      },
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Range 层级。"
+      }
+    ],
+    "oneLiner": "Excel 对象的父子关系",
+    "summary": "Application 下面有 Workbook，Workbook 下面有 Worksheet，Worksheet 下面才是 Range。少写一层，默认就落到活动对象上。"
+  }
+]

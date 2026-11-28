@@ -6,6 +6,9 @@ import CategoryPage from '@/ui/pages/CategoryPage';
 import SearchPage from '@/ui/pages/SearchPage';
 import FunctionDetailPage from '@/ui/pages/FunctionDetailPage';
 import InterpreterPage from '@/ui/pages/InterpreterPage';
+import MacroHomePage from '@/ui/pages/MacroHomePage';
+import MacroDetailPage from '@/ui/pages/MacroDetailPage';
+import MacroCheatsheetPage from '@/ui/pages/MacroCheatsheetPage';
 import DataPage from '@/ui/pages/DataPage';
 import AboutPage from '@/ui/pages/AboutPage';
 import SettingsPage from '@/ui/pages/SettingsPage';
@@ -32,6 +35,10 @@ const routes: RouteObject[] = [
       { path: 'search', element: <SearchPage /> },
       { path: 'f/:id', element: <FunctionDetailPage /> },
       { path: 'interpreter', element: <InterpreterPage /> },
+      // 静态段必须排在 :id 之前（v6 也按静态优先，但写清楚更稳）
+      { path: 'macro/cheatsheet', element: <MacroCheatsheetPage /> },
+      { path: 'macro/:id', element: <MacroDetailPage /> },
+      { path: 'macro', element: <MacroHomePage /> },
       { path: 'data', element: <DataPage /> },
       { path: 'about', element: <AboutPage /> },
       ...nativeRoutes,

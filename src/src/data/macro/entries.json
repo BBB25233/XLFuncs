@@ -1,0 +1,1000 @@
+[
+  {
+    "id": "what-is-macro",
+    "enName": "Macro / Sub",
+    "zhName": "什么是宏",
+    "alias": ["宏", "VBA", "代码", "自动化", "一键"],
+    "keywords": ["自动做重复操作", "一键执行", "写一段代码让Excel自己干"],
+    "kind": "concept",
+    "level": 1,
+    "host": ["excel"],
+    "hostNotes": "WPS 专业版内置 VBA，写法基本一致；WPS 个人版默认没有 VBA，需要另装「VBA 宏插件」（本项目未实测，标为未验证）。",
+    "syntax": "Sub 宏名()\n    ' 这里写要做的事\nEnd Sub",
+    "examples": [
+      {
+        "title": "最小宏：弹一个框",
+        "code": "Sub 你好()\n    MsgBox \"我是第一条宏\"\nEnd Sub",
+        "howToRun": "Alt+F11 打开 VBA 编辑器 → 菜单「插入 → 模块」→ 粘贴代码 → 光标放在 Sub 与 End Sub 之间按 F5。",
+        "result": "弹出对话框「我是第一条宏」，点确定关闭。"
+      },
+      {
+        "title": "把 A1 填成今天的日期",
+        "code": "Sub 填日期()\n    Range(\"A1\").Value = Date\nEnd Sub",
+        "howToRun": "同上；运行前先确认当前工作表是你要写的那张。",
+        "result": "A1 显示今天的日期；若显示成一串数字，把 A1 的单元格格式改成「日期」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "另存为 .xlsx 之后宏全没了",
+        "reason": "xlsx 格式不支持宏，Excel 保存时会提示「无宏的工作簿」并丢掉 VBA 代码。",
+        "fix": "另存为「Excel 启用宏的工作簿（.xlsm）」，再打开才有代码。",
+        "level": "high"
+      },
+      {
+        "title": "打开文件顶部出现「宏已被禁用」",
+        "reason": "默认安全级别会禁用来自网络的文件里的宏，代码本身没问题。",
+        "fix": "点黄色条上的「启用内容」；常用文件夹可加入「受信任位置」，以后不再拦。",
+        "level": "high"
+      },
+      {
+        "title": "按 F5 没反应，或弹出「宏名」选择框",
+        "reason": "光标不在任何过程内部，Excel 不知道该运行哪一个宏。",
+        "fix": "把光标放进 Sub 与 End Sub 之间，或按 Alt+F8 选中宏名点「运行」。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "macro-security", "kind": "companion", "why": "第一次用宏，先过安全设置这一关，否则代码根本跑不起来。" },
+      { "id": "module-and-procedure", "kind": "companion", "why": "宏必须写在模块里，写错位置按 F5 也无效。" }
+    ],
+    "oneLiner": "让 Excel 自己重复干活的代码",
+    "summary": "宏就是一段保存在工作簿里的 VBA 代码，运行一次就替你把一串点击做完。你可以用「录制宏」生成第一版，再改成能长期用的版本。"
+  },
+  {
+    "id": "macro-security",
+    "enName": "Macro Security",
+    "zhName": "宏安全与启用",
+    "alias": ["启用宏", "宏被禁用", "受信任位置", "安全级别"],
+    "keywords": ["打不开宏", "启用内容按钮是灰的", "文件被标记来自网络"],
+    "kind": "concept",
+    "level": 1,
+    "host": ["excel"],
+    "hostNotes": "WPS 的宏安全入口在「工具 → 选项 → 安全性」，文案与 Excel 不同（未实测）。",
+    "syntax": "文件 → 选项 → 信任中心 → 信任中心设置 → 宏设置",
+    "examples": [
+      {
+        "title": "自检：这台机器允许运行宏吗",
+        "code": "Sub 自检()\n    MsgBox \"宏可以运行，当前安全级别允许执行\"\nEnd Sub",
+        "howToRun": "插入模块后按 F5。若这一步就报「宏已被禁用」，说明是安全设置拦的，不是代码问题。",
+        "result": "能弹出提示 = 宏环境正常；弹不出来 = 先去「启用内容」或调整信任中心。"
+      },
+      {
+        "title": "打开别人的工作簿，但不执行它的宏",
+        "code": "Sub 安全打开()\n    Dim 原级别 As Long\n    原级别 = Application.AutomationSecurity\n    Application.AutomationSecurity = msoAutomationSecurityForceDisable\n    Workbooks.Open \"C:\\数据\\外部报表.xlsx\"\n    Application.AutomationSecurity = 原级别\nEnd Sub",
+        "howToRun": "把路径改成真实文件后按 F5；需要引用里的 msoAutomationSecurityForceDisable 常量（Office 自带）。",
+        "result": "文件正常打开，但里面的宏一律不执行；打开完把安全级别还原，避免影响后续操作。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "「启用内容」按钮是灰的，点不了",
+        "reason": "文件被 Windows 标记为「来自网络」，Excel 连启用按钮都不给。",
+        "fix": "先关掉文件 → 右键文件「属性」→ 勾选底部「解除锁定」→ 确定，再打开。",
+        "level": "high"
+      },
+      {
+        "title": "把整个下载目录设成受信任位置，等于关掉防护",
+        "reason": "受信任位置里的宏不经过安全检查，任何下载到该目录的 xlsm 都会直接运行。",
+        "fix": "只把「自己写代码的固定目录」加入受信任位置，下载目录不要加。",
+        "level": "high"
+      },
+      {
+        "title": "同事打开你的文件看不到内容，只有一片空白",
+        "reason": "工作簿里用了宏打开时隐藏工作表 / 自动跳转，但对方机器禁用了宏。",
+        "fix": "给对方一份纯函数版（不发 xlsm），或在文档里写清「需要启用宏」。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "what-is-macro", "kind": "companion", "why": "先知道宏是什么，再看它为什么被拦。" },
+      { "id": "module-and-procedure", "kind": "companion", "why": "启用之后，代码要放对模块才会被触发。" }
+    ],
+    "oneLiner": "管住「谁能运行这段代码」",
+    "summary": "Excel 默认不信任来历不明的宏。搞不清「宏被禁用」和「代码报错」的区别，是新手最常卡住的地方——先看顶部有没有黄色安全条。"
+  },
+  {
+    "id": "module-and-procedure",
+    "enName": "Module / Procedure",
+    "zhName": "模块与过程",
+    "alias": ["模块", "标准模块", "ThisWorkbook", "工作表模块", "过程"],
+    "keywords": ["代码放在哪里", "事件不触发", "插入模块"],
+    "kind": "concept",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "' 标准模块：插入 → 模块\nSub 过程名()\nEnd Sub",
+    "examples": [
+      {
+        "title": "标准模块 + 按钮：最常用的组合",
+        "code": "Sub 给A列加粗()\n    Columns(\"A\").Font.Bold = True\nEnd Sub",
+        "howToRun": "Alt+F11 → 插入 → 模块 → 粘贴；回到表格，插入一个形状，右键「指定宏」选它，点形状即可运行。",
+        "result": "A 列整列变粗体；点一次运行一次。"
+      },
+      {
+        "title": "Worksheet_Change：改了单元格就自动跑",
+        "code": "Private Sub Worksheet_Change(ByVal Target As Range)\n    If Target.Column = 1 Then\n        Target.Offset(0, 1).Value = Now\n    End If\nEnd Sub",
+        "howToRun": "这段必须放在「对应工作表的模块」里（在 VBE 左侧双击 Sheet1），放标准模块永远不会触发。",
+        "result": "在 A 列任意单元格输入内容，右边一格自动写入当前时间。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "事件过程写了，但改单元格毫无反应",
+        "reason": "Worksheet_Change 这类事件只认「工作表模块」和 ThisWorkbook，放标准模块等于没写。",
+        "fix": "在 VBE 左侧双击对应工作表（如 Sheet1），把代码贴进它的代码窗口。",
+        "level": "high"
+      },
+      {
+        "title": "按 F5 弹出「宏名」列表",
+        "reason": "当前模块里有多个过程，或者光标不在过程内部，Excel 让你选一个。",
+        "fix": "把光标放进目标过程内部再按 F5；或 Alt+F8 精确选择。",
+        "level": "mid"
+      },
+      {
+        "title": "两个模块里有同名 Sub，运行时报「编译错误：二义性名称」",
+        "reason": "同一工作簿里过程名必须唯一，复制代码时最容易撞名。",
+        "fix": "改名（如 加粗_A / 加粗_B），或在声明前加 Private 限定作用范围。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "sub-vs-function", "kind": "companion", "why": "模块里能放两种东西：Sub 干活，Function 返回值。" },
+      { "id": "what-is-macro", "kind": "companion", "why": "宏最终都要落到某个过程里执行。" }
+    ],
+    "oneLiner": "代码要放对位置才跑得起来",
+    "summary": "VBA 代码按「模块」分组：标准模块放通用宏，工作表模块放事件，ThisWorkbook 放工作簿级事件。放错模块最常见的结果是「代码没错，但就是不响应」。"
+  },
+  {
+    "id": "sub-vs-function",
+    "enName": "Sub / Function",
+    "zhName": "Sub 与 Function",
+    "alias": ["过程", "函数", "返回值", "自定义函数", "UDF"],
+    "keywords": ["宏和函数有什么区别", "自定义函数怎么写", "在单元格里调用自己的函数"],
+    "kind": "concept",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Function 名称(参数 As 类型) As 返回类型\n    ' 计算\n    名称 = 结果\nEnd Function",
+    "examples": [
+      {
+        "title": "自定义函数：单元格里直接调用",
+        "code": "Function 双倍(数值 As Double) As Double\n    双倍 = 数值 * 2\nEnd Function",
+        "howToRun": "代码放标准模块；回到表格，在任意单元格输入 =双倍(A1)。",
+        "result": "A1 是 12 时返回 24；改 A1 的值，结果自动重算。"
+      },
+      {
+        "title": "Sub 调用 Function 并显示结果",
+        "code": "Sub 试算()\n    MsgBox \"双倍(7) = \" & 双倍(7)\nEnd Sub",
+        "howToRun": "同一个标准模块里按 F5（光标在 Sub 体内）。",
+        "result": "弹出「双倍(7) = 14」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "自定义函数在单元格里显示 #VALUE! 或 0",
+        "reason": "Function 没有给函数名赋值，或参数类型与传入值不匹配（文本传给 Double）。",
+        "fix": "确认过程内有「函数名 = 结果」；参数类型改成 Variant 再自己判断。",
+        "level": "high"
+      },
+      {
+        "title": "自定义函数想顺便把别的单元格改掉，结果报错",
+        "reason": "被单元格公式调用的 Function 只能返回值，不能改工作表结构或其它单元格。",
+        "fix": "把「改单元格」的部分拆成 Sub，用按钮或事件触发，而不是公式。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "dim", "kind": "companion", "why": "函数内部一样要先声明变量再算。" },
+      { "id": "for-next", "kind": "companion", "why": "函数里常要循环一批数据，用 For…Next 最直接。" }
+    ],
+    "oneLiner": "Sub 干活，Function 交结果",
+    "summary": "Sub 执行动作、不需要返回值；Function 必须返回一个值，因此既能被别的过程调用，也能像普通函数一样写进单元格公式。"
+  },
+  {
+    "id": "object-property-method",
+    "enName": "Object.Property.Method",
+    "zhName": "对象·属性·方法",
+    "alias": ["对象", "属性", "方法", "点号", "对象模型"],
+    "keywords": ["属性和方法区别", "点号后面写什么", "对象模型怎么理解"],
+    "kind": "concept",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "对象.属性 = 值\n对象.方法 参数",
+    "examples": [
+      {
+        "title": "属性：读一个值、写一个值",
+        "code": "Sub 读写属性()\n    Range(\"A1\").Value = 100\n    MsgBox \"A1 现在是 \" & Range(\"A1\").Value\n    MsgBox \"A1 的地址是 \" & Range(\"A1\").Address\nEnd Sub",
+        "howToRun": "标准模块里按 F5。",
+        "result": "A1 写入 100；依次弹出两个框，显示 100 与 $A$1。"
+      },
+      {
+        "title": "方法：让对象做一件事",
+        "code": "Sub 调用方法()\n    Range(\"A1:C3\").ClearContents\n    Range(\"A1:C3\").Borders.LineStyle = xlContinuous\nEnd Sub",
+        "howToRun": "先随便在 A1:C3 写点内容再运行，能看出区别。",
+        "result": "区域内内容被清空，但边框还在；第二行再给整块区域加细边框。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Range(\"A1\").Value = 100 写成了 Set Range(\"A1\").Value = 100",
+        "reason": "Set 只能给对象变量赋值，给属性赋值不需要 Set。",
+        "fix": "去掉 Set：Range(\"A1\").Value = 100。",
+        "level": "mid"
+      },
+      {
+        "title": "只用 Range 不写工作表，结果改到了别的表",
+        "reason": "Range 省略父对象时作用于「当前活动工作表」，切表后结果就跑了。",
+        "fix": "写成 ThisWorkbook.Worksheets(\"销售\").Range(\"A1\")，把父对象钉死。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      { "id": "range-vs-cells", "kind": "companion", "why": "最常用的两个对象引用写法，区别见下一条。" },
+      { "id": "set", "kind": "companion", "why": "把对象装进变量要 Set，属性赋值则不要。" }
+    ],
+    "oneLiner": "对象是东西，属性是特征，方法是动作",
+    "summary": "VBA 的一切都挂在对象上：Workbook → Worksheet → Range。属性回答「它是什么样」，方法回答「让它做什么」，写法都是点号接下去。"
+  },
+  {
+    "id": "range-vs-cells",
+    "enName": "Range vs Cells",
+    "zhName": "Range 与 Cells",
+    "alias": ["Range", "Cells", "单元格引用", "定位单元格"],
+    "keywords": ["A1写法和行列号写法", "Cells怎么用", "两者区别"],
+    "kind": "concept",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Range(\"B3\")   ' 地址写法\nCells(3, 2)     ' 行号, 列号写法",
+    "examples": [
+      {
+        "title": "同一个单元格的两种写法",
+        "code": "Sub 两种写法()\n    Range(\"B3\").Value = \"地址写法\"\n    Cells(3, 2).Value = \"行列写法\"\n    MsgBox Range(\"B3\").Address & \" 与 \" & Cells(3, 2).Address\nEnd Sub",
+        "howToRun": "标准模块里按 F5。两次赋值都落在 B3，后一次覆盖前一次。",
+        "result": "B3 显示「行列写法」；弹框显示两个地址都是 $B$3。"
+      },
+      {
+        "title": "用 Cells 在循环里按行号填数",
+        "code": "Sub 填十行()\n    Dim i As Long\n    For i = 1 To 10\n        Cells(i, 2).Value = i * 10\n    Next i\nEnd Sub",
+        "howToRun": "确认当前表 B 列为空再运行。",
+        "result": "B1:B10 依次写入 10、20 …… 100。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Cells(2, 3) 以为指向 B2，结果写到了 C2",
+        "reason": "Cells 的顺序是（行号, 列号），列号 3 对应 C 列。",
+        "fix": "记住 B2 = Cells(2, 2)；拿不准时先 MsgBox Cells(2, 3).Address 验证。",
+        "level": "high"
+      },
+      {
+        "title": "循环里改完数据，发现整张表都被写满了",
+        "reason": "Cells 没写父对象，用的是活动表；活动表被切换后范围失控。",
+        "fix": "统一写成 ws.Cells(i, 2)，其中 Set ws = ThisWorkbook.Worksheets(\"明细\")。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "range", "kind": "companion", "why": "区域级操作用 Range，单点定位用 Cells 更灵活。" },
+      { "id": "offset", "kind": "companion", "why": "拿到单元格后，靠 Offset 相对移动比硬写地址更稳。" }
+    ],
+    "oneLiner": "地址写法 vs 行列号写法",
+    "summary": "Range 擅长写死地址或命名区域，Cells 擅长拿行号列号算位置。真正写循环时基本都用 Cells，稳定且好算。"
+  },
+  {
+    "id": "dim",
+    "enName": "Dim",
+    "zhName": "声明变量",
+    "alias": ["Dim", "变量声明", "声明", "Option Explicit"],
+    "keywords": ["变量怎么定义", "声明类型", "变量不声明会怎样"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Dim 变量名 As 类型",
+    "params": [
+      { "name": "变量名", "type": "标识符", "required": true, "desc": "自己起的名字，不能是关键字，也不能以数字开头。" },
+      { "name": "类型", "type": "Long / Double / String / Range / Worksheet …", "required": false, "desc": "省略时是 Variant，什么都能装但更慢、更难查错。" }
+    ],
+    "examples": [
+      {
+        "title": "三个常见类型的最小用法",
+        "code": "Sub 声明演示()\n    Dim 数量 As Long\n    Dim 单价 As Double\n    Dim 名称 As String\n    数量 = 3\n    单价 = 12.5\n    名称 = \"笔记本\"\n    MsgBox 名称 & \"：\" & 数量 & \" 件，合计 \" & 数量 * 单价\nEnd Sub",
+        "howToRun": "标准模块里按 F5。",
+        "result": "弹出「笔记本：3 件，合计 37.5」。"
+      },
+      {
+        "title": "声明对象变量（还要配合 Set）",
+        "code": "Sub 声明对象()\n    Dim ws As Worksheet\n    Set ws = ThisWorkbook.Worksheets(1)\n    MsgBox ws.Name & \" 共 \" & ws.UsedRange.Rows.Count & \" 行\"\nEnd Sub",
+        "howToRun": "按 F5；工作表至少有一个有内容的区域。",
+        "result": "弹出第一张工作表的名字和已用区域行数。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "变量名打错了，代码却照跑，结果不对",
+        "reason": "没开 Option Explicit 时，拼错的名字会被当成一个新 Variant 变量，值是空的。",
+        "fix": "在模块最上方写 Option Explicit，之后拼错会直接编译报错「变量未定义」。",
+        "level": "high"
+      },
+      {
+        "title": "用 Integer 装行号，数据超过 32767 行就溢出",
+        "reason": "Integer 上限 32767，而 Excel 一行有 104 万行。",
+        "fix": "行号、计数一律用 Long。",
+        "level": "mid",
+        "errorCode": "6"
+      }
+    ],
+    "related": [
+      { "id": "set", "kind": "companion", "why": "Dim 只声明对象变量，赋值还得 Set。" },
+      { "id": "for-next", "kind": "companion", "why": "循环变量必须在循环外 Dim 一次，别写在循环体内。" }
+    ],
+    "oneLiner": "先声明，再用；类型越具体越快",
+    "summary": "VBA 不强制声明变量，但强烈建议声明：类型明确、拼写错误能查出来、运行更快。行号和计数统一用 Long，别用 Integer。"
+  },
+  {
+    "id": "set",
+    "enName": "Set",
+    "zhName": "引用对象",
+    "alias": ["Set", "对象赋值", "对象引用", "91错误"],
+    "keywords": ["对象变量怎么赋值", "漏了Set报错", "工作表对象装进变量"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Set 对象变量 = 对象",
+    "params": [
+      { "name": "对象变量", "type": "Range / Worksheet / Workbook …", "required": true, "desc": "已用 Dim 声明过的对象变量。" },
+      { "name": "对象", "type": "同类型的对象表达式", "required": true, "desc": "如 ThisWorkbook.Worksheets(\"销售\")、Range(\"A1\")。" }
+    ],
+    "examples": [
+      {
+        "title": "把工作表装进变量，后面少写一长串",
+        "code": "Sub 用Set简化()\n    Dim ws As Worksheet\n    Set ws = ThisWorkbook.Worksheets(1)\n    ws.Range(\"A1\").Value = \"汇总\"\n    ws.Range(\"A2\").Value = Date\nEnd Sub",
+        "howToRun": "按 F5；会写入当前工作簿的第一张表。",
+        "result": "第一张表 A1 写入「汇总」，A2 写入今天日期。"
+      },
+      {
+        "title": "把一块区域装进变量，再量它的尺寸",
+        "code": "Sub 量区域()\n    Dim r As Range\n    Set r = Range(\"A1\").CurrentRegion\n    MsgBox \"区域 \" & r.Address & \"，共 \" & r.Rows.Count & \" 行 \" & r.Columns.Count & \" 列\"\nEnd Sub",
+        "howToRun": "光标放在有数据的区域里再运行（CurrentRegion 以 A1 为起点取连通块）。",
+        "result": "弹出区域地址与行列数。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "漏写 Set，运行时错误 91「对象变量或 With 块变量未设置」",
+        "reason": "对象变量只能用 Set 赋值；直接等号是给默认属性赋值，对象变量仍为空。",
+        "fix": "补上 Set：Set r = Range(\"A1\")。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "Set 之后工作表被删掉，再用就报错",
+        "reason": "变量里存的是对象引用，对象不存在了，引用就失效。",
+        "fix": "删除工作表后重新 Set，或改用名称/索引每次现取。",
+        "level": "mid",
+        "errorCode": "424"
+      }
+    ],
+    "related": [
+      { "id": "dim", "kind": "companion", "why": "先 Dim 出对象变量，才能 Set。" },
+      { "id": "object-property-method", "kind": "companion", "why": "分清给对象赋值（Set）和给属性赋值（不用 Set）。" }
+    ],
+    "oneLiner": "对象赋值必须带 Set",
+    "summary": "Set 只干一件事：把「对象」装进变量。忘记写 Set 是 VBA 新手第一高频错误，报错固定是 91。"
+  },
+  {
+    "id": "if-then-else",
+    "enName": "If...Then...Else",
+    "zhName": "条件判断",
+    "alias": ["If", "条件", "判断", "分支", "ElseIf"],
+    "keywords": ["满足条件才执行", "多个条件分支", "单行If"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "If 条件 Then\n    ' 成立时\nElseIf 另一个条件 Then\n    ' 另一个成立时\nElse\n    ' 都不成立时\nEnd If",
+    "params": [
+      { "name": "条件", "type": "布尔表达式", "required": true, "desc": "如 Range(\"A1\").Value > 60、名称 = \"张三\"。" }
+    ],
+    "examples": [
+      {
+        "title": "块状 If：三档评级",
+        "code": "Sub 评级()\n    Dim 分数 As Long\n    分数 = Range(\"A1\").Value\n    If 分数 >= 90 Then\n        Range(\"B1\").Value = \"优秀\"\n    ElseIf 分数 >= 60 Then\n        Range(\"B1\").Value = \"及格\"\n    Else\n        Range(\"B1\").Value = \"不及格\"\n    End If\nEnd Sub",
+        "howToRun": "在 A1 填一个 0–100 的分数，然后按 F5。",
+        "result": "B1 按分数写入优秀 / 及格 / 不及格。"
+      },
+      {
+        "title": "单行 If：只有一句动作时更省事",
+        "code": "Sub 单行判断()\n    If Range(\"A1\").Value = \"\" Then Range(\"A1\").Value = \"待填\"\nEnd Sub",
+        "howToRun": "把 A1 清空后运行。",
+        "result": "A1 为空时写入「待填」，非空时什么都不做。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "单行 If 后面又写了 End If，编译报错",
+        "reason": "单行 If 不配对 End If，多写一个就成了「End If 没有对应 If」。",
+        "fix": "要么写成块状（换行 + End If），要么删掉多余的 End If。",
+        "level": "high"
+      },
+      {
+        "title": "写成 Else If，结果必须写两个 End If",
+        "reason": "Else If 会被解析成「Else 里面又开了一个 If」，是需要两层结束的嵌套。",
+        "fix": "多分支用 ElseIf（连写），只有真的嵌套才用 Else If。",
+        "level": "mid"
+      },
+      {
+        "title": "拿文本和数字比较，怎么都不成立",
+        "reason": "单元格里是文本「100」，与数字 100 比较时类型不同，结果可能反直觉。",
+        "fix": "先转换：If Val(Range(\"A1\").Value) >= 90 Then。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "for-next", "kind": "companion", "why": "逐行判断再写入时，If 通常和循环一起用。" },
+      { "id": "for-next", "kind": "companion", "why": "判断常和循环一起用：逐行判断再写入。" }
+    ],
+    "oneLiner": "满足条件才做，不满足走另一条",
+    "summary": "If 是 VBA 里最常用的分支结构。只有一句动作就用单行写法，两档以上一律用块状 + End If，读起来最不容易错。"
+  },
+  {
+    "id": "for-next",
+    "enName": "For...Next",
+    "zhName": "计数循环",
+    "alias": ["For", "Next", "循环", "Step", "倒序循环"],
+    "keywords": ["重复执行N次", "按行号循环", "倒着删行"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "For 计数变量 = 起始 To 结束 [Step 步长]\n    ' 循环体\nNext 计数变量",
+    "params": [
+      { "name": "计数变量", "type": "Long", "required": true, "desc": "循环计数器，必须提前 Dim 成数值类型。" },
+      { "name": "起始/结束", "type": "数值", "required": true, "desc": "从几数到几；结束小于起始时循环一次都不执行。" },
+      { "name": "Step 步长", "type": "数值，可为负", "required": false, "desc": "省略为 1；写 -1 就是倒序，删行时必须倒序。" }
+    ],
+    "examples": [
+      {
+        "title": "正序：把 1 到 10 累加",
+        "code": "Sub 累加()\n    Dim i As Long\n    Dim 合计 As Long\n    For i = 1 To 10\n        合计 = 合计 + i\n    Next i\n    MsgBox \"1 到 10 的和是 \" & 合计\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「1 到 10 的和是 55」。"
+      },
+      {
+        "title": "倒序：从下往上删空行（关键写法）",
+        "code": "Sub 倒序删空行()\n    Dim i As Long\n    For i = 20 To 1 Step -1\n        If Trim(Cells(i, 1).Value) = \"\" Then Rows(i).Delete\n    Next i\nEnd Sub",
+        "howToRun": "在一张有空白行的表上运行（示例固定查 1–20 行）。",
+        "result": "A 列为空的行被删掉；正序删会漏行，因为删完一行后下面的行号整体上移。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "正序循环删行，只删掉一半",
+        "reason": "删掉第 5 行后，原来的第 6 行变成第 5 行，计数器却已经加到 6，跳过了它。",
+        "fix": "删行一律 Step -1 倒序，或改用 For Each 后再统一删除。",
+        "level": "high"
+      },
+      {
+        "title": "在循环里改循环变量，次数变得莫名其妙",
+        "reason": "循环体内给 i 重新赋值会打乱 Next 的推进逻辑。",
+        "fix": "另起一个临时变量传值，不要动计数变量。",
+        "level": "mid"
+      },
+      {
+        "title": "Step 写成 0，Excel 直接卡死",
+        "reason": "步长为 0 时计数器永远不前进，循环无限执行。",
+        "fix": "确认步长非 0；不确定就省略 Step（默认 1）。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "for-each-next", "kind": "alternative", "why": "遍历集合里的每个对象时用 For Each，不必关心下标。" },
+      { "id": "delete-empty-rows", "kind": "companion", "why": "最常见的实战：倒序循环 + 删整行。" }
+    ],
+    "oneLiner": "按次数重复，能正着也能倒着",
+    "summary": "For…Next 用计数器控制次数，需要行号时首选它。涉及删除行/列，必须 Step -1 倒序，否则一定漏。"
+  },
+  {
+    "id": "for-each-next",
+    "enName": "For Each...Next",
+    "zhName": "遍历集合",
+    "alias": ["For Each", "遍历", "集合循环"],
+    "keywords": ["遍历每个单元格", "遍历所有工作表", "逐个处理"],
+    "kind": "statement",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "For Each 元素 In 集合\n    ' 循环体\nNext 元素",
+    "params": [
+      { "name": "元素", "type": "对象或 Variant", "required": true, "desc": "循环里代表当前那个对象，如 Dim c As Range。" },
+      { "name": "集合", "type": "Range / Worksheets / Shapes …", "required": true, "desc": "要遍历的集合，如 Range(\"A1:A10\")、ThisWorkbook.Worksheets。" }
+    ],
+    "examples": [
+      {
+        "title": "逐个检查单元格，标出空值",
+        "code": "Sub 标空值()\n    Dim c As Range\n    For Each c In Range(\"A1:A10\")\n        If c.Value = \"\" Then c.Interior.Color = RGB(255, 235, 156)\n    Next c\nEnd Sub",
+        "howToRun": "在 A1:A10 里留几个空格再运行。",
+        "result": "所有空单元格被填上浅黄色底。"
+      },
+      {
+        "title": "遍历所有工作表，列出名字",
+        "code": "Sub 列工作表()\n    Dim ws As Worksheet\n    Dim 名单 As String\n    For Each ws In ThisWorkbook.Worksheets\n        名单 = 名单 & ws.Name & vbCrLf\n    Next ws\n    MsgBox 名单\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹框按顺序列出全部工作表名。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "遍历工作表时顺手删除，后面的表被跳过",
+        "reason": "删除集合元素会让遍历指针错位，和正序删行同理。",
+        "fix": "先记录要删的名字，循环结束后统一删；或倒序按索引删。",
+        "level": "high"
+      },
+      {
+        "title": "For Each 变量声明成 Range，却拿去遍历 Worksheets",
+        "reason": "元素类型与集合类型不匹配，运行时报类型不匹配 13。",
+        "fix": "元素类型跟着集合走：遍历工作表就用 Worksheet。",
+        "level": "mid",
+        "errorCode": "13"
+      }
+    ],
+    "related": [
+      { "id": "for-next", "kind": "alternative", "why": "需要行号或要倒序删行时，只能用 For…Next。" },
+      { "id": "range", "kind": "companion", "why": "For Each 最常遍历的就是 Range 区域。" }
+    ],
+    "oneLiner": "把集合里的每个都过一遍",
+    "summary": "For Each 不用关心下标，遍历区域、工作表、图形都很顺手。唯一要小心的是「边遍历边删除」，那会漏掉元素。"
+  },
+  {
+    "id": "range",
+    "enName": "Range",
+    "zhName": "单元格区域",
+    "alias": ["Range", "区域", "选中区域", "命名区域"],
+    "keywords": ["选中一块单元格", "按名称取区域", "跨表取区域"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Range(\"A1:B5\")   ' 地址\nRange(\"销售明细\") ' 命名区域\nWorksheets(\"销售\").Range(\"A1\")",
+    "params": [
+      { "name": "地址或名称", "type": "字符串", "required": true, "desc": "A1 样式地址、整行整列（\"A:A\"、\"3:3\"）或已定义的名称。" }
+    ],
+    "examples": [
+      {
+        "title": "引用一块区域并读出尺寸",
+        "code": "Sub 区域信息()\n    Dim r As Range\n    Set r = Range(\"A1:C4\")\n    MsgBox r.Address & \" 有 \" & r.Rows.Count & \" 行 \" & r.Columns.Count & \" 列\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「$A$1:$C$4 有 4 行 3 列」。"
+      },
+      {
+        "title": "用命名区域，公式和代码都不怕插行",
+        "code": "Sub 用名称()\n    Range(\"A1:B4\").Name = \"明细表\"\n    MsgBox Range(\"明细表\").Address\nEnd Sub",
+        "howToRun": "先运行一次命名，再运行第二次看地址；命名后在名称框里能看到「明细表」。",
+        "result": "弹框显示 $A$1:$B$4；之后在中间插入行，名称仍指向整块。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在非活动表上调用 .Select，报 1004",
+        "reason": "Select 只能作用于活动表上的区域，跨表选中必须先激活工作表。",
+        "fix": "改用直接操作（.Value / .Interior），或先 ws.Activate 再 Select。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "地址字符串拼错，报 1004「应用程序定义或对象定义错误」",
+        "reason": "Range 的参数不是合法地址（如 \"A1:B\" 或缺工作表名）时直接抛错。",
+        "fix": "用 Cells 拼地址，或先 MsgBox 打印拼出来的字符串核对。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      { "id": "cells", "kind": "alternative", "why": "要按行列号算位置时，Cells 比拼地址字符串更稳。" },
+      { "id": "value", "kind": "companion", "why": "选出区域只是第一步，读写内容靠 Value。" }
+    ],
+    "oneLiner": "用地址或名称圈定一块单元格",
+    "summary": "Range 是 VBA 里出现频率最高的对象。能写死地址、能用名称、能跨表取，但要记住：它默认挂在活动表上，跨表操作一定写清父对象。"
+  },
+  {
+    "id": "cells",
+    "enName": "Cells",
+    "zhName": "按行列取单元格",
+    "alias": ["Cells", "行列号", "单元格坐标"],
+    "keywords": ["用行号列号定位", "最后一行怎么取", "循环写单元格"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Cells(行号, 列号)",
+    "params": [
+      { "name": "行号", "type": "Long", "required": true, "desc": "从 1 开始；Rows.Count 是最后一行。" },
+      { "name": "列号", "type": "Long", "required": true, "desc": "从 1 开始，A=1、B=2；也可以写列字母 \"B\"。" }
+    ],
+    "examples": [
+      {
+        "title": "按坐标写入并回读",
+        "code": "Sub 坐标写入()\n    Cells(5, 3).Value = \"C5 的内容\"\n    MsgBox Cells(5, 3).Address & \"：\" & Cells(5, 3).Value\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "C5 写入内容；弹框显示 $C$5 与刚写入的文字。"
+      },
+      {
+        "title": "取最后一行（最常用的一行代码）",
+        "code": "Sub 最后一行()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    MsgBox \"A 列最后一行是 \" & 末行\nEnd Sub",
+        "howToRun": "在 A 列写几行数据再运行。",
+        "result": "弹出 A 列最后一条非空数据所在的行号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 Cells 当成 (列, 行) 用，位置全错",
+        "reason": "顺序固定是（行号, 列号），写成 Cells(3, 5) 指的是 E3。",
+        "fix": "养成习惯：先写行再写列；调试时 MsgBox .Address 核对。",
+        "level": "high"
+      },
+      {
+        "title": "取最后一行总取到 1048576",
+        "reason": "单元格里有看不见的空格或公式返回空串，End(xlUp) 会一路顶到最底。",
+        "fix": "先确认 A 列真的没有多余内容；必要时改用 UsedRange 或按关键列判断。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "range", "kind": "alternative", "why": "整块区域操作用 Range 更方便，单点定位用 Cells。" },
+      { "id": "offset", "kind": "companion", "why": "拿到 Cells 后，用 Offset 相对移动，比重新算坐标省事。" }
+    ],
+    "oneLiner": "用行号和列号定位一个单元格",
+    "summary": "Cells(行, 列) 是最适合写循环的定位方式。配合 Rows.Count + End(xlUp) 就能动态找到数据末尾，不用手写死行号。"
+  },
+  {
+    "id": "offset",
+    "enName": "Range.Offset",
+    "zhName": "相对偏移",
+    "alias": ["Offset", "偏移", "相对位置"],
+    "keywords": ["往右一格取值", "相对当前单元格移动", "偏移几行几列"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range对象.Offset(行偏移, 列偏移)",
+    "params": [
+      { "name": "行偏移", "type": "Long", "required": false, "desc": "正数向下、负数向上；省略为 0。" },
+      { "name": "列偏移", "type": "Long", "required": false, "desc": "正数向右、负数向左；省略为 0。" }
+    ],
+    "examples": [
+      {
+        "title": "从 A1 向右下移动 2 行 2 列",
+        "code": "Sub 偏移()\n    MsgBox Range(\"A1\").Offset(2, 2).Address\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出 $C$3 —— 下移 2 行、右移 2 列。"
+      },
+      {
+        "title": "在 B 列逐行写判断结果",
+        "code": "Sub 逐行标注()\n    Dim i As Long\n    For i = 2 To 10\n        If Cells(i, 1).Value >= 100 Then\n            Cells(i, 1).Offset(0, 1).Value = \"达标\"\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "A2:A10 填几个大于 100 的数字再运行。",
+        "result": "对应行的 B 列写入「达标」，其余行不动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "偏移到表格外，报 1004",
+        "reason": "A1 再向上偏移 1 行就超出了工作表范围，Excel 直接报错。",
+        "fix": "偏移前先判断：If r.Row > 1 Then …，或改用 If r.Row >= 2。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "对整块区域 Offset，以为只移动左上角",
+        "reason": "Offset 返回的是「同尺寸」的新区域，A1:C3 偏移后仍是 3 行 3 列。",
+        "fix": "只想取单格，就先 .Cells(1,1) 再 Offset。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "cells", "kind": "companion", "why": "Offset 通常接在 Cells 后面，形成相对定位。" },
+      { "id": "range", "kind": "companion", "why": "Offset 的返回值仍是 Range，可以继续链式操作。" }
+    ],
+    "oneLiner": "以当前格为原点，横竖各挪几格",
+    "summary": "Offset 让你不用重算坐标，直接「往右一格、往下一行」地取数据，写逐行判断、逐行填值时最顺手。"
+  },
+  {
+    "id": "value",
+    "enName": "Range.Value / Value2",
+    "zhName": "读写单元格的值",
+    "alias": ["Value", "Value2", "取值", "赋值", "数组批量读写"],
+    "keywords": ["批量读取数据", "一次性写回结果", "为什么这么慢"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Value        ' 会按单元格格式返回日期/货币\nRange.Value2       ' 返回原始值（日期是序列号）",
+    "examples": [
+      {
+        "title": "一次读整列到数组，再算总和",
+        "code": "Sub 数组求和()\n    Dim v As Variant\n    Dim i As Long, 合计 As Double\n    v = Range(\"A2:A10000\").Value\n    For i = 1 To UBound(v, 1)\n        If IsNumeric(v(i, 1)) Then 合计 = 合计 + v(i, 1)\n    Next i\n    MsgBox \"合计 \" & 合计\nEnd Sub",
+        "howToRun": "A2:A10000 里放一些数字（含空格也没关系）再运行。",
+        "result": "一次读取、循环里只算内存，1 万行通常毫秒级完成。"
+      },
+      {
+        "title": "批量写回：一次赋值给整块区域",
+        "code": "Sub 批量写回()\n    Dim v As Variant\n    ReDim v(1 To 10, 1 To 1)\n    Dim i As Long\n    For i = 1 To 10\n        v(i, 1) = i * 3\n    Next i\n    Range(\"B1:B10\").Value = v\nEnd Sub",
+        "howToRun": "确认 B1:B10 为空再运行。",
+        "result": "B1:B10 一次性写入 3、6、9 …… 30，比逐格写快一个数量级。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "一万行数据逐格读写，跑了几十秒",
+        "reason": "每读写一个单元格都要和 Excel 界面交互一次，次数越多越慢。",
+        "fix": "整块读进数组 → 在内存里算 → 整块写回，并临时关闭 ScreenUpdating。",
+        "level": "high"
+      },
+      {
+        "title": "取日期用了 Value2，得到 46000 这种数字",
+        "reason": "Value2 不识别日期和货币，返回的是底层序列号。",
+        "fix": "要日期就用 Value；只做数值计算才用 Value2。",
+        "level": "mid"
+      },
+      {
+        "title": "区域里有 #N/A，数组算出来报类型不匹配 13",
+        "reason": "错误值读进数组后是 Error 类型，直接参与算术会报 13。",
+        "fix": "先判断：If Not IsError(v(i, 1)) Then …。",
+        "level": "mid",
+        "errorCode": "13"
+      }
+    ],
+    "related": [
+      { "id": "numberformat", "kind": "companion", "why": "Value 改的是真实值，NumberFormat 改的是显示，两者别混。" },
+      { "id": "range", "kind": "companion", "why": "Value 永远挂在某个 Range 上。" }
+    ],
+    "oneLiner": "整块读写，比逐格快得多",
+    "summary": "Value 负责真实内容：读出来是什么、写进去是什么。批量处理时先整块读进数组再整块写回，这是把宏从几十秒压到毫秒级的关键。"
+  },
+  {
+    "id": "numberformat",
+    "enName": "Range.NumberFormat",
+    "zhName": "设置数字格式",
+    "alias": ["NumberFormat", "格式", "千分位", "两位小数", "日期格式"],
+    "keywords": ["显示两位小数", "加上千分位", "日期显示成横杠", "保住前导零"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Range.NumberFormat = \"格式代码\"",
+    "params": [
+      { "name": "格式代码", "type": "字符串", "required": true, "desc": "与「设置单元格格式 → 自定义」里填的完全一致，如 \"0.00\"、\"#,##0\"、\"yyyy-mm-dd\"、\"@\"。" }
+    ],
+    "examples": [
+      {
+        "title": "金额列：两位小数 + 千分位",
+        "code": "Sub 金额格式()\n    Range(\"C2:C100\").NumberFormat = \"#,##0.00\"\nEnd Sub",
+        "howToRun": "C 列放几个数字再运行。",
+        "result": "12345.6 显示为 12,345.60；真实值不变，只是显示变了。"
+      },
+      {
+        "title": "日期列统一成 2026-11-27 这种写法",
+        "code": "Sub 日期格式()\n    Range(\"D2:D100\").NumberFormat = \"yyyy-mm-dd\"\nEnd Sub",
+        "howToRun": "D 列放日期再运行；若本来就是文本日期，先转成真日期。",
+        "result": "日期统一显示成年-月-日；排序、筛选都能按日期正确工作。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "数字太长，单元格显示一堆 ####",
+        "reason": "格式生效了，但列宽不够，Excel 用 #### 表示「放不下」。",
+        "fix": "加一句 Columns(\"C\").AutoFit，或手动拉宽列。",
+        "level": "high"
+      },
+      {
+        "title": "用 \"0.00\" 以为改了数值，导出后还是长小数",
+        "reason": "NumberFormat 只改显示，底层值仍是完整精度。",
+        "fix": "真要改值就用 Round 或 WorksheetFunction.Round 再写回。",
+        "level": "mid"
+      },
+      {
+        "title": "先写数据再设文本格式，前导零已经丢了",
+        "reason": "写入时 Excel 已把 00123 当数字处理，格式设晚了救不回来。",
+        "fix": "先设 NumberFormat = \"@\"，再写文本；或写入时前面加单引号。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "value", "kind": "companion", "why": "值和格式是两套东西：Value 管内容，NumberFormat 管显示。" },
+      { "id": "format-column", "kind": "companion", "why": "实战里格式通常和字体、底色、边框一起批量设置。" }
+    ],
+    "oneLiner": "只改显示，不改真实数值",
+    "summary": "NumberFormat 的格式代码和「自定义格式」一模一样，学会 0.00、#,##0、yyyy-mm-dd、@ 这几个就够日常用。记住它只影响显示。"
+  },
+  {
+    "id": "find",
+    "enName": "Range.Find",
+    "zhName": "查找单元格",
+    "alias": ["Find", "查找", "定位", "搜索内容"],
+    "keywords": ["按内容找单元格", "找到所有匹配", "查找返回地址"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Find(What, [After], [LookIn], [LookAt], [SearchOrder], [MatchCase])",
+    "params": [
+      { "name": "What", "type": "任意值", "required": true, "desc": "要找的内容，如 \"张三\" 或 100。" },
+      { "name": "After", "type": "Range", "required": false, "desc": "从哪个单元格之后开始找；循环查找时用它改变起点。" },
+      { "name": "LookIn", "type": "xlValues / xlFormulas", "required": false, "desc": "找值还是找公式；省略时会沿用上一次的设置。" },
+      { "name": "LookAt", "type": "xlWhole / xlPart", "required": false, "desc": "整格匹配还是包含匹配；默认包含，容易多命中。" },
+      { "name": "MatchCase", "type": "Boolean", "required": false, "desc": "是否区分大小写，默认 False。" }
+    ],
+    "examples": [
+      {
+        "title": "找第一个「张三」并返回地址",
+        "code": "Sub 找一个()\n    Dim r As Range\n    Set r = Range(\"A2:A100\").Find(What:=\"张三\", LookIn:=xlValues, LookAt:=xlWhole)\n    If r Is Nothing Then\n        MsgBox \"没找到\"\n    Else\n        MsgBox \"在 \" & r.Address\n    End If\nEnd Sub",
+        "howToRun": "A2:A100 里放几个名字再运行。",
+        "result": "找到就弹地址（如 $A$7），没有就弹「没找到」。"
+      },
+      {
+        "title": "找全部匹配（FindNext 的正确写法）",
+        "code": "Sub 找全部()\n    Dim r As Range, 首个 As String\n    Set r = Range(\"A2:A100\").Find(What:=\"张三\", LookIn:=xlValues, LookAt:=xlWhole)\n    If r Is Nothing Then Exit Sub\n    首个 = r.Address\n    Do\n        Debug.Print r.Address\n        Set r = Range(\"A2:A100\").FindNext(r)\n        If r Is Nothing Then Exit Do\n    Loop While r.Address <> 首个\nEnd Sub",
+        "howToRun": "按 F5，结果在 VBE 的「立即窗口」（Ctrl+G）里看。",
+        "result": "逐个打印所有「张三」的地址，且不会卡死循环。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不判断 Nothing 就取地址，报 91",
+        "reason": "Find 找不到时返回 Nothing，直接 .Address 就是「对象变量未设置」。",
+        "fix": "先写 If r Is Nothing Then 分支，再访问属性。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "FindNext 写了死循环，Excel 卡住",
+        "reason": "FindNext 会绕回开头，不记录首个地址就会一直找下去。",
+        "fix": "记住第一个命中地址，循环回到它就退出（见示例 2）。",
+        "level": "high"
+      },
+      {
+        "title": "同一个会话里第二次 Find 突然找不到",
+        "reason": "Find 会记住上次的 LookIn / LookAt 等参数，第二次没显式传就沿用了上次。",
+        "fix": "每次 Find 都把关键参数写全，别依赖默认值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "range", "kind": "companion", "why": "Find 的搜索范围就是一块 Range。" },
+      { "id": "vlookup", "kind": "alternative", "why": "只是取对应值，用公式 VLOOKUP/XLOOKUP 更快；要在代码里定位位置才用 Find。" }
+    ],
+    "oneLiner": "按内容找到那个单元格",
+    "summary": "Find 是代码里的「Ctrl+F」：找到返回单元格，找不到返回 Nothing。用它必须写三件事——判 Nothing、显式给参数、FindNext 记首地址。"
+  },
+  {
+    "id": "delete-empty-rows",
+    "enName": "Recipe: 删除空行",
+    "zhName": "删除所有空行",
+    "alias": ["删空行", "清空行", "空白行删除", "整行删除"],
+    "keywords": ["把空行都删掉", "去掉空白行", "行里有空就删"],
+    "kind": "recipe",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Sub 删除空行()\n    ' 倒序循环 + EntireRow.Delete\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：按 A 列判断，删掉空行",
+        "code": "Sub 删除空行()\n    Dim ws As Worksheet\n    Dim i As Long, 末行 As Long\n    Set ws = ThisWorkbook.Worksheets(\"明细\")\n    末行 = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row\n    Application.ScreenUpdating = False\n    For i = 末行 To 2 Step -1\n        If Trim(ws.Cells(i, 1).Value) = \"\" Then ws.Rows(i).Delete\n    Next i\n    Application.ScreenUpdating = True\n    MsgBox \"处理完成，共检查 \" & 末行 & \" 行\"\nEnd Sub",
+        "howToRun": "把工作表名改成你自己的表名；先备份文件，再按 F5。",
+        "result": "A 列为空的行被整行删除，剩下的数据行号自动上移，弹框显示检查了多少行。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "删完发现还是剩一堆空行",
+        "reason": "用正序循环删行，删掉一行后下面的行整体上移，计数器却继续加，跳过了新的那一行。",
+        "fix": "必须倒序：For i = 末行 To 2 Step -1。",
+        "level": "high"
+      },
+      {
+        "title": "合并单元格区域报 1004",
+        "reason": "整行删除遇到跨行合并的单元格会失败，这是 Excel 的限制。",
+        "fix": "先取消合并（或先处理合并区域），再删行。",
+        "level": "mid",
+        "errorCode": "1004"
+      },
+      {
+        "title": "只按 A 列为空判断，把有内容的行也删了",
+        "reason": "A 列是空但 B 列有备注的行，被当成空行整行删掉。",
+        "fix": "改成整行判断：If Application.CountA(ws.Rows(i)) = 0 Then。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      { "id": "for-next", "kind": "companion", "why": "倒序循环是删行不出错的根本。" },
+      { "id": "cells", "kind": "companion", "why": "用 Cells(Rows.Count,1).End(xlUp) 判断数据末尾，比手写行号更稳。" }
+    ],
+    "oneLiner": "把 A 列为空的整行删掉",
+    "summary": "小白最常问的清理动作之一。核心只有两点：先算出末行、再倒序删。数组法更快，但倒序循环对几千行已经完全够用。"
+  },
+  {
+    "id": "format-column",
+    "enName": "Recipe: 整列套格式",
+    "zhName": "整列套格式",
+    "alias": ["批量格式", "套格式", "统一字体", "加边框"],
+    "keywords": ["一次性设置字体字号", "整列加边框", "批量改底色"],
+    "kind": "recipe",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Sub 整列套格式()\n    ' 一次设置 NumberFormat / Font / Interior / Borders\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：给数据区统一字体、边框、格式",
+        "code": "Sub 整列套格式()\n    Dim ws As Worksheet, r As Range\n    Set ws = ThisWorkbook.Worksheets(\"明细\")\n    Set r = ws.Range(\"A1\").CurrentRegion\n    With r\n        .Font.Name = \"微软雅黑\"\n        .Font.Size = 10\n        .Borders.LineStyle = xlContinuous\n        .Borders.Weight = xlThin\n        .VerticalAlignment = xlCenter\n    End With\n    ws.Range(\"C2:C\" & r.Rows.Count).NumberFormat = \"#,##0.00\"\n    MsgBox \"已处理 \" & r.Rows.Count & \" 行 \" & r.Columns.Count & \" 列\"\nEnd Sub",
+        "howToRun": "把表名改成你的表名；CurrentRegion 会以 A1 为起点取整块连通区域。",
+        "result": "整块数据统一字体、细边框、垂直居中，C 列金额显示两位小数加千分位。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "逐格设置格式，几千行要等半分钟",
+        "reason": "每个单元格单独设置都要和界面交互，次数太多。",
+        "fix": "对整块 Range 一次性设置属性（见脚本），或先关 ScreenUpdating。",
+        "level": "high"
+      },
+      {
+        "title": "对 Columns(\"A:A\") 设边框，文件变大又卡",
+        "reason": "整列 100 多万个单元格都被记了格式，文件体积暴涨。",
+        "fix": "只对实际数据区操作：Range(\"A1:A\" & 末行)。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "numberformat", "kind": "companion", "why": "套格式里最常调的就是 NumberFormat。" },
+      { "id": "format-column", "kind": "companion", "why": "底色、字体都在这个配方里一起讲。" }
+    ],
+    "oneLiner": "一次设置整块区域的格式",
+    "summary": "格式类需求的正确姿势是「选整块、一次设」，而不是「循环每格设一遍」。同时只对数据区操作，别碰整列，否则文件会迅速变大。"
+  },
+  {
+    "id": "split-by-column",
+    "enName": "Recipe: 按列拆表",
+    "zhName": "按 A 列拆成多张表",
+    "alias": ["拆表", "按列拆分", "分表", "按部门拆"],
+    "keywords": ["一张表按部门拆成多张", "按分类拆工作表", "分组导出"],
+    "kind": "recipe",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Sub 按列拆表()\n    ' Dictionary 收集分类 → 每类复制表头 → 追加数据\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：按 B 列（部门）拆成多张工作表",
+        "code": "Sub 按列拆表()\n    Dim ws As Worksheet, 新表 As Worksheet\n    Dim d As Object, i As Long, 末行 As Long, k\n    Set ws = ThisWorkbook.Worksheets(\"明细\")\n    末行 = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    For i = 2 To 末行\n        d(ws.Cells(i, 2).Value) = d(ws.Cells(i, 2).Value) + 1\n    Next i\n    Application.ScreenUpdating = False\n    For Each k In d.Keys\n        ws.Rows(1).Copy\n        Set 新表 = Sheets.Add(After:=Sheets(Sheets.Count))\n        新表.Name = CStr(k)\n        新表.Range(\"A1\").PasteSpecial xlPasteAll\n        ws.Range(\"A1\").AutoFilter 2, k\n        ws.Range(\"A1:A\" & 末行).Copy 新表.Range(\"A2\")\n        ws.AutoFilterMode = False\n    Next k\n    Application.ScreenUpdating = True\n    MsgBox \"已拆成 \" & d.Count & \" 张表\"\nEnd Sub",
+        "howToRun": "把表名与分类列改成实际列；运行前备份，脚本会新增工作表。",
+        "result": "每个部门生成一张新表，第一行是原表头，下面是该部门的数据。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "分类名里有 / 或 * 等符号，报 1004",
+        "reason": "工作表名不允许 \\ / ? * [ ] : 这些字符，也不能超过 31 个字符。",
+        "fix": "命名前清洗：Replace 掉非法字符，并截断到 31 字以内。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "同名工作表已存在，Sheets.Add + Name 报错",
+        "reason": "工作表名在工作簿内必须唯一。",
+        "fix": "先判断是否存在，存在就加后缀（如「销售_2」）。",
+        "level": "mid",
+        "errorCode": "1004"
+      },
+      {
+        "title": "新表只有数据没有表头，或表头错位",
+        "reason": "忘了复制第一行，或复制时把筛选状态带过去了。",
+        "fix": "先复制 Rows(1) 再写数据；复制完把 AutoFilterMode 关掉。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "for-each-next", "kind": "companion", "why": "遍历 Dictionary 的分类键，是拆表脚本的骨架。" },
+      { "id": "range", "kind": "companion", "why": "复制数据靠 Range.Copy 与 PasteSpecial。" }
+    ],
+    "oneLiner": "一张总表按分类拆成多张",
+    "summary": "拆表是典型的小白刚需：一张明细按部门/地区分开。思路是「用 Dictionary 收集分类 → 每类建一张表 → 复制表头 → 筛选复制数据」，比手工复制稳。"
+  }
+]
+

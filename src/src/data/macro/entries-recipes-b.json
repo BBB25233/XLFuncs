@@ -1,0 +1,358 @@
+[
+  {
+    "id": "batch-fill-formula",
+    "enName": "批量填充公式",
+    "zhName": "批量填充公式",
+    "alias": [
+      "填充公式",
+      "公式下拉",
+      "整列写公式"
+    ],
+    "keywords": [
+      "公式填到最后一行",
+      "批量下拉公式",
+      "不用手动拖"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Range(\"D2:D\" & lastRow).FormulaR1C1 = \"=RC[-2]*RC[-1]\"",
+    "examples": [
+      {
+        "title": "一次填到最后一行",
+        "code": "Sub 填公式()\n    Dim lastRow As Long\n    lastRow = Cells(Rows.Count, 2).End(xlUp).Row\n    Range(\"D2:D\" & lastRow).FormulaR1C1 = \"=RC[-2]*RC[-1]\"\nEnd Sub",
+        "howToRun": "B、C 列有数据，D 列留空，按 F5。",
+        "result": "D2 到最后一行都是「同行 B × 同行 C」。"
+      },
+      {
+        "title": "先判断末行，避免写到空行",
+        "code": "Sub 安全填充()\n    Dim lastRow As Long, r As Range\n    lastRow = Cells(Rows.Count, 1).End(xlUp).Row\n    If lastRow < 2 Then Exit Sub\n    Set r = Range(\"C2:C\" & lastRow)\n    r.FormulaR1C1 = \"=RC[-2]+RC[-1]\"\nEnd Sub",
+        "howToRun": "A、B 列有数据，C 列留空，按 F5。",
+        "result": "C 列只在有数据的行填公式，空行不碰。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "逐行 Cells(i, 4).Formula 循环，几千行就明显卡",
+        "reason": "每写一次都走一次界面刷新。",
+        "fix": "整块区域一次赋 FormulaR1C1，或先关 ScreenUpdating。",
+        "level": "high"
+      },
+      {
+        "title": "用 A1 公式整块粘贴，相对引用全错位",
+        "reason": "A1 公式按粘贴位置平移，容易错列。",
+        "fix": "批量填用 R1C1，或先写好第一行再 Copy 下拉。",
+        "level": "mid"
+      },
+      {
+        "title": "D 列是文本格式，公式只显示成字符串",
+        "reason": "文本格式下写入的公式不计算。",
+        "fix": "先把目标列 NumberFormat 设为 \"General\"。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "formula",
+        "kind": "companion",
+        "why": "Formula 写 A1，批量更推荐 R1C1。"
+      },
+      {
+        "id": "formula-r1c1",
+        "kind": "companion",
+        "why": "整列填公式的标准写法。"
+      },
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "大批量写入前先关刷新。"
+      }
+    ],
+    "oneLiner": "一条语句填满整列公式",
+    "summary": "批量填公式的核心是「先算末行，再整块赋值」。用 FormulaR1C1 避免相对引用错位，文本格式要先改回常规。"
+  },
+  {
+    "id": "sheet-directory",
+    "enName": "生成目录页",
+    "zhName": "生成目录页",
+    "alias": [
+      "目录页",
+      "工作表目录",
+      "超链接目录"
+    ],
+    "keywords": [
+      "给所有工作表做目录",
+      "点击跳转工作表",
+      "目录超链接"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "目录表.Hyperlinks.Add Anchor, \"\", SubAddress:=\"'表名'!A1\", TextToDisplay:=表名",
+    "examples": [
+      {
+        "title": "重建一个带跳转链接的目录表",
+        "code": "Sub 生成目录()\n    Dim ws As Worksheet, dirWs As Worksheet, i As Long\n    Application.DisplayAlerts = False\n    On Error Resume Next\n    Worksheets(\"目录\").Delete\n    On Error GoTo 0\n    Application.DisplayAlerts = True\n    Set dirWs = Worksheets.Add(Before:=Worksheets(1))\n    dirWs.Name = \"目录\"\n    i = 2\n    For Each ws In Worksheets\n        If ws.Name <> \"目录\" Then\n            dirWs.Hyperlinks.Add Anchor:=dirWs.Cells(i, 1), _\n                Address:=\"\", SubAddress:=\"'\" & ws.Name & \"'!A1\", _\n                TextToDisplay:=ws.Name\n            i = i + 1\n        End If\n    Next ws\nEnd Sub",
+        "howToRun": "工作簿里有多个工作表，按 F5。",
+        "result": "第一张表变成「目录」，A 列每个表名都可点击跳转。"
+      },
+      {
+        "title": "只追加新增的表，不重建整个目录",
+        "code": "Sub 追加目录()\n    Dim ws As Worksheet, dirWs As Worksheet, i As Long\n    Set dirWs = Worksheets(\"目录\")\n    i = dirWs.Cells(dirWs.Rows.Count, 1).End(xlUp).Row + 1\n    For Each ws In Worksheets\n        If ws.Name <> \"目录\" And _\n           Application.CountIf(dirWs.Columns(1), ws.Name) = 0 Then\n            dirWs.Hyperlinks.Add Anchor:=dirWs.Cells(i, 1), _\n                Address:=\"\", SubAddress:=\"'\" & ws.Name & \"'!A1\", _\n                TextToDisplay:=ws.Name\n            i = i + 1\n        End If\n    Next ws\nEnd Sub",
+        "howToRun": "已有「目录」表，按 F5。",
+        "result": "只把还没登记的表追加到目录末尾。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "反复运行生成目录，目录表越堆越多",
+        "reason": "每次 Worksheets.Add 都会新建一张表，旧目录没清。",
+        "fix": "先删旧「目录」再重建，或像第二个例子只追加缺失项。",
+        "level": "high"
+      },
+      {
+        "title": "表名里有空格或特殊字符，超链接点不开",
+        "reason": "SubAddress 里的表名必须用单引号包住。",
+        "fix": "统一写 \"'\" & ws.Name & \"'!A1\"，别直接拼裸名字。",
+        "level": "mid"
+      },
+      {
+        "title": "把目录表自己也加进目录",
+        "reason": "循环包含当前目录表。",
+        "fix": "循环里跳过 ws.Name = \"目录\"。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "目录的核心是遍历 Worksheets。"
+      },
+      {
+        "id": "rename-sheets",
+        "kind": "companion",
+        "why": "表名改了目录链接会失效，需同步更新。"
+      }
+    ],
+    "oneLiner": "一键做出可跳转目录",
+    "summary": "目录页靠 Hyperlinks.Add + SubAddress 指向各表 A1。反复运行要先删旧目录，表名必须用单引号包住。"
+  },
+  {
+    "id": "merge-workbooks",
+    "enName": "MergeWorkbooks",
+    "zhName": "多工作簿汇总",
+    "alias": [
+      "合并工作簿",
+      "多文件汇总",
+      "批量汇总"
+    ],
+    "keywords": [
+      "一个文件夹多个表合并",
+      "汇总所有工作簿",
+      "多文件取数"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dir(文件夹 & \"*.xlsx\") 循环 → Workbooks.Open → 复制 UsedRange → Close",
+    "examples": [
+      {
+        "title": "把文件夹内所有 xlsx 的第一张表汇总到当前表",
+        "code": "Sub 合并工作簿()\n    Dim p As String, f As String, wb As Workbook\n    Dim dstRow As Long\n    p = \"C:\\报表\\\"\n    dstRow = 1\n    f = Dir(p & \"*.xlsx\")\n    Do While f <> \"\"\n        Set wb = Workbooks.Open(p & f, ReadOnly:=True)\n        wb.Worksheets(1).UsedRange.Copy\n        ThisWorkbook.Worksheets(\"汇总\").Cells(dstRow, 1).PasteSpecial xlPasteValues\n        dstRow = dstRow + wb.Worksheets(1).UsedRange.Rows.Count\n        wb.Close SaveChanges:=False\n        f = Dir\n    Loop\n    Application.CutCopyMode = False\nEnd Sub",
+        "howToRun": "C:\\报表\\ 放几个同结构 xlsx，当前簿有「汇总」表，按 F5。",
+        "result": "每个文件的数据依次贴到汇总表，一个文件接一个文件往下排。"
+      },
+      {
+        "title": "跳过每个文件的标题行",
+        "code": "Sub 合并去表头()\n    Dim p As String, f As String, wb As Workbook, src As Range\n    Dim dstRow As Long\n    p = \"C:\\报表\\\"\n    dstRow = 2\n    f = Dir(p & \"*.xlsx\")\n    Do While f <> \"\"\n        Set wb = Workbooks.Open(p & f, ReadOnly:=True)\n        Set src = wb.Worksheets(1).UsedRange\n        src.Offset(1, 0).Resize(src.Rows.Count - 1, src.Columns.Count).Copy\n        ThisWorkbook.Worksheets(\"汇总\").Cells(dstRow, 1).PasteSpecial xlPasteValues\n        dstRow = dstRow + src.Rows.Count - 1\n        wb.Close SaveChanges:=False\n        f = Dir\n    Loop\n    Application.CutCopyMode = False\nEnd Sub",
+        "howToRun": "同结构、都有标题行的多个文件，按 F5。",
+        "result": "汇总表只保留一份标题，下面是各文件的数据体。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "打开文件后忘了 Close，文件夹被锁住",
+        "reason": "每个 Workbooks.Open 都要配对 Close，异常时更容易漏。",
+        "fix": "Close 放在复制之后；出错分支也补 Close SaveChanges:=False。",
+        "level": "high"
+      },
+      {
+        "title": "每个文件都粘标题，汇总表里标题重复几十行",
+        "reason": "UsedRange 包含表头。",
+        "fix": "用 Offset(1,0).Resize(行数-1, 列数) 去掉第一行。",
+        "level": "mid"
+      },
+      {
+        "title": "各文件列顺序不一致，粘完数据错列",
+        "reason": "直接按位置粘贴，不校验列结构。",
+        "fix": "先核对标题行，或按列名用字典映射后再写。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "merge-two-sheets",
+        "kind": "companion",
+        "why": "同簿两表合并是单文件版。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Open/Close 是工作簿对象操作。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "判断每个文件的数据范围。"
+      }
+    ],
+    "oneLiner": "把一堆文件拼成一张表",
+    "summary": "多工作簿合并 = Dir 遍历 + Open 只读 + UsedRange 复制 + Close。必须配平 Close、去掉重复表头、核对列顺序。"
+  },
+  {
+    "id": "export-pdf",
+    "enName": "导出 PDF",
+    "zhName": "导出 PDF",
+    "alias": [
+      "ExportAsFixedFormat",
+      "导出PDF",
+      "另存PDF"
+    ],
+    "keywords": [
+      "表格转 PDF",
+      "导出指定区域",
+      "整个工作簿导 PDF"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "工作表.ExportAsFixedFormat Type:=xlTypePDF, Filename:=路径, Quality:=xlQualityStandard",
+    "examples": [
+      {
+        "title": "只导出当前表的打印区域",
+        "code": "Sub 导出当前表()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\报表.pdf\"\n    ActiveSheet.ExportAsFixedFormat _\n        Type:=xlTypePDF, Filename:=p, _\n        Quality:=xlQualityStandard, IncludeSelection:=False\n    MsgBox \"已导出：\" & p\nEnd Sub",
+        "howToRun": "先保存工作簿（未保存时 Path 为空），按 F5。",
+        "result": "在文件同目录生成「报表.pdf」。"
+      },
+      {
+        "title": "导出整个工作簿",
+        "code": "Sub 导出整簿()\n    ThisWorkbook.ExportAsFixedFormat _\n        Type:=xlTypePDF, _\n        Filename:=ThisWorkbook.Path & \"\\整簿.pdf\"\nEnd Sub",
+        "howToRun": "工作簿已保存，按 F5。",
+        "result": "所有工作表按顺序导出成一个 PDF。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "工作簿没保存，ThisWorkbook.Path 是空串，报错",
+        "reason": "未保存的文件没有路径。",
+        "fix": "先 ThisWorkbook.Save，或用 SaveAs 指定路径后再导出。",
+        "level": "high"
+      },
+      {
+        "title": "不设打印区域，导出带出一堆空白页",
+        "reason": "UsedRange 可能比实际内容大很多。",
+        "fix": "先设 PageSetup.PrintArea，或在导出前清理多余行列。",
+        "level": "mid"
+      },
+      {
+        "title": "文件名带 : * ? 等字符，导出失败",
+        "reason": "Windows 文件名不允许这些字符。",
+        "fix": "导出前替换非法字符，或只用日期数字命名。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "export-csv",
+        "kind": "companion",
+        "why": "CSV 与 PDF 是两种常用导出。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "按表导出是工作表级操作。"
+      }
+    ],
+    "oneLiner": "把表导成 PDF",
+    "summary": "ExportAsFixedFormat 按表或按簿导出 PDF。必须先保存拿到 Path、设好打印区域，文件名别带非法字符。"
+  },
+  {
+    "id": "input-form",
+    "enName": "输入框录入",
+    "zhName": "输入框录入",
+    "alias": [
+      "InputBox",
+      "录入框",
+      "弹窗输入"
+    ],
+    "keywords": [
+      "弹窗让人输入",
+      "录入到单元格",
+      "输入校验"
+    ],
+    "kind": "recipe",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "v = InputBox(\"提示\", \"标题\", 默认值)\nIf StrPtr(v) = 0 Then Exit Sub   ' 点了取消",
+    "examples": [
+      {
+        "title": "输入金额并校验后写入",
+        "code": "Sub 录入金额()\n    Dim v As String\n    v = InputBox(\"请输入金额：\", \"录入\", \"0\")\n    If StrPtr(v) = 0 Then Exit Sub\n    If Not IsNumeric(v) Then\n        MsgBox \"必须是数字\"\n        Exit Sub\n    End If\n    Range(\"B2\").Value = CDbl(v)\nEnd Sub",
+        "howToRun": "按 F5，输入 100 或 abc 分别试。",
+        "result": "数字写入 B2；非数字提示后退出；点取消不写入。"
+      },
+      {
+        "title": "循环问到合法为止",
+        "code": "Sub 必须输入数字()\n    Dim v As String\n    Do\n        v = InputBox(\"请输入数量（正整数）：\")\n        If StrPtr(v) = 0 Then Exit Sub\n        If IsNumeric(v) Then\n            If Val(v) > 0 And Int(Val(v)) = Val(v) Then Exit Do\n        End If\n        MsgBox \"请输入正整数\"\n    Loop\n    Range(\"C2\").Value = CLng(v)\nEnd Sub",
+        "howToRun": "按 F5，先输 0 或 abc，再输 3。",
+        "result": "不合法的输入会一直提示，直到输入正整数才写入 C2。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用户点取消，空串被当成有效输入写进去",
+        "reason": "InputBox 取消时返回空串，和「输入空」无法用值区分。",
+        "fix": "用 StrPtr(v) = 0 判断取消；要允许空输入就另设默认值。",
+        "level": "high"
+      },
+      {
+        "title": "IsNumeric 通过后直接 CDbl，空串或超范围报 13",
+        "reason": "IsNumeric 对某些字符串宽松，转换仍可能失败。",
+        "fix": "转换包 On Error，或用 Val 先取值再判断范围。",
+        "level": "mid",
+        "errorCode": "13"
+      },
+      {
+        "title": "不校验直接写入，文本混进数字列",
+        "reason": "InputBox 永远返回字符串。",
+        "fix": "先 IsNumeric/正则校验，再 CDbl/CLng 转换。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "inputbox",
+        "kind": "companion",
+        "why": "InputBox 语句是录入框的基础。"
+      },
+      {
+        "id": "msgbox",
+        "kind": "companion",
+        "why": "校验失败用 MsgBox 提示。"
+      }
+    ],
+    "oneLiner": "弹窗收一个值再写表",
+    "summary": "InputBox 永远返回字符串，取消返回空串。用 StrPtr 判取消、IsNumeric 判类型、再转换写入，是录入框的三件套。"
+  }
+]

@@ -1,0 +1,1080 @@
+[
+  {
+    "id": "pivot-filter",
+    "enName": "PivotField.PivotFilters",
+    "zhName": "透视表筛选",
+    "alias": [
+      "PivotFilters",
+      "透视表筛选",
+      "筛选字段"
+    ],
+    "keywords": [
+      "透视表按条件筛",
+      "清除透视表筛选",
+      "只显示华东"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "pf.PivotFilters.Add Type:=xlCaptionEquals, Value1:=\"华东\"\npf.ClearAllFilters",
+    "examples": [
+      {
+        "title": "地区字段只显示华东",
+        "code": "Sub 筛华东()\n    Dim pf As PivotField\n    Set pf = ActiveSheet.PivotTables(1).PivotFields(\"地区\")\n    pf.ClearAllFilters\n    pf.PivotFilters.Add Type:=xlCaptionEquals, Value1:=\"华东\"\nEnd Sub",
+        "howToRun": "透视表有「地区」行字段，按 F5。",
+        "result": "透视表只保留华东一行。"
+      },
+      {
+        "title": "清除所有筛选",
+        "code": "Sub 清筛选()\n    Dim pf As PivotField\n    For Each pf In ActiveSheet.PivotTables(1).PivotFields\n        pf.ClearAllFilters\n    Next pf\nEnd Sub",
+        "howToRun": "有筛选时按 F5。",
+        "result": "所有字段筛选被清掉，恢复全量。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对数据字段加筛选，报错",
+        "reason": "PivotFilters 只能用在行/列/页字段。",
+        "fix": "确认该字段 Orientation 是 xlRowField / xlColumnField / xlPageField。",
+        "level": "high"
+      },
+      {
+        "title": "反复 Add 不清理，筛选叠加冲突",
+        "reason": "同一字段可挂多个筛选条件。",
+        "fix": "每次重设前先 ClearAllFilters。",
+        "level": "mid"
+      },
+      {
+        "title": "筛完不刷新，看到旧汇总",
+        "reason": "筛选改变了可见项，汇总需要重算。",
+        "fix": "筛完调用 pt.RefreshTable 或 Update。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-add-fields",
+        "kind": "companion",
+        "why": "先有字段才能筛。"
+      },
+      {
+        "id": "pivot-refresh",
+        "kind": "companion",
+        "why": "筛选后刷新。"
+      },
+      {
+        "id": "autofilter",
+        "kind": "confusable",
+        "why": "普通表筛选与透视表筛选不是一套。"
+      }
+    ],
+    "oneLiner": "给透视表字段加筛选",
+    "summary": "PivotFilters 只作用于行/列/页字段，重设前先 ClearAllFilters。普通表的 AutoFilter 与它不是一套东西。"
+  },
+  {
+    "id": "format-conditions",
+    "enName": "Range.FormatConditions",
+    "zhName": "条件格式集合",
+    "alias": [
+      "FormatConditions",
+      "条件格式",
+      "规则集合"
+    ],
+    "keywords": [
+      "遍历条件格式",
+      "条件格式数量",
+      "规则优先级"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.FormatConditions.Count\nrng.FormatConditions(1).Type",
+    "examples": [
+      {
+        "title": "列出 A1:A10 的条件格式规则",
+        "code": "Sub 列规则()\n    Dim fc As FormatCondition\n    For Each fc In Range(\"A1:A10\").FormatConditions\n        Debug.Print fc.Type, fc.Formula1\n    Next fc\nEnd Sub",
+        "howToRun": "区域有条件格式时按 F5。",
+        "result": "打印每条规则的类型和公式。"
+      },
+      {
+        "title": "统计当前表有多少条规则",
+        "code": "Sub 数规则()\n    Dim total As Long, r As Range\n    For Each r In ActiveSheet.UsedRange\n        total = total + r.FormatConditions.Count\n    Next r\n    MsgBox total\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出已用区域里条件格式规则的累计数量。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为一个区域只有一条规则",
+        "reason": "同一区域可以叠多条规则。",
+        "fix": "按集合遍历，别只取 (1)。",
+        "level": "mid"
+      },
+      {
+        "title": "逐单元格统计，数字重复膨胀",
+        "reason": "同一规则覆盖多格，每格都算一次。",
+        "fix": "按 FormatConditions 对象或整块区域统计，别逐格累加。",
+        "level": "mid"
+      },
+      {
+        "title": "规则优先级看集合顺序，但顺序会变",
+        "reason": "新加的规则可能排到前面。",
+        "fix": "需要固定优先级就 SetFirstPriority / ModifyPriority。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "cf-add-rule",
+        "kind": "companion",
+        "why": "新增规则。"
+      },
+      {
+        "id": "cf-clear",
+        "kind": "companion",
+        "why": "清空规则。"
+      },
+      {
+        "id": "conditional-color",
+        "kind": "companion",
+        "why": "条件格式配方。"
+      }
+    ],
+    "oneLiner": "一条区域上的所有条件格式",
+    "summary": "FormatConditions 是规则集合，一个区域可以叠多条。逐格统计会重复计数，优先级按集合顺序但不稳定。"
+  },
+  {
+    "id": "cf-add-rule",
+    "enName": "FormatConditions.Add",
+    "zhName": "新增条件格式",
+    "alias": [
+      "FormatConditions.Add",
+      "加条件格式",
+      "大于标红"
+    ],
+    "keywords": [
+      "大于100标红",
+      "VBA 条件格式",
+      "单元格值规则"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.FormatConditions.Add Type:=xlCellValue, Operator:=xlGreater, Formula1:=\"100\"",
+    "examples": [
+      {
+        "title": "B2:B20 大于 100 标红",
+        "code": "Sub 大于标红()\n    Dim fc As FormatCondition\n    With Range(\"B2:B20\")\n        .FormatConditions.Delete\n        Set fc = .FormatConditions.Add(xlCellValue, xlGreater, \"100\")\n        fc.Interior.Color = vbRed\n        fc.Font.Color = vbWhite\n    End With\nEnd Sub",
+        "howToRun": "B2:B20 有数字，按 F5。",
+        "result": "大于 100 的格子红底白字。"
+      },
+      {
+        "title": "重复值标黄",
+        "code": "Sub 重复标黄()\n    Dim fc As FormatCondition\n    With Range(\"C2:C30\")\n        .FormatConditions.Delete\n        Set fc = .FormatConditions.AddUniqueValues()\n        fc.DupeUnique = xlDuplicate\n        fc.Interior.Color = vbYellow\n    End With\nEnd Sub",
+        "howToRun": "C2:C30 有重复值，按 F5。",
+        "result": "重复出现的值标黄。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不先 Delete，规则越加越多",
+        "reason": "Add 是追加，不覆盖旧规则。",
+        "fix": "配置前固定 .FormatConditions.Delete。",
+        "level": "high"
+      },
+      {
+        "title": "Formula1 传数字不带引号，类型不匹配",
+        "reason": "参数是字符串，直接写 100 可能被当数值。",
+        "fix": "统一写 \"100\"，公式类规则写完整公式字符串。",
+        "level": "mid"
+      },
+      {
+        "title": "整列上条件格式，文件变卡",
+        "reason": "整列规则会覆盖大量空单元格。",
+        "fix": "限定到实际数据区，或用表格结构化引用。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "format-conditions",
+        "kind": "companion",
+        "why": "规则集合。"
+      },
+      {
+        "id": "cf-formula-rule",
+        "kind": "companion",
+        "why": "公式型规则。"
+      },
+      {
+        "id": "cf-clear",
+        "kind": "companion",
+        "why": "清理规则。"
+      }
+    ],
+    "oneLiner": "按单元格值加一条格式规则",
+    "summary": "Add 只追加，配置前先 Delete。Formula1 用字符串；规则尽量限定到数据区，整列规则会拖慢文件。"
+  },
+  {
+    "id": "cf-formula-rule",
+    "enName": "FormatConditions.Add(xlExpression)",
+    "zhName": "公式条件格式",
+    "alias": [
+      "xlExpression",
+      "公式规则",
+      "整行变色"
+    ],
+    "keywords": [
+      "整行标色",
+      "按公式条件格式",
+      "隔行变色"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.FormatConditions.Add Type:=xlExpression, Formula1:=\"=$B2>100\"",
+    "examples": [
+      {
+        "title": "B 列大于 100 时整行标黄",
+        "code": "Sub 整行标黄()\n    Dim fc As FormatCondition\n    With Range(\"A2:D20\")\n        .FormatConditions.Delete\n        Set fc = .FormatConditions.Add(xlExpression, , \"=$B2>100\")\n        fc.Interior.Color = vbYellow\n    End With\nEnd Sub",
+        "howToRun": "A2:D20 有数据、B 列是数值，按 F5。",
+        "result": "B 列大于 100 的行，A:D 整行变黄。"
+      },
+      {
+        "title": "隔行变色",
+        "code": "Sub 隔行()\n    With Range(\"A2:D20\")\n        .FormatConditions.Delete\n        .FormatConditions.Add xlExpression, , \"=MOD(ROW(),2)=0\"\n        .FormatConditions(1).Interior.Color = RGB(242, 242, 242)\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "偶数行变浅灰，形成斑马纹。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "公式用了相对引用却选错锚点，整片错位",
+        "reason": "规则公式以区域左上角为锚点，相对引用会逐格偏移。",
+        "fix": "想整行判断就锁列不锁行，例如 =$B2>100。",
+        "level": "high"
+      },
+      {
+        "title": "公式里引用别的表没加工作表名，结果全错",
+        "reason": "条件格式公式的跨表引用规则与普通公式不同。",
+        "fix": "写全 Worksheets(\"数据\")!B2，或改用同表辅助列。",
+        "level": "mid"
+      },
+      {
+        "title": "公式返回错误值，规则静默不生效",
+        "reason": "条件格式把错误当 FALSE。",
+        "fix": "用 IFERROR 包一层，或先验证公式在单元格里的结果。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "cf-add-rule",
+        "kind": "companion",
+        "why": "单元格值型规则。"
+      },
+      {
+        "id": "format-conditions",
+        "kind": "companion",
+        "why": "规则集合。"
+      },
+      {
+        "id": "conditional-color",
+        "kind": "companion",
+        "why": "条件格式配方。"
+      }
+    ],
+    "oneLiner": "用公式决定是否上色",
+    "summary": "xlExpression 规则以区域左上角为锚点写公式。整行变色锁列不锁行，跨表引用要写全，错误值会被当成不命中。"
+  },
+  {
+    "id": "cf-clear",
+    "enName": "FormatConditions.Delete",
+    "zhName": "清除条件格式",
+    "alias": [
+      "清除条件格式",
+      "Delete 规则",
+      "清空规则"
+    ],
+    "keywords": [
+      "删掉条件格式",
+      "批量清除规则",
+      "恢复无格式"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.FormatConditions.Delete          ' 清整块\nrng.FormatConditions(1).Delete      ' 清单条",
+    "examples": [
+      {
+        "title": "清掉 A1:D20 的所有规则",
+        "code": "Sub 清规则()\n    Range(\"A1:D20\").FormatConditions.Delete\nEnd Sub",
+        "howToRun": "区域有条件格式时按 F5。",
+        "result": "该区域所有条件格式规则被删除，底色恢复。"
+      },
+      {
+        "title": "只删第一条规则",
+        "code": "Sub 删第一条()\n    With Range(\"A1:D20\").FormatConditions\n        If .Count > 0 Then .Item(1).Delete\n    End With\nEnd Sub",
+        "howToRun": "至少有一条规则时按 F5。",
+        "result": "只删掉集合里的第一条，其余保留。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Delete 后单元格底色还在，以为没删掉",
+        "reason": "条件格式删除不会清除手工填充色。",
+        "fix": "再执行 Interior.ColorIndex = xlNone 清手工底色。",
+        "level": "mid"
+      },
+      {
+        "title": "对整表 Delete，误删别人的规则",
+        "reason": "UsedRange 可能覆盖很多无关区域。",
+        "fix": "限定到明确区域，操作前先备份。",
+        "level": "high"
+      },
+      {
+        "title": "Count=0 时取 Item(1) 报下标越界",
+        "reason": "集合为空。",
+        "fix": "先判断 Count > 0。",
+        "level": "mid",
+        "errorCode": "9"
+      }
+    ],
+    "related": [
+      {
+        "id": "format-conditions",
+        "kind": "companion",
+        "why": "规则集合。"
+      },
+      {
+        "id": "cf-add-rule",
+        "kind": "companion",
+        "why": "重建前先清。"
+      },
+      {
+        "id": "clear-formats",
+        "kind": "companion",
+        "why": "清除格式配方。"
+      }
+    ],
+    "oneLiner": "删除条件格式规则",
+    "summary": "Delete 清规则但不清手工底色，别对整表乱删。只删一条要确认 Count>0，否则 Item(1) 会下标越界。"
+  },
+  {
+    "id": "comment-object",
+    "enName": "Range.Comment",
+    "zhName": "批注对象",
+    "alias": [
+      "Comment",
+      "Comments",
+      "单元格批注"
+    ],
+    "keywords": [
+      "读取批注内容",
+      "批注作者",
+      "遍历批注"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.Comment\nrng.Comment.Text\nrng.Comment.Author",
+    "examples": [
+      {
+        "title": "读取 A1 的批注",
+        "code": "Sub 读批注()\n    If Range(\"A1\").Comment Is Nothing Then\n        MsgBox \"没有批注\"\n    Else\n        MsgBox Range(\"A1\").Comment.Text\n    End If\nEnd Sub",
+        "howToRun": "A1 有/无批注分别运行。",
+        "result": "有批注弹内容，没有则提示。"
+      },
+      {
+        "title": "列出当前表所有批注",
+        "code": "Sub 列批注()\n    Dim cm As Comment\n    For Each cm In ActiveSheet.Comments\n        Debug.Print cm.Parent.Address, cm.Author, cm.Text\n    Next cm\nEnd Sub",
+        "howToRun": "表里有批注时按 F5。",
+        "result": "打印批注所在单元格、作者和内容。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接读 Comment.Text，没有批注时报错",
+        "reason": "Comment 为 Nothing 时访问属性会抛 91。",
+        "fix": "先判断 Is Nothing。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "新版「线程批注」不在 Comment 集合里",
+        "reason": "Excel 365 的讨论式批注是另一套对象。",
+        "fix": "老式备注用 Comment；新式批注要查 Comments 的新接口或手动处理。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 Comment.Text 能直接改格式",
+        "reason": "Text 只是纯文本。",
+        "fix": "格式要动 Comment.Shape.TextFrame。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "comment-add",
+        "kind": "companion",
+        "why": "添加批注。"
+      },
+      {
+        "id": "comment-delete",
+        "kind": "companion",
+        "why": "删除批注。"
+      },
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "批注挂在单元格上。"
+      }
+    ],
+    "oneLiner": "读写单元格上的老式批注",
+    "summary": "Comment 是单元格的老式备注，没有批注时是 Nothing，直接读会报 91。新版线程批注不走这套对象。"
+  },
+  {
+    "id": "comment-add",
+    "enName": "Range.AddComment",
+    "zhName": "添加批注",
+    "alias": [
+      "AddComment",
+      "加批注",
+      "写备注"
+    ],
+    "keywords": [
+      "VBA 加批注",
+      "批量写备注",
+      "批注大小"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.AddComment \"批注内容\"\nrng.Comment.Shape.Width = 200",
+    "examples": [
+      {
+        "title": "给 A1 加一条批注",
+        "code": "Sub 加批注()\n    With Range(\"A1\")\n        If Not .Comment Is Nothing Then .Comment.Delete\n        .AddComment \"这是本月重点\"\n    End With\nEnd Sub",
+        "howToRun": "按 F5，鼠标移到 A1 查看。",
+        "result": "A1 右上角出现红三角，悬停显示文字。"
+      },
+      {
+        "title": "批量加批注并统一大小",
+        "code": "Sub 批量批注()\n    Dim r As Range\n    For Each r In Range(\"B2:B6\")\n        If Not r.Comment Is Nothing Then r.Comment.Delete\n        r.AddComment \"待核对\"\n        r.Comment.Shape.Width = 160\n        r.Comment.Shape.Height = 60\n    Next r\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "B2:B6 每格都有统一尺寸的「待核对」批注。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "单元格已有批注，直接 AddComment 报错",
+        "reason": "一个单元格只能有一条老式批注。",
+        "fix": "先判断并 Delete，再 AddComment。",
+        "level": "high"
+      },
+      {
+        "title": "批注框太小，文字显示不全",
+        "reason": "默认尺寸按内容估算，长文本会被截。",
+        "fix": "设 Comment.Shape.Width/Height，或 AutoSize。",
+        "level": "mid"
+      },
+      {
+        "title": "批注内容带换行，写进去变成一行",
+        "reason": "字符串里没有真正的换行符。",
+        "fix": "用 Chr(10) 或 vbCrLf 拼接。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "comment-object",
+        "kind": "companion",
+        "why": "批注对象。"
+      },
+      {
+        "id": "comment-delete",
+        "kind": "companion",
+        "why": "删除批注。"
+      }
+    ],
+    "oneLiner": "给单元格写一条批注",
+    "summary": "AddComment 前先删旧批注，否则报错。长文本要自己调批注框大小，换行用 Chr(10)。"
+  },
+  {
+    "id": "comment-delete",
+    "enName": "Range.ClearComments",
+    "zhName": "删除批注",
+    "alias": [
+      "ClearComments",
+      "删批注",
+      "清除批注"
+    ],
+    "keywords": [
+      "批量删批注",
+      "清空所有备注",
+      "删除单元格批注"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.ClearComments        ' 清整块\nrng.Comment.Delete      ' 清单个",
+    "examples": [
+      {
+        "title": "清掉 A1:D20 的所有批注",
+        "code": "Sub 清批注()\n    Range(\"A1:D20\").ClearComments\nEnd Sub",
+        "howToRun": "区域有批注时按 F5。",
+        "result": "该区域所有红三角消失。"
+      },
+      {
+        "title": "只删 A1 的批注",
+        "code": "Sub 删一个()\n    If Not Range(\"A1\").Comment Is Nothing Then\n        Range(\"A1\").Comment.Delete\n    End If\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A1 的批注被删除，其他批注保留。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "ClearComments 连内容一起清？不会",
+        "reason": "它只删批注，不动单元格值。",
+        "fix": "放心用；要连内容清用 Clear。",
+        "level": "low"
+      },
+      {
+        "title": "没批注时直接 .Comment.Delete，报 91",
+        "reason": "Comment 为 Nothing。",
+        "fix": "先判断 Is Nothing。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "删完发现批注是别人写的，无法撤销",
+        "reason": "VBA 删除不进撤销栈。",
+        "fix": "批量删前先备份工作簿。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "comment-object",
+        "kind": "companion",
+        "why": "批注对象。"
+      },
+      {
+        "id": "comment-add",
+        "kind": "companion",
+        "why": "添加批注。"
+      }
+    ],
+    "oneLiner": "删除单元格批注",
+    "summary": "ClearComments 批量清、Comment.Delete 清单个。只删批注不动内容；没有批注时直接 Delete 会报 91。"
+  },
+  {
+    "id": "hyperlink-add",
+    "enName": "Worksheet.Hyperlinks.Add",
+    "zhName": "添加超链接",
+    "alias": [
+      "Hyperlinks.Add",
+      "加超链接",
+      "插入链接"
+    ],
+    "keywords": [
+      "单元格加链接",
+      "链接到文件",
+      "超链接文字"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.Hyperlinks.Add Anchor:=Range(\"A1\"), Address:=\"https://example.com\", TextToDisplay:=\"打开\"",
+    "examples": [
+      {
+        "title": "给 A1 加网页链接",
+        "code": "Sub 加链接()\n    ActiveSheet.Hyperlinks.Add _\n        Anchor:=Range(\"A1\"), _\n        Address:=\"https://example.com\", _\n        TextToDisplay:=\"打开示例站\"\nEnd Sub",
+        "howToRun": "按 F5，点击 A1。",
+        "result": "A1 显示蓝色下划线文字，点击打开网页。"
+      },
+      {
+        "title": "链接到本工作簿的另一张表",
+        "code": "Sub 表内跳转()\n    ActiveSheet.Hyperlinks.Add _\n        Anchor:=Range(\"B1\"), _\n        Address:=\"\", _\n        SubAddress:=\"数据!A1\", _\n        TextToDisplay:=\"去数据表\"\nEnd Sub",
+        "howToRun": "工作簿有「数据」表，按 F5。",
+        "result": "点击 B1 跳到「数据」表 A1。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "同一格重复 Add，链接叠加或报错",
+        "reason": "一个单元格只应有一个超链接。",
+        "fix": "先 rng.Hyperlinks.Delete，再 Add。",
+        "level": "high"
+      },
+      {
+        "title": "表内跳转写了 Address，结果打开新文件",
+        "reason": "Address 是外部地址，SubAddress 才是表内位置。",
+        "fix": "表内跳转 Address 留空，只写 SubAddress。",
+        "level": "high"
+      },
+      {
+        "title": "本地文件路径带空格没处理",
+        "reason": "路径含空格时链接可能打不开。",
+        "fix": "用完整路径，必要时把空格转成 %20 或改用 SubAddress。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "hyperlink-follow",
+        "kind": "companion",
+        "why": "打开链接。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Hyperlinks 挂在表上。"
+      }
+    ],
+    "oneLiner": "给单元格插入可点击链接",
+    "summary": "Add 要指定 Anchor 和显示文字；表内跳转用 SubAddress 而不是 Address。同一格重复加之前先清旧链接。"
+  },
+  {
+    "id": "hyperlink-follow",
+    "enName": "Hyperlink.Follow",
+    "zhName": "打开超链接",
+    "alias": [
+      "Follow",
+      "打开链接",
+      "跳转超链接"
+    ],
+    "keywords": [
+      "代码打开链接",
+      "自动跳转",
+      "Follow 用法"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.Hyperlinks(1).Follow",
+    "examples": [
+      {
+        "title": "打开 A1 上的链接",
+        "code": "Sub 打开()\n    If Range(\"A1\").Hyperlinks.Count > 0 Then\n        Range(\"A1\").Hyperlinks(1).Follow\n    Else\n        MsgBox \"A1 没有链接\"\n    End If\nEnd Sub",
+        "howToRun": "A1 有超链接时按 F5。",
+        "result": "浏览器或目标文件被打开。"
+      },
+      {
+        "title": "遍历并打开当前表所有链接",
+        "code": "Sub 全打开()\n    Dim h As Hyperlink\n    For Each h In ActiveSheet.Hyperlinks\n        Debug.Print h.TextToDisplay\n        h.Follow\n    Next h\n End Sub",
+        "howToRun": "表里链接不多时按 F5。",
+        "result": "依次打开每个链接，并打印显示文字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没有链接就 Follow，报错",
+        "reason": "Hyperlinks(1) 不存在。",
+        "fix": "先判断 Count > 0。",
+        "level": "high"
+      },
+      {
+        "title": "Follow 会弹安全提示或要求确认",
+        "reason": "外部地址受 Excel 安全策略约束。",
+        "fix": "不要试图绕安全提示，必要时改用 ThisWorkbook.FollowHyperlink 并接受提示。",
+        "level": "mid"
+      },
+      {
+        "title": "循环打开大量链接，卡住或弹一堆窗口",
+        "reason": "每个 Follow 都可能启动外部程序。",
+        "fix": "先收集地址再批量处理，别在循环里无脑 Follow。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "hyperlink-add",
+        "kind": "companion",
+        "why": "先有链接才能打开。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "链接集合挂在表上。"
+      }
+    ],
+    "oneLiner": "用代码点开一个超链接",
+    "summary": "Follow 相当于用户点击链接，会触发外部程序和安全提示。调用前先确认链接存在，循环打开要克制。"
+  },
+  {
+    "id": "range-union",
+    "enName": "Application.Union",
+    "zhName": "合并区域",
+    "alias": [
+      "Union",
+      "合并多个区域",
+      "多区域操作"
+    ],
+    "keywords": [
+      "同时操作多块区域",
+      "Union 用法",
+      "批量上色多区域"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set r = Union(Range(\"A1:A10\"), Range(\"C1:C10\"))",
+    "examples": [
+      {
+        "title": "两块区域一起上色",
+        "code": "Sub 合并上色()\n    Dim r As Range\n    Set r = Union(Range(\"A1:A10\"), Range(\"C1:C10\"))\n    r.Interior.Color = vbYellow\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A1:A10 和 C1:C10 同时变黄，B 列不变。"
+      },
+      {
+        "title": "循环累加多个区域",
+        "code": "Sub 累加区域()\n    Dim r As Range, c As Range\n    For Each c In Range(\"A1:A10\")\n        If c.Value > 0 Then\n            If r Is Nothing Then Set r = c Else Set r = Union(r, c)\n        End If\n    Next c\n    If Not r Is Nothing Then r.Font.Bold = True\nEnd Sub",
+        "howToRun": "A1:A10 有正负数，按 F5。",
+        "result": "所有正数单元格加粗。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Union 参数必须是同一工作表上的区域",
+        "reason": "跨表区域不能直接 Union。",
+        "fix": "分表分别处理，或先复制到同一表。",
+        "level": "high"
+      },
+      {
+        "title": "初始变量是 Nothing，直接 Union 报错",
+        "reason": "Union(Nothing, r) 不合法。",
+        "fix": "第一次先 Set r = cell，之后才 Union。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 Union 会去重重叠区域",
+        "reason": "重叠部分仍只算一块，但 Areas 可能重复。",
+        "fix": "需要去重就逐格判断，别依赖 Union。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "range-intersect",
+        "kind": "companion",
+        "why": "另一个区域组合函数。"
+      },
+      {
+        "id": "areas",
+        "kind": "companion",
+        "why": "多区域按 Areas 拆。"
+      },
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Range 对象。"
+      }
+    ],
+    "oneLiner": "把多块区域拼成一个 Range",
+    "summary": "Union 把同表多个区域合成一个对象，能一次性上色/加粗。跨表不行；累加时第一次要先赋值，否则 Nothing 会报错。"
+  },
+  {
+    "id": "range-intersect",
+    "enName": "Application.Intersect",
+    "zhName": "区域交集",
+    "alias": [
+      "Intersect",
+      "区域交集",
+      "共同区域"
+    ],
+    "keywords": [
+      "判断是否重叠",
+      "取交集",
+      "Change 事件限定列"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set r = Intersect(Range(\"A1:D10\"), Range(\"B:B\"))",
+    "examples": [
+      {
+        "title": "取 A1:D10 与 B 列的交集",
+        "code": "Sub 取交集()\n    Dim r As Range\n    Set r = Intersect(Range(\"A1:D10\"), Range(\"B:B\"))\n    If Not r Is Nothing Then\n        r.Interior.Color = vbGreen\n    End If\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "只有 B1:B10 变绿。"
+      },
+      {
+        "title": "Change 事件只处理 A 列",
+        "code": "Private Sub Worksheet_Change(ByVal Target As Range)\n    Dim r As Range\n    Set r = Intersect(Target, Me.Columns(\"A\"))\n    If r Is Nothing Then Exit Sub\n    Application.EnableEvents = False\n    r.Offset(0, 1).Value = Now\n    Application.EnableEvents = True\nEnd Sub",
+        "howToRun": "代码放进工作表模块，改 A 列和其他列对比。",
+        "result": "只有改 A 列才会在 B 列写时间。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没判断 Nothing，直接用交集区域报错",
+        "reason": "两块区域不相交时 Intersect 返回 Nothing。",
+        "fix": "固定写 If Not r Is Nothing Then。",
+        "level": "high"
+      },
+      {
+        "title": "跨表取交集，返回 Nothing 或报错",
+        "reason": "Intersect 只对同一工作表有效。",
+        "fix": "分表分别判断。",
+        "level": "mid"
+      },
+      {
+        "title": "Target 是多区域，Intersect 后仍要按 Areas 处理",
+        "reason": "交集可能是不连续区域。",
+        "fix": "需要逐块处理时遍历 r.Areas。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "range-union",
+        "kind": "companion",
+        "why": "合并与交集相对。"
+      },
+      {
+        "id": "events",
+        "kind": "companion",
+        "why": "Change 事件常用 Intersect。"
+      },
+      {
+        "id": "areas",
+        "kind": "companion",
+        "why": "交集可能是多区域。"
+      }
+    ],
+    "oneLiner": "取两块区域重叠的部分",
+    "summary": "Intersect 常用于 Change 事件限定列。不相交返回 Nothing，必须先判断；跨表不适用，多区域还要按 Areas 拆。"
+  },
+  {
+    "id": "print-area",
+    "enName": "PageSetup.PrintArea",
+    "zhName": "打印区域",
+    "alias": [
+      "PrintArea",
+      "打印区域",
+      "设置打印范围"
+    ],
+    "keywords": [
+      "只打印部分区域",
+      "设置打印范围",
+      "清打印区域"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.PageSetup.PrintArea = \"$A$1:$H$30\"\nws.PageSetup.PrintArea = \"\"   ' 清除",
+    "examples": [
+      {
+        "title": "只打印 A1:H30",
+        "code": "Sub 设打印区()\n    ActiveSheet.PageSetup.PrintArea = \"$A$1:$H$30\"\nEnd Sub",
+        "howToRun": "按 F5，进打印预览。",
+        "result": "预览只显示 A1:H30。"
+      },
+      {
+        "title": "按实际数据区自动设打印区",
+        "code": "Sub 自动打印区()\n    With ActiveSheet\n        .PageSetup.PrintArea = .Range(\"A1\").Resize( _\n            .UsedRange.Rows.Count, 8).Address\n    End With\nEnd Sub",
+        "howToRun": "数据从 A1 开始、最多 8 列时按 F5。",
+        "result": "打印区覆盖 A:H 的实际数据范围。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "地址写成 A1:H30 不带 $，某些版本不认",
+        "reason": "PrintArea 需要绝对地址字符串。",
+        "fix": "用 Range.Address 生成，或手写 $A$1:$H$30。",
+        "level": "mid"
+      },
+      {
+        "title": "设了打印区，用户看不到其他列以为数据丢了",
+        "reason": "打印区只影响打印，不影响显示。",
+        "fix": "交付前说明，或打印完清除打印区。",
+        "level": "low"
+      },
+      {
+        "title": "多区域打印用逗号拼接，顺序错乱",
+        "reason": "PrintArea 支持多块，但分页顺序按区域顺序。",
+        "fix": "需要固定顺序就逐块设置或分页打印。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "page-setup",
+        "kind": "companion",
+        "why": "纸张、方向、缩放。"
+      },
+      {
+        "id": "export-pdf",
+        "kind": "companion",
+        "why": "导出 PDF 前常设打印区。"
+      }
+    ],
+    "oneLiner": "限定只打印哪一块",
+    "summary": "PrintArea 只影响打印，不影响屏幕显示，值必须是绝对地址字符串。多区域顺序要自己控制，交付前最好说明或清除。"
+  },
+  {
+    "id": "page-setup",
+    "enName": "Worksheet.PageSetup",
+    "zhName": "页面设置",
+    "alias": [
+      "PageSetup",
+      "页面设置",
+      "打印设置"
+    ],
+    "keywords": [
+      "横向打印",
+      "缩放到一页",
+      "打印标题行"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.PageSetup.Orientation = xlLandscape\nws.PageSetup.Zoom = False\nws.PageSetup.FitToPagesWide = 1",
+    "examples": [
+      {
+        "title": "横向、缩到一页宽",
+        "code": "Sub 页面()\n    With ActiveSheet.PageSetup\n        .Orientation = xlLandscape\n        .Zoom = False\n        .FitToPagesWide = 1\n        .FitToPagesTall = False\n    End With\nEnd Sub",
+        "howToRun": "按 F5，看打印预览。",
+        "result": "横向纸，所有列压到一页宽。"
+      },
+      {
+        "title": "每页重复打印标题行",
+        "code": "Sub 打标题()\n    ActiveSheet.PageSetup.PrintTitleRows = \"$1:$2\"\nEnd Sub",
+        "howToRun": "第 1-2 行是表头时按 F5。",
+        "result": "每页顶部都重复第 1-2 行。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Zoom 和 FitToPages 同时设，冲突",
+        "reason": "缩放比例与「调整为几页」互斥。",
+        "fix": "用 FitToPages 时先设 Zoom=False。",
+        "level": "high"
+      },
+      {
+        "title": "FitToPagesTall 不设 False，被压成一页高",
+        "reason": "只设 Wide=1，Tall 可能沿用旧值。",
+        "fix": "明确 FitToPagesTall = False 表示不限高。",
+        "level": "mid"
+      },
+      {
+        "title": "打印标题行地址写错，每页不重复",
+        "reason": "PrintTitleRows 要绝对行地址。",
+        "fix": "写 \"$1:$2\" 这种形式，别写 \"A1:B2\"。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "print-area",
+        "kind": "companion",
+        "why": "打印区域。"
+      },
+      {
+        "id": "export-pdf",
+        "kind": "companion",
+        "why": "导出 PDF 前设页面。"
+      }
+    ],
+    "oneLiner": "控制纸张、方向和缩放",
+    "summary": "PageSetup 管打印外观：方向、缩放、标题行。Zoom 与 FitToPages 互斥，不限高要显式设 False。"
+  },
+  {
+    "id": "window-freeze",
+    "enName": "Window.FreezePanes",
+    "zhName": "冻结窗格",
+    "alias": [
+      "FreezePanes",
+      "冻结窗格",
+      "固定表头"
+    ],
+    "keywords": [
+      "冻结首行",
+      "固定前两列",
+      "取消冻结"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "With ActiveWindow\n    .SplitRow = 1\n    .SplitColumn = 0\n    .FreezePanes = True\nEnd With",
+    "examples": [
+      {
+        "title": "冻结首行",
+        "code": "Sub 冻结首行()\n    With ActiveWindow\n        .SplitRow = 1\n        .SplitColumn = 0\n        .FreezePanes = True\n    End With\nEnd Sub",
+        "howToRun": "按 F5，向下滚动。",
+        "result": "第 1 行始终可见。"
+      },
+      {
+        "title": "取消冻结",
+        "code": "Sub 取消冻结()\n    ActiveWindow.FreezePanes = False\nEnd Sub",
+        "howToRun": "先冻结再运行。",
+        "result": "窗格恢复可滚动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只设 FreezePanes=True，没设 SplitRow，没反应",
+        "reason": "冻结位置由 SplitRow/SplitColumn 决定。",
+        "fix": "先设 SplitRow/SplitColumn，再 FreezePanes=True。",
+        "level": "high"
+      },
+      {
+        "title": "想冻结首列却把 SplitColumn 设成 1 后滚错方向",
+        "reason": "SplitColumn=1 表示冻结第 1 列左侧。",
+        "fix": "冻结前 N 列就设 SplitColumn=N，冻结前 N 行设 SplitRow=N。",
+        "level": "mid"
+      },
+      {
+        "title": "对非活动窗口设冻结，没效果",
+        "reason": "FreezePanes 属于 Window 对象。",
+        "fix": "先激活目标工作簿/窗口，再设置。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "freeze-panes",
+        "kind": "companion",
+        "why": "冻结窗格配方。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "冻结作用于窗口里的表。"
+      }
+    ],
+    "oneLiner": "固定表头或前几列",
+    "summary": "冻结要同时设 SplitRow/SplitColumn 和 FreezePanes。只开 FreezePanes 不设分割位置，通常没反应。"
+  }
+]

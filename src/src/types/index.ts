@@ -342,12 +342,10 @@ export interface CatalogRow {
 }
 
 /**
- * 搜索索引条目（由 data/index.ts 在运行时从 CatalogRow 派生）。
- * 注意：索引数组由 data 层按 usageLevel 降序预排，
- * 因此 core/search.ts 只需按 score 稳定排序，即可满足 ARCHITECTURE §3.6 的
- * 「按 (score, usageLevel) 降序」要求，无需把 usageLevel 带进索引条目。
+ * 可参与搜索打分的最小字段集（`core/search.ts` 只认这六个字段）。
+ * 函数索引与宏索引都实现它，因此同一套六级排序逻辑可以同时服务两者。
  */
-export interface SearchEntry {
+export interface SearchableEntry {
   id: string;
   enName: string;
   /** 可能为 null */
@@ -358,6 +356,15 @@ export interface SearchEntry {
   pinyin: string;
   /** zhCommon + alias + keywords 的合集，用于第⑥级别名匹配 */
   aliases: string[];
+}
+
+/**
+ * 搜索索引条目（由 data/index.ts 在运行时从 CatalogRow 派生）。
+ * 注意：索引数组由 data 层按 usageLevel 降序预排，
+ * 因此 core/search.ts 只需按 score 稳定排序，即可满足 ARCHITECTURE §3.6 的
+ * 「按 (score, usageLevel) 降序」要求，无需把 usageLevel 带进索引条目。
+ */
+export interface SearchEntry extends SearchableEntry {
   category: CategoryId;
   oneLiner: string;
   status: EntryStatus;
@@ -475,4 +482,84 @@ export interface SiteSettings {
   lastImportAt: string | null;
   /** 首屏「数据只存本机」的一次性引导条是否已看过 */
   onboardingSeen: boolean;
+}
+
+
+/* =========================================================================
+ * 11. 宏内容（M2）—— 与 FunctionEntry 完全独立的结构
+ * ========================================================================= */
+
+/** 宏条目类型：概念 / 语句 / 对象成员 / 配方 / 错误码 */
+export type MacroKind = 'concept' | 'statement' | 'jsa' | 'member' | 'recipe' | 'error';
+
+/** 宿主：Excel 与 WPS（WPS 分专业版/个人版/JSA，见 hostNotes） */
+export type MacroHost = 'excel' | 'wps';
+
+/** 难度：1 入门 / 2 进阶 / 3 专家（页面按此折叠） */
+export type MacroLevel = 1 | 2 | 3;
+
+/** 宏参数（对应 syntax 里的占位） */
+export interface MacroParam {
+  /** 参数名，如 'Cell' */
+  name: string;
+  /** 类型，如 'Range' */
+  type: string;
+  required: boolean;
+  /** 一句话：填什么 */
+  desc: string;
+}
+
+/** 可运行的宏示例 */
+export interface MacroExample {
+  title: string;
+  /** 完整可跑代码（≤ 10 行优先，长脚本放配方） */
+  code: string;
+  /** 运行前置：Alt+F11 → 插入模块 → F5，或「放在工作表模块」 */
+  howToRun: string;
+  /** 预期看到什么 */
+  result: string;
+}
+
+/**
+ * 宏条目。
+ * 与 FunctionEntry 的差别：没有 calc / 版本 / 分类 / 星级，多了 kind / level / host。
+ */
+export interface MacroEntry {
+  /** 唯一 id，如 'range-find' */
+  id: string;
+  /** 英文名或对象成员写法，如 'Range.Find' */
+  enName: string;
+  /** 中文助记名，如 '查找单元格'；无通用叫法时为 null */
+  zhName: string | null;
+  /** 别名 / 口语叫法，进搜索索引 */
+  alias: string[];
+  /** 用途关键词，支撑「我要做什么」的自然语言搜索 */
+  keywords: string[];
+  kind: MacroKind;
+  level: MacroLevel;
+  /** 适用宿主；没实测过的不要写 'wps' */
+  host: MacroHost[];
+  /** WPS 差异说明（必须实测；WPS 个人版默认无 VBA） */
+  hostNotes?: string;
+  /** 语法骨架，如 'Range.Find(What, [After], [LookIn], [LookAt])' */
+  syntax: string;
+  params?: MacroParam[];
+  /** 示例：普通条目 ≥2 条，配方 ≥1 条完整脚本 */
+  examples: MacroExample[];
+  /** 常见错误，复用函数页的 PitfallItem */
+  pitfalls: PitfallItem[];
+  /** 关联：id 可以是宏条目，也可以是函数 id（渲染时按存在性跳转） */
+  related: RelatedItem[];
+  /** 一句话用途（列表与搜索展示用，≤20 字） */
+  oneLiner: string;
+  /** 补充说明：什么时候该用它 */
+  summary: string;
+}
+
+/** 宏的搜索索引条目：实现 SearchableEntry，附加类型与宿主用于徽标/筛选 */
+export interface MacroSearchEntry extends SearchableEntry {
+  kind: MacroKind;
+  level: MacroLevel;
+  host: MacroHost[];
+  oneLiner: string;
 }

@@ -63,7 +63,33 @@ export default function FunctionDetailPage(): ReactElement {
     );
   }
 
-  if (error !== null || entry === null || display === null) {
+  // 加载失败（如文件夹版内容包缺失）与「压根没有这个函数」要分开说，别都报成「没找到」
+  if (error !== null) {
+    return (
+      <div className="mx-auto max-w-content">
+        <div className="py-12">
+          <p className="text-h4 text-ink">{error}</p>
+          <p className="mt-2 text-sm text-ink-2">
+            如果你用的是文件夹版，请确认解压的是完整文件夹：index.html 与 packs 目录在同一层。
+          </p>
+          <div className="mt-4 flex items-center gap-4">
+            <button
+              type="button"
+              onClick={reload}
+              className="rounded-btn border border-line px-3 py-1.5 text-sm text-ink hover:bg-bg-sub"
+            >
+              重新加载
+            </button>
+            <Link to="/" className="text-sm text-accent hover:text-accent-hover">
+              回到首页
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (entry === null || display === null) {
     return (
       <div className="mx-auto max-w-content">
         <EmptyState

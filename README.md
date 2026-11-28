@@ -2,7 +2,7 @@
 
 [![函数总数](https://img.shields.io/badge/函数-414-4285F4)](https://github.com/BBB25233/XLFuncs/releases)
 [![分类](https://img.shields.io/badge/分类-12-34A853)](https://github.com/BBB25233/XLFuncs/releases)
-[![版本](https://img.shields.io/badge/版本-v1.6-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
+[![版本](https://img.shields.io/badge/版本-v1.7-FBBC04)](https://github.com/BBB25233/XLFuncs/releases)
 [![网页端](https://img.shields.io/badge/网页端-单文件离线-9AA0A6)](https://github.com/BBB25233/XLFuncs/releases)
 [![安卓端](https://img.shields.io/badge/安卓端-Capacitor%206-3DDC84)](https://github.com/BBB25233/XLFuncs/releases)
 [![构建](https://img.shields.io/badge/构建-CI%20自动发布-9AA0A6)](https://github.com/BBB25233/XLFuncs/actions)
@@ -30,6 +30,17 @@
 - **单文件离线（网页端）**：交付物是一个独立的 `index-v1.html`，**双击即可打开**，无需联网、无需安装。
 - **原生 App 体验（安卓端）**：返回键逐级回退、侧滑抽屉导航、字号可调、应用图标。
 - **零外部依赖**：页面不引用任何外部网络资源。
+
+---
+
+## 🆕 v1.7 更新
+
+- **新增「宏与 VBA」专区，271 条内容**：概念 36 / 语句 45 / 对象成员 90 / 配方 40 / 错误码 30 / JSA 30，每条都有可跑示例、坑与关联。
+- **速查表 291 行**：271 条 + 20 个 VBA 内建函数，一屏可查。
+- **壳 + 内容包构建**：不再是一整块，拆成 `app` + `catalog` + 13 个按分类懒加载的包（12 函数分类 + 1 宏包）；**解压文件夹双击 `index.html` 依旧可用**，搜索索引在壳内，不加载包也能搜全站。
+- **两种产物并存**：单文件 `index-v1.html`（分享/离线）与 `XLFuncs-folder-v1.7.zip`（解压即用、可按分类增量加载）。
+- **JSA（WPS 的 JS 宏）30 条**：与 VBA 分区独立，不与 VBA 混讲；标注「本机未装 WPS，按宏编辑器口径编写」，**尚未逐条真机验证**。
+- 搜索把宏与函数合并，按类型打徽标；测试从 380 增至 **425**。
 
 ---
 
@@ -240,7 +251,7 @@ data/     数据层：414 条目录、12 个分类包、样板内容、三张样
 ## 👤 作者与版本
 
 - **作者 ID**：`BBB25`
-- **版本**：第一版 `v1.6` · 414 函数 / 12 分类 · 含公式解释器
+- **版本**：第一版 `v1.7` · 414 函数 + 271 条宏 / 12 分类 · 含公式解释器
 - **形态**：网页单文件（`index-v1.html`）+ 安卓 App（Capacitor 6）
 - **范围**：完整框架 + 全部函数的完整内容，均为「内容完整、可在线试算」的函数，无需等待后续补齐。
 

@@ -46,6 +46,9 @@ export default function Header(): ReactElement {
           <span className="hidden text-xs text-ink-3 sm:inline">414 个函数</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
+          <Link to="/macro" className="text-ink-2 hover:text-accent">
+            宏与 VBA
+          </Link>
           <Link to="/interpreter" className="text-ink-2 hover:text-accent">
             公式解释
           </Link>

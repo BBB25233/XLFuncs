@@ -1,0 +1,713 @@
+[
+  {
+    "id": "screenupdating",
+    "enName": "Application.ScreenUpdating",
+    "zhName": "屏幕刷新开关",
+    "alias": [
+      "ScreenUpdating",
+      "关闭刷新",
+      "屏幕刷新"
+    ],
+    "keywords": [
+      "宏运行太慢",
+      "批量写入卡顿",
+      "关闭屏幕刷新"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.ScreenUpdating = False   ' 关闭刷新\nApplication.ScreenUpdating = True    ' 必须恢复",
+    "examples": [
+      {
+        "title": "批量上色时关刷新，速度差一截",
+        "code": "Sub 快速上色()\n    Dim i As Long\n    Application.ScreenUpdating = False\n    For i = 2 To 500\n        If Cells(i, 2).Value < 0 Then Cells(i, 2).Interior.Color = vbRed\n    Next i\n    Application.ScreenUpdating = True\nEnd Sub",
+        "howToRun": "B2:B500 有正负数，按 F5，对比开/关刷新的耗时。",
+        "result": "整列标红，过程中界面不闪；结束后恢复正常显示。"
+      },
+      {
+        "title": "用状态栏代替界面反馈",
+        "code": "Sub 带进度()\n    Dim i As Long\n    Application.ScreenUpdating = False\n    For i = 2 To 500\n        Application.StatusBar = \"处理 \" & i & \" / 500\"\n        Cells(i, 3).Value = Cells(i, 2).Value * 2\n    Next i\n    Application.StatusBar = False\n    Application.ScreenUpdating = True\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "状态栏滚动显示进度，结束后恢复默认。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "忘了恢复 True，Excel 看起来像卡死",
+        "reason": "关闭期间界面不重绘，结束后也没刷新。",
+        "fix": "过程末尾一定写 Application.ScreenUpdating = True，错误分支也要恢复。",
+        "level": "high"
+      },
+      {
+        "title": "关掉刷新还想看 MsgBox 里的实时结果",
+        "reason": "ScreenUpdating 只控制屏幕重绘，不阻止代码执行。",
+        "fix": "要看中间结果就临时打开刷新，或用 Debug.Print。",
+        "level": "mid"
+      },
+      {
+        "title": "以为关刷新能解决所有慢",
+        "reason": "真正的瓶颈常在逐格读写、公式重算、事件触发。",
+        "fix": "配合 Calculation、EnableEvents 一起关，并改成批量读写。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "性能三件套的第一件。"
+      },
+      {
+        "id": "calculation",
+        "kind": "companion",
+        "why": "重算开关常一起关。"
+      },
+      {
+        "id": "statusbar",
+        "kind": "companion",
+        "why": "关刷新后用状态栏显示进度。"
+      }
+    ],
+    "oneLiner": "批量操作时关掉重绘",
+    "summary": "ScreenUpdating 关掉后界面不重绘，批量写入能明显变快。铁律是无论正常还是出错都要恢复 True。"
+  },
+  {
+    "id": "displayalerts",
+    "enName": "Application.DisplayAlerts",
+    "zhName": "警告提示开关",
+    "alias": [
+      "DisplayAlerts",
+      "关闭警告",
+      "不弹确认框"
+    ],
+    "keywords": [
+      "删除工作表不弹确认",
+      "覆盖文件不提示",
+      "关闭警告框"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.DisplayAlerts = False   ' 不再弹确认/警告\nApplication.DisplayAlerts = True    ' 恢复",
+    "examples": [
+      {
+        "title": "删旧表不弹「确认删除」",
+        "code": "Sub 删旧表()\n    Application.DisplayAlerts = False\n    On Error Resume Next\n    Worksheets(\"临时\").Delete\n    On Error GoTo 0\n    Application.DisplayAlerts = True\nEnd Sub",
+        "howToRun": "工作簿里有「临时」表，按 F5。",
+        "result": "表被直接删除，不出现确认框；没有该表也不报错。"
+      },
+      {
+        "title": "另存覆盖同名文件不打断",
+        "code": "Sub 覆盖保存()\n    Application.DisplayAlerts = False\n    ActiveWorkbook.SaveAs ThisWorkbook.Path & \"\\备份.xlsx\", xlOpenXMLWorkbook\n    Application.DisplayAlerts = True\nEnd Sub",
+        "howToRun": "同目录已有「备份.xlsx」，按 F5。",
+        "result": "直接覆盖，不弹「是否替换」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "关掉警告后误删了不该删的表",
+        "reason": "DisplayAlerts=False 会跳过所有确认，包括删除、覆盖。",
+        "fix": "只在明确要删/要覆盖的窄范围内关，操作完立刻恢复。",
+        "level": "high"
+      },
+      {
+        "title": "忘了恢复 True，后面所有提示都消失",
+        "reason": "它是应用级开关，影响后续所有操作。",
+        "fix": "用 On Error 保证恢复，或把关闭范围压到最小。",
+        "level": "high"
+      },
+      {
+        "title": "以为关警告能吞掉运行时错误",
+        "reason": "它只关界面提示，VBA 运行时错误照常抛。",
+        "fix": "错误处理用 On Error，别指望 DisplayAlerts。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "enableevents",
+        "kind": "companion",
+        "why": "两个应用级开关常一起管。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "删表/改表时最容易用到。"
+      }
+    ],
+    "oneLiner": "跳过确认框和覆盖提示",
+    "summary": "DisplayAlerts 关掉后删除、覆盖都不再确认。它不吞运行时错误，而且必须尽快恢复，否则后续操作全无提示。"
+  },
+  {
+    "id": "calculation",
+    "enName": "Application.Calculation",
+    "zhName": "重算模式",
+    "alias": [
+      "Calculation",
+      "手动重算",
+      "关闭自动计算"
+    ],
+    "keywords": [
+      "公式太多算得慢",
+      "批量写入关重算",
+      "手动计算"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.Calculation = xlCalculationManual\nApplication.Calculate\nApplication.Calculation = xlCalculationAutomatic",
+    "examples": [
+      {
+        "title": "批量写数时先关重算，最后统一算",
+        "code": "Sub 批量写入()\n    Dim i As Long\n    Application.Calculation = xlCalculationManual\n    For i = 2 To 500\n        Cells(i, 3).Value = Cells(i, 2).Value * 1.06\n    Next i\n    Application.Calculate\n    Application.Calculation = xlCalculationAutomatic\nEnd Sub",
+        "howToRun": "B 列有数字，C 列是公式区，按 F5。",
+        "result": "500 行一次算完，不会每写一格就重算整表。"
+      },
+      {
+        "title": "先确认当前模式再改",
+        "code": "Sub 看模式()\n    Select Case Application.Calculation\n        Case xlCalculationManual: MsgBox \"手动\"\n        Case xlCalculationAutomatic: MsgBox \"自动\"\n        Case Else: MsgBox \"半自动\"\n    End Select\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出当前重算模式。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "忘了恢复自动，改完数据公式不更新",
+        "reason": "Manual 模式下 Excel 不会自动重算。",
+        "fix": "收尾恢复 xlCalculationAutomatic，或至少 Application.Calculate 一次。",
+        "level": "high"
+      },
+      {
+        "title": "Manual 期间读依赖公式的单元格，拿到旧值",
+        "reason": "公式还没重算，Value 仍是上一次结果。",
+        "fix": "读取前先 Application.Calculate，或改读原始数据。",
+        "level": "high"
+      },
+      {
+        "title": "在工作簿打开事件里改成 Manual，用户以为公式坏了",
+        "reason": "应用级设置会影响用户后续所有操作。",
+        "fix": "只在批处理过程内临时改，结束立即还原。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "重算是性能三件套之一。"
+      },
+      {
+        "id": "screenupdating",
+        "kind": "companion",
+        "why": "两个开关常成对使用。"
+      },
+      {
+        "id": "formula",
+        "kind": "companion",
+        "why": "重算影响公式结果。"
+      }
+    ],
+    "oneLiner": "控制公式什么时候重算",
+    "summary": "Calculation 切手动能大幅提速批量写入，但读完必须恢复自动并补一次 Calculate，否则用户看到的是旧结果。"
+  },
+  {
+    "id": "enableevents",
+    "enName": "Application.EnableEvents",
+    "zhName": "事件开关",
+    "alias": [
+      "EnableEvents",
+      "关闭事件",
+      "避免事件递归"
+    ],
+    "keywords": [
+      "Worksheet_Change 死循环",
+      "宏改单元格触发事件",
+      "关闭事件"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.EnableEvents = False\n' 改单元格不会触发 Worksheet_Change\nApplication.EnableEvents = True",
+    "examples": [
+      {
+        "title": "避免 Change 事件自己触发自己",
+        "code": "Private Sub Worksheet_Change(ByVal Target As Range)\n    If Target.Column <> 1 Then Exit Sub\n    Application.EnableEvents = False\n    Target.Offset(0, 1).Value = Now\n    Application.EnableEvents = True\nEnd Sub",
+        "howToRun": "把代码放进工作表模块，在 A 列输入内容。",
+        "result": "B 列自动写时间，且不会因为写 B 列再次触发事件。"
+      },
+      {
+        "title": "批量改数据前临时关事件",
+        "code": "Sub 批量改()\n    Application.EnableEvents = False\n    Range(\"A2:A100\").Value = \"已处理\"\n    Application.EnableEvents = True\nEnd Sub",
+        "howToRun": "工作表里有 Change 事件时按 F5。",
+        "result": "100 个单元格一次改完，事件不会逐个触发。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "忘了恢复 True，之后所有事件都失效",
+        "reason": "EnableEvents 是应用级开关。",
+        "fix": "用 On Error 保证恢复，或把关闭范围压到最小。",
+        "level": "high"
+      },
+      {
+        "title": "以为关了事件就能阻止手动操作触发宏",
+        "reason": "它只影响当前会话的事件派发。",
+        "fix": "真要禁用宏是安全设置层面的事，不是 EnableEvents。",
+        "level": "mid"
+      },
+      {
+        "title": "事件过程里出错，恢复语句被跳过",
+        "reason": "未处理的错误会直接跳出过程。",
+        "fix": "在事件过程里加 On Error，错误分支也恢复 EnableEvents。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "events",
+        "kind": "companion",
+        "why": "事件机制的概念条目。"
+      },
+      {
+        "id": "displayalerts",
+        "kind": "companion",
+        "why": "同为应用级开关，常一起管。"
+      },
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "性能三件套的第三件。"
+      }
+    ],
+    "oneLiner": "临时让事件不触发",
+    "summary": "EnableEvents 关掉后，改单元格不会触发 Worksheet_Change，能避免递归。关键是异常路径也要恢复，否则事件全哑。"
+  },
+  {
+    "id": "statusbar",
+    "enName": "Application.StatusBar",
+    "zhName": "状态栏文字",
+    "alias": [
+      "StatusBar",
+      "状态栏",
+      "进度提示"
+    ],
+    "keywords": [
+      "显示处理进度",
+      "状态栏提示",
+      "恢复状态栏"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.StatusBar = \"处理中...\"   ' 显示文字\nApplication.StatusBar = False        ' 恢复默认",
+    "examples": [
+      {
+        "title": "循环时显示进度",
+        "code": "Sub 进度()\n    Dim i As Long\n    For i = 2 To 300\n        Application.StatusBar = \"第 \" & i & \" 行 / 300\"\n        Cells(i, 2).Value = Cells(i, 1).Value * 2\n    Next i\n    Application.StatusBar = False\nEnd Sub",
+        "howToRun": "A 列有数字，按 F5。",
+        "result": "状态栏实时显示行号，结束后恢复「就绪」。"
+      },
+      {
+        "title": "显示当前工作簿信息",
+        "code": "Sub 显示信息()\n    Application.StatusBar = ThisWorkbook.Name & \"｜\" & ActiveSheet.Name\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "状态栏显示工作簿名和工作表名。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "不设回 False，状态栏一直挂着提示",
+        "reason": "StatusBar 会一直保留最后设置的文字。",
+        "fix": "过程结束写 Application.StatusBar = False。",
+        "level": "high"
+      },
+      {
+        "title": "每行都刷新状态栏，反而拖慢",
+        "reason": "频繁更新界面也有成本。",
+        "fix": "每 50/100 行更新一次，别逐行刷。",
+        "level": "mid"
+      },
+      {
+        "title": "状态栏太长被截断，看不到关键信息",
+        "reason": "状态栏宽度有限。",
+        "fix": "只放短信息，详细日志写 Debug.Print 或日志表。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "screenupdating",
+        "kind": "companion",
+        "why": "关刷新后靠状态栏给反馈。"
+      },
+      {
+        "id": "msgbox",
+        "kind": "confusable",
+        "why": "MsgBox 会打断，状态栏不打断。"
+      }
+    ],
+    "oneLiner": "在底部显示一行进度",
+    "summary": "StatusBar 适合不打断的进度提示，结束必须设 False 复位。逐行刷新会拖慢，隔几十行更新一次就够。"
+  },
+  {
+    "id": "worksheetfunction",
+    "enName": "Application.WorksheetFunction",
+    "zhName": "调用工作表函数",
+    "alias": [
+      "WorksheetFunction",
+      "工作表函数",
+      "VBA 调公式"
+    ],
+    "keywords": [
+      "VBA 里用 VLOOKUP",
+      "调用 SUMIFS",
+      "工作表函数报错"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.WorksheetFunction.VLookup(值, 区域, 列号, False)",
+    "examples": [
+      {
+        "title": "用 VLOOKUP 查价格",
+        "code": "Sub 查价()\n    Dim p As Variant\n    On Error GoTo 没找到\n    p = Application.WorksheetFunction.VLookup(Range(\"A2\").Value, Range(\"D2:F100\"), 3, False)\n    MsgBox p\n    Exit Sub\n没找到:\n    MsgBox \"没有这个编号\"\nEnd Sub",
+        "howToRun": "A2 放编号，D:F 是编号-名称-价格表，按 F5。",
+        "result": "找到就弹价格，找不到弹提示，不会中断。"
+      },
+      {
+        "title": "用 SumIfs 做条件汇总",
+        "code": "Sub 汇总()\n    Dim total As Double\n    total = Application.WorksheetFunction.SumIfs(Range(\"C2:C100\"), Range(\"A2:A100\"), \"华东\")\n    MsgBox total\nEnd Sub",
+        "howToRun": "A 列是区域、C 列是金额，按 F5。",
+        "result": "弹出华东区域的金额合计。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "函数名写成中文「查找」，直接报错",
+        "reason": "WorksheetFunction 只认英文函数名。",
+        "fix": "统一写 VLookup、SumIfs、CountIf 等英文名。",
+        "level": "high"
+      },
+      {
+        "title": "VLookup 找不到时抛 1004，宏直接停",
+        "reason": "WorksheetFunction 版本遇到错误会抛运行时错误，不返回 #N/A。",
+        "fix": "用 On Error 捕获，或改用 Application.VLookup 拿错误值再判断。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "参数顺序按 Excel 公式习惯写反",
+        "reason": "VBA 方法参数与公式参数顺序大体一致，但可选参数省略规则不同。",
+        "fix": "对照对象浏览器或先写完整参数，别凭记忆。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "evaluate",
+        "kind": "alternative",
+        "why": "Evaluate 算公式字符串，WorksheetFunction 直接调函数。"
+      },
+      {
+        "id": "vlookup",
+        "kind": "companion",
+        "why": "VLookup 是最常用的一个。"
+      }
+    ],
+    "oneLiner": "在 VBA 里直接调 Excel 函数",
+    "summary": "WorksheetFunction 省去自己实现算法，但只认英文名、出错会抛 1004。找不到结果的场景要 On Error，或改用 Application 版本拿错误值。"
+  },
+  {
+    "id": "application-wait",
+    "enName": "Application.Wait",
+    "zhName": "等待",
+    "alias": [
+      "Wait",
+      "暂停几秒",
+      "延时"
+    ],
+    "keywords": [
+      "宏里等几秒",
+      "延时执行",
+      "Wait 用法"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.Wait Now + TimeValue(\"00:00:02\")   ' 等 2 秒",
+    "examples": [
+      {
+        "title": "等 2 秒再继续",
+        "code": "Sub 等两秒()\n    Application.StatusBar = \"等待中...\"\n    Application.Wait Now + TimeValue(\"00:00:02\")\n    Application.StatusBar = False\n    MsgBox \"继续\"\nEnd Sub",
+        "howToRun": "按 F5，观察两秒后弹窗。",
+        "result": "暂停约 2 秒后弹出「继续」。"
+      },
+      {
+        "title": "轮询等待文件出现",
+        "code": "Sub 等文件()\n    Dim t As Double\n    t = Timer\n    Do While Dir(\"C:\\报表\\导出.xlsx\") = \"\"\n        If Timer - t > 30 Then Exit Do\n        Application.Wait Now + TimeValue(\"00:00:01\")\n    Loop\n    MsgBox \"等待结束\"\nEnd Sub",
+        "howToRun": "把路径改成实际目录，按 F5。",
+        "result": "最多等 30 秒，文件出现或超时后结束。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Wait 期间界面完全无响应，以为死机",
+        "reason": "Wait 会阻塞 Excel 的消息处理。",
+        "fix": "等待超过几秒时用状态栏提示，或改用 DoEvents 轮询。",
+        "level": "high"
+      },
+      {
+        "title": "用 Wait 0.5 想要半秒，实际不支持",
+        "reason": "参数是日期时间，不是秒数。",
+        "fix": "写 Now + TimeValue(\"00:00:01\")，精度约 1 秒。",
+        "level": "mid"
+      },
+      {
+        "title": "在循环里无限 Wait，没有超时",
+        "reason": "外部条件一直不满足就永远等。",
+        "fix": "加最大等待时间或次数，超时就退出。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "statusbar",
+        "kind": "companion",
+        "why": "等待时用状态栏给反馈。"
+      },
+      {
+        "id": "performance-trio",
+        "kind": "companion",
+        "why": "等待和刷新/事件开关常配合。"
+      }
+    ],
+    "oneLiner": "让宏暂停一段时间",
+    "summary": "Wait 接收一个时间点，不是秒数；等待期间界面不响应。超过几秒要配状态栏，循环等待必须加超时。"
+  },
+  {
+    "id": "cutcopymode",
+    "enName": "Application.CutCopyMode",
+    "zhName": "复制状态",
+    "alias": [
+      "CutCopyMode",
+      "取消复制",
+      "虚线框"
+    ],
+    "keywords": [
+      "复制后虚线框不消失",
+      "取消剪贴板状态",
+      "Copy 后清理"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.CutCopyMode = False   ' 退出复制/剪切状态",
+    "examples": [
+      {
+        "title": "复制粘贴后清掉虚线框",
+        "code": "Sub 粘完清理()\n    Range(\"A1:A10\").Copy\n    Range(\"C1\").PasteSpecial xlPasteValues\n    Application.CutCopyMode = False\nEnd Sub",
+        "howToRun": "A1:A10 有值，按 F5。",
+        "result": "C1:C10 得到值，源区域不再有闪动的虚线框。"
+      },
+      {
+        "title": "操作前先确认不在复制状态",
+        "code": "Sub 检查状态()\n    If Application.CutCopyMode <> False Then\n        Application.CutCopyMode = False\n        MsgBox \"已取消复制\"\n    Else\n        MsgBox \"当前没有复制\"\n    End If\nEnd Sub",
+        "howToRun": "先复制一块区域，再按 F5。",
+        "result": "提示已取消复制，虚线框消失。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "粘完不清理，虚线框一直闪",
+        "reason": "复制状态没退出。",
+        "fix": "PasteSpecial 后固定加 Application.CutCopyMode = False。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 CutCopyMode=False 会清空 Windows 剪贴板",
+        "reason": "它只退出 Excel 的复制状态，系统剪贴板内容可能还在。",
+        "fix": "要彻底清空剪贴板得用 DataObject 或系统 API。",
+        "level": "mid"
+      },
+      {
+        "title": "在复制状态下删除行/改结构，报错或结果异常",
+        "reason": "Excel 不允许在复制模式里做某些结构操作。",
+        "fix": "操作前先 Application.CutCopyMode = False。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "paste-special",
+        "kind": "companion",
+        "why": "选择性粘贴后必须清状态。"
+      },
+      {
+        "id": "selection-clipboard",
+        "kind": "companion",
+        "why": "复制状态与选区、剪贴板的关系。"
+      }
+    ],
+    "oneLiner": "退出复制，收掉虚线框",
+    "summary": "CutCopyMode 管的是 Excel 的复制状态和虚线框，不是系统剪贴板。Copy/Paste 之后固定清一次，能避免一堆怪问题。"
+  },
+  {
+    "id": "activeworkbook",
+    "enName": "Application.ActiveWorkbook",
+    "zhName": "活动工作簿",
+    "alias": [
+      "ActiveWorkbook",
+      "当前工作簿",
+      "活动簿"
+    ],
+    "keywords": [
+      "当前打开的是哪个簿",
+      "活动工作簿和 ThisWorkbook",
+      "引用当前簿"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ActiveWorkbook       ' 当前激活的工作簿\nThisWorkbook         ' 宏代码所在的工作簿",
+    "examples": [
+      {
+        "title": "确认活动簿和代码所在簿不是同一个",
+        "code": "Sub 对比()\n    MsgBox \"活动簿：\" & ActiveWorkbook.Name & Chr(10) & _\n           \"代码所在：\" & ThisWorkbook.Name\nEnd Sub",
+        "howToRun": "再打开一个工作簿并切到它，然后运行宏。",
+        "result": "两个名字不同，说明活动簿会随窗口切换变化。"
+      },
+      {
+        "title": "始终对代码所在簿操作",
+        "code": "Sub 安全写法()\n    ThisWorkbook.Worksheets(1).Range(\"A1\").Value = \"固定写入\"\nEnd Sub",
+        "howToRun": "随便切到别的工作簿，按 F5。",
+        "result": "数据始终写进宏所在工作簿的第 1 张表。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为 ActiveWorkbook 就是宏所在簿，写错文件",
+        "reason": "活动簿是当前窗口显示的那一个，用户切一下就变。",
+        "fix": "要固定在宏所在簿就用 ThisWorkbook。",
+        "level": "high"
+      },
+      {
+        "title": "在加载项/个人宏工作簿里用 ActiveWorkbook",
+        "reason": "加载项可能不是活动簿，ActiveWorkbook 指向用户文件。",
+        "fix": "明确写 ThisWorkbook 或传入 Workbook 参数。",
+        "level": "high"
+      },
+      {
+        "title": "关掉活动簿后继续用 ActiveWorkbook",
+        "reason": "对象已失效，后续访问报错。",
+        "fix": "先 Set 变量持有引用，关闭前完成操作。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "工作簿对象的概念条目。"
+      },
+      {
+        "id": "activesheet",
+        "kind": "companion",
+        "why": "活动表与活动簿常一起出现。"
+      }
+    ],
+    "oneLiner": "当前窗口里的那个工作簿",
+    "summary": "ActiveWorkbook 跟着窗口走，用户一切换就变；ThisWorkbook 永远指宏所在簿。写固定逻辑优先 ThisWorkbook。"
+  },
+  {
+    "id": "activesheet",
+    "enName": "Application.ActiveSheet",
+    "zhName": "活动工作表",
+    "alias": [
+      "ActiveSheet",
+      "当前工作表",
+      "活动表"
+    ],
+    "keywords": [
+      "当前显示的是哪张表",
+      "活动表和指定表",
+      "引用当前表"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ActiveSheet          ' 当前显示的表（可能是图表表）\nActiveSheet.Name     ' 表名",
+    "examples": [
+      {
+        "title": "往当前表写标题",
+        "code": "Sub 写标题()\n    ActiveSheet.Range(\"A1\").Value = \"2026 年 11 月\"\nEnd Sub",
+        "howToRun": "切到任意工作表，按 F5。",
+        "result": "当前表 A1 写入标题。"
+      },
+      {
+        "title": "先确认活动表再操作",
+        "code": "Sub 确认表()\n    MsgBox \"当前表：\" & ActiveSheet.Name & Chr(10) & _\n           \"类型：\" & TypeName(ActiveSheet)\nEnd Sub",
+        "howToRun": "分别切到普通表和图表表再运行。",
+        "result": "普通表显示 Worksheet，图表表显示 Chart。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "活动表是图表表，Range 直接报错",
+        "reason": "Chart 对象没有 Range 属性。",
+        "fix": "先 TypeName(ActiveSheet) = \"Worksheet\" 判断，或明确指定 Worksheets(\"表名\")。",
+        "level": "high"
+      },
+      {
+        "title": "隐藏工作表不能被激活",
+        "reason": "Visible=xlSheetHidden 的表无法 Activate。",
+        "fix": "先设 Visible=xlSheetVisible，再激活。",
+        "level": "mid"
+      },
+      {
+        "title": "依赖用户当前停在哪张表，结果不可复现",
+        "reason": "ActiveSheet 随点击变化。",
+        "fix": "生产代码明确写表名，别把活动表当默认目标。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 对象的概念条目。"
+      },
+      {
+        "id": "activeworkbook",
+        "kind": "companion",
+        "why": "活动簿与活动表常一起用。"
+      },
+      {
+        "id": "worksheet-visible",
+        "kind": "companion",
+        "why": "隐藏表不能激活。"
+      }
+    ],
+    "oneLiner": "当前显示的那张表",
+    "summary": "ActiveSheet 是用户当前看到的表，可能是图表表而不是工作表。生产代码别依赖它，明确写表名更稳。"
+  }
+]

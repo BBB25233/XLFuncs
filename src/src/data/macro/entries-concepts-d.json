@@ -1,0 +1,442 @@
+[
+  {
+    "id": "event-order",
+    "enName": "Event Order",
+    "zhName": "事件触发顺序",
+    "alias": [
+      "事件顺序",
+      "Workbook_Open",
+      "SheetChange"
+    ],
+    "keywords": [
+      "事件谁先触发",
+      "打开工作簿事件",
+      "Change 和 SelectionChange"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Workbook_Open → Workbook_Activate → Worksheet_Activate\nWorksheet_Change 在值改完后触发，SelectionChange 在选区内触发",
+    "examples": [
+      {
+        "title": "记录打开与激活顺序",
+        "code": "Private Sub Workbook_Open()\n    Debug.Print \"1 Open\"\nEnd Sub\n\nPrivate Sub Workbook_Activate()\n    Debug.Print \"2 Activate\"\nEnd Sub",
+        "howToRun": "代码放进 ThisWorkbook，关闭再打开文件，看立即窗口。",
+        "result": "先打印 1 Open，再打印 2 Activate（视打开方式可能多次 Activate）。"
+      },
+      {
+        "title": "看清 Change 与 SelectionChange 的先后",
+        "code": "Private Sub Worksheet_SelectionChange(ByVal Target As Range)\n    Debug.Print \"选区变了\"\nEnd Sub\n\nPrivate Sub Worksheet_Change(ByVal Target As Range)\n    Debug.Print \"值变了\"\nEnd Sub",
+        "howToRun": "代码放进工作表模块，先点单元格，再输入内容。",
+        "result": "点击时打印「选区变了」，输入后打印「值变了」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在 Change 里改单元格，又触发 Change 形成递归",
+        "reason": "Change 会在宏写入后再次触发。",
+        "fix": "改单元格前后配 Application.EnableEvents = False/True。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Open 事件里能安全操作所有表",
+        "reason": "此时工作簿刚加载，某些对象/连接还没就绪。",
+        "fix": "复杂初始化放到 Activate 或延时处理。",
+        "level": "mid"
+      },
+      {
+        "title": "事件写在标准模块里，从来不被触发",
+        "reason": "Workbook/Worksheet 事件必须放在对应对象模块。",
+        "fix": "ThisWorkbook 放工作簿事件，表模块放工作表事件。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "events",
+        "kind": "companion",
+        "why": "事件机制总览。"
+      },
+      {
+        "id": "enableevents",
+        "kind": "companion",
+        "why": "防递归开关。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "工作表事件挂载点。"
+      }
+    ],
+    "oneLiner": "谁先触发、谁后触发",
+    "summary": "Open → Activate → Sheet Activate，选区变化先于值变化。事件必须放对模块，改值前记得关事件防递归。"
+  },
+  {
+    "id": "userform-basics",
+    "enName": "UserForm Basics",
+    "zhName": "用户窗体基础",
+    "alias": [
+      "UserForm",
+      "窗体",
+      "VBA 对话框"
+    ],
+    "keywords": [
+      "做个输入窗口",
+      "UserForm 显示",
+      "窗体控件"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "UserForm1.Show   ' 模态\nUserForm1.Show vbModeless   ' 非模态",
+    "examples": [
+      {
+        "title": "显示窗体并读文本框",
+        "code": "Sub 打开窗体()\n    UserForm1.Show\nEnd Sub\n\nPrivate Sub CommandButton1_Click()\n    Range(\"A1\").Value = TextBox1.Text\n    Unload Me\nEnd Sub",
+        "howToRun": "插入 UserForm，放一个文本框和一个按钮，按钮代码放窗体模块。",
+        "result": "点按钮后 A1 写入文本框内容，窗体关闭。"
+      },
+      {
+        "title": "用非模态窗体，边看边操作",
+        "code": "Sub 非模态()\n    UserForm1.Show vbModeless\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "窗体显示着，仍可选中和编辑工作表。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "窗体里直接写 Range(\"A1\")，写到了活动表",
+        "reason": "Range 默认属于 ActiveSheet。",
+        "fix": "明确 Worksheets(\"表名\").Range(\"A1\")。",
+        "level": "high"
+      },
+      {
+        "title": "Show 之后代码停住，以为宏卡死",
+        "reason": "默认 Show 是模态，必须关窗体才返回。",
+        "fix": "需要并行操作就用 vbModeless。",
+        "level": "mid"
+      },
+      {
+        "title": "Unload Me 后又访问控件，报错",
+        "reason": "窗体已卸载，控件对象失效。",
+        "fix": "先取完值再 Unload，或 Hide 代替 Unload。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "窗体代码也是模块。"
+      },
+      {
+        "id": "inputbox",
+        "kind": "alternative",
+        "why": "简单输入不必做窗体。"
+      }
+    ],
+    "oneLiner": "自己做一个输入对话框",
+    "summary": "UserForm 适合多字段输入。默认 Show 是模态会阻塞，控件取值要写全表名，Unload 后别再碰控件。"
+  },
+  {
+    "id": "add-in",
+    "enName": "Excel Add-in",
+    "zhName": "加载项",
+    "alias": [
+      "AddIn",
+      "xlam",
+      "Excel 加载项"
+    ],
+    "keywords": [
+      "做成加载项",
+      "xlam 怎么用",
+      "宏随 Excel 启动"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ThisWorkbook.IsAddin = True\n另存为 .xlam → 文件 → 选项 → 加载项 → 浏览",
+    "examples": [
+      {
+        "title": "把当前工作簿标记为加载项",
+        "code": "Sub 设为加载项()\n    ThisWorkbook.IsAddin = True\n    ThisWorkbook.SaveAs ThisWorkbook.Path & \"\\我的工具.xlam\", xlAddIn\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "生成 .xlam，Excel 的加载项列表里可勾选。"
+      },
+      {
+        "title": "加载项打开时加一个菜单按钮",
+        "code": "Private Sub Workbook_Open()\n    If ThisWorkbook.IsAddin Then\n        MsgBox \"加载项已启动\"\n    End If\nEnd Sub",
+        "howToRun": "代码放 ThisWorkbook，重开 Excel 观察。",
+        "result": "加载项启用时会提示一次。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把普通工作簿改成加载项，窗口消失以为文件丢了",
+        "reason": "IsAddin=True 后工作簿不再作为普通窗口显示。",
+        "fix": "用 Workbooks(\"我的工具.xlam\") 访问，或先设 False 再打开界面。",
+        "level": "high"
+      },
+      {
+        "title": "加载项里用 ThisWorkbook 以外的活动簿，指错文件",
+        "reason": "加载项运行时 ActiveWorkbook 是用户当前文件。",
+        "fix": "加载项自己的数据用 ThisWorkbook。",
+        "level": "high"
+      },
+      {
+        "title": "加载项路径变了/文件被移走，启动报错",
+        "reason": "Excel 记住的是绝对路径。",
+        "fix": "固定安装目录，或在加载项管理里重新浏览。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "activeworkbook",
+        "kind": "companion",
+        "why": "加载项里活动簿不是自己。"
+      },
+      {
+        "id": "workbook-open",
+        "kind": "companion",
+        "why": "加载项也是工作簿。"
+      },
+      {
+        "id": "vba-project-model",
+        "kind": "companion",
+        "why": "工程与模块结构。"
+      }
+    ],
+    "oneLiner": "让宏随 Excel 一起启动",
+    "summary": "加载项是隐藏窗口的 xlam，适合常驻工具。IsAddin=True 后不再有普通界面，代码里要分清 ThisWorkbook 和活动簿。"
+  },
+  {
+    "id": "automation",
+    "enName": "Automation",
+    "zhName": "跨应用自动化",
+    "alias": [
+      "Automation",
+      "CreateObject",
+      "Excel 控制 Word"
+    ],
+    "keywords": [
+      "VBA 操作 Word",
+      "跨软件自动化",
+      "CreateObject 用法"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set app = CreateObject(\"Word.Application\")\napp.Visible = True\napp.Documents.Add",
+    "examples": [
+      {
+        "title": "从 Excel 启动 Word 并写一段话",
+        "code": "Sub 写Word()\n    Dim wd As Object, doc As Object\n    Set wd = CreateObject(\"Word.Application\")\n    wd.Visible = True\n    Set doc = wd.Documents.Add\n    doc.Content.Text = \"来自 Excel 的报告\"\n    doc.SaveAs ThisWorkbook.Path & \"\\报告.docx\"\n    doc.Close False\n    wd.Quit\n End Sub",
+        "howToRun": "装 Word 的机器上按 F5。",
+        "result": "同目录生成「报告.docx」，Word 关闭。"
+      },
+      {
+        "title": "先判断应用是否已在运行",
+        "code": "Sub 复用Word()\n    Dim wd As Object\n    On Error Resume Next\n    Set wd = GetObject(, \"Word.Application\")\n    On Error GoTo 0\n    If wd Is Nothing Then Set wd = CreateObject(\"Word.Application\")\n    wd.Visible = True\nEnd Sub",
+        "howToRun": "先手动开 Word，再按 F5。",
+        "result": "复用已开的 Word，不会多开一个进程。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "CreateObject 的应用没 Quit，进程残留",
+        "reason": "对象变量释放不等于退出应用。",
+        "fix": "用完 doc.Close、app.Quit，再 Set Nothing。",
+        "level": "high"
+      },
+      {
+        "title": "目标机器没装对应软件，报「ActiveX 部件不能创建对象」",
+        "reason": "CreateObject 依赖本机注册表里的 ProgID。",
+        "fix": "先检测环境，或改用文件格式转换方案。",
+        "level": "high"
+      },
+      {
+        "title": "自动化过程中弹窗卡住脚本",
+        "reason": "目标应用的对话框需要人点。",
+        "fix": "设 DisplayAlerts=False 仍有风险，尽量用无交互 API。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "late-binding",
+        "kind": "companion",
+        "why": "CreateObject 属后期绑定。"
+      },
+      {
+        "id": "application-run",
+        "kind": "companion",
+        "why": "在 Excel 内跑其他宏。"
+      },
+      {
+        "id": "object-model-hierarchy",
+        "kind": "companion",
+        "why": "跨应用对象模型不同。"
+      }
+    ],
+    "oneLiner": "用 VBA 驱动另一个软件",
+    "summary": "CreateObject 启动外部应用，GetObject 复用已开实例。用完必须 Quit 并释放，否则进程残留；没装软件则直接创建失败。"
+  },
+  {
+    "id": "vba-project-model",
+    "enName": "VBA Project Model",
+    "zhName": "VBA 工程结构",
+    "alias": [
+      "VBAProject",
+      "工程资源管理器",
+      "模块结构"
+    ],
+    "keywords": [
+      "VBA 工程是什么",
+      "模块放哪",
+      "引用怎么加"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "VBAProject\n├─ Microsoft Excel Objects（ThisWorkbook / Sheet1…）\n├─ 标准模块（Module1…）\n├─ 类模块 / 窗体\n└─ 引用（工具 → 引用）",
+    "examples": [
+      {
+        "title": "列出当前工程里的模块",
+        "code": "Sub 列模块()\n    Dim c As Object\n    For Each c In ThisWorkbook.VBProject.VBComponents\n        Debug.Print c.Name, c.Type\n    Next c\n End Sub",
+        "howToRun": "需在「信任中心 → 宏设置」允许访问 VBA 工程对象模型，按 F5。",
+        "result": "打印 ThisWorkbook、各 Sheet、Module1 等组件名和类型号。"
+      },
+      {
+        "title": "判断代码在哪个模块里",
+        "code": "Sub 我在哪()\n    MsgBox Application.VBE.ActiveCodePane.CodeModule.Name\nEnd Sub",
+        "howToRun": "光标停在某个过程里按 F5。",
+        "result": "弹出当前代码所在模块名。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把工作表事件写进标准模块，永远不触发",
+        "reason": "事件必须绑定到对应的文档/表对象模块。",
+        "fix": "Workbook 事件放 ThisWorkbook，Sheet 事件放 Sheet 模块。",
+        "level": "high"
+      },
+      {
+        "title": "访问 VBProject 被安全设置挡住，报 1004",
+        "reason": "默认禁止访问 VBA 工程对象模型。",
+        "fix": "在信任中心显式勾选允许；不要试图绕安全策略。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "重命名模块后，代码里的旧过程名找不到",
+        "reason": "模块名不是过程名，但调用关系可能写死。",
+        "fix": "改名后全局搜索旧名并回归测试。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "module-and-procedure",
+        "kind": "companion",
+        "why": "模块与过程。"
+      },
+      {
+        "id": "class-module",
+        "kind": "companion",
+        "why": "类模块也是工程组件。"
+      },
+      {
+        "id": "macro-security",
+        "kind": "companion",
+        "why": "工程访问受安全设置约束。"
+      }
+    ],
+    "oneLiner": "代码在 Excel 文件里怎么组织",
+    "summary": "一个工作簿就是一个 VBA 工程，里面有文档模块、标准模块、类模块和窗体。事件放错模块是新手最常见的「代码不触发」。"
+  },
+  {
+    "id": "late-binding",
+    "enName": "Late Binding",
+    "zhName": "后期绑定",
+    "alias": [
+      "Late Binding",
+      "CreateObject",
+      "前期绑定"
+    ],
+    "keywords": [
+      "前期绑定和后期绑定",
+      "CreateObject 优缺点",
+      "引用库"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set o = CreateObject(\"Scripting.Dictionary\")   ' 后期绑定\n' 前期绑定：工具→引用 勾选库，Dim o As New Dictionary",
+    "examples": [
+      {
+        "title": "后期绑定：不引库也能用字典",
+        "code": "Sub 后期字典()\n    Dim d As Object\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    d(\"A\") = 1\n    MsgBox d(\"A\")\n End Sub",
+        "howToRun": "不勾任何引用，直接按 F5。",
+        "result": "正常弹 1，代码可移植到没勾引用的机器。"
+      },
+      {
+        "title": "前期绑定：有智能提示但依赖引用",
+        "code": "Sub 前期字典()\n    Dim d As New Dictionary\n    d.Add \"A\", 1\n    MsgBox d(\"A\")\n End Sub",
+        "howToRun": "先工具→引用勾选 Microsoft Scripting Runtime，再按 F5。",
+        "result": "正常弹 1，编辑时有成员提示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "前期绑定换台机器没勾引用，编译直接失败",
+        "reason": "类型库依赖本机注册。",
+        "fix": "要分发给别人就用后期绑定 + Object。",
+        "level": "high"
+      },
+      {
+        "title": "后期绑定写错方法名，运行到那行才报错",
+        "reason": "没有编译期成员检查。",
+        "fix": "开发时前期绑定调试，交付前改后期绑定并回归。",
+        "level": "mid"
+      },
+      {
+        "title": "后期绑定拿不到常量，只能手写数值",
+        "reason": "Object 不暴露枚举常量。",
+        "fix": "查清常量值写成 Const，或保留前期绑定。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "automation",
+        "kind": "companion",
+        "why": "跨应用常用后期绑定。"
+      },
+      {
+        "id": "dictionary",
+        "kind": "companion",
+        "why": "字典是典型例子。"
+      },
+      {
+        "id": "vba-project-model",
+        "kind": "companion",
+        "why": "引用属于工程配置。"
+      }
+    ],
+    "oneLiner": "运行时才认对象类型",
+    "summary": "前期绑定有提示、编译期检查，但依赖引用；后期绑定用 CreateObject + Object，移植性好但错误暴露晚。开发前期、交付后期是常见做法。"
+  }
+]

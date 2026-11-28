@@ -1,0 +1,1021 @@
+[
+  {
+    "id": "runtime-9",
+    "enName": "Run-time error 9: Subscript out of range",
+    "zhName": "运行时错误 9：下标越界",
+    "alias": [
+      "9",
+      "下标越界",
+      "索引越界",
+      "Subscript out of range"
+    ],
+    "keywords": [
+      "下标越界",
+      "运行时错误9",
+      "取第几个表报错",
+      "数组越界",
+      "工作表名不存在报错"
+    ],
+    "kind": "error",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 9\nErr.Description = \"下标越界\"",
+    "examples": [
+      {
+        "title": "最小复现：按不存在的表名取表",
+        "code": "Sub 复现下标越界()\n    On Error GoTo 处理\n    Dim ws As Worksheet\n    Set ws = Worksheets(\"不存在的表\")\n    MsgBox ws.Name\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "工作簿里没有名为「不存在的表」的工作表时按 F5（有就换成你表里确实没有的名字）。",
+        "result": "弹出「9 / 下标越界」，代码停在 Set ws 那一行。"
+      },
+      {
+        "title": "修法：先判断表在不在，再取",
+        "code": "Sub 先检查再取()\n    Dim ws As Worksheet\n    On Error Resume Next\n    Set ws = Worksheets(\"不存在的表\")\n    On Error GoTo 0\n    If ws Is Nothing Then\n        MsgBox \"没有这张表，先确认表名\"\n        Exit Sub\n    End If\n    MsgBox \"取到了：\" & ws.Name\nEnd Sub",
+        "howToRun": "按 F5，分别在有这张表和没有这张表的工作簿里试一次。",
+        "result": "没有该表时提示「没有这张表」；有则显示「取到了：表名」，不再报 9。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把「集合从 1 开始」和「数组从 0 开始」搞混",
+        "reason": "Worksheets、Cells 这类集合下标从 1 开始；Dim a(3) 这种数组默认从 0 开始，a(3) 其实是第 4 个。",
+        "fix": "集合用 1 到 Count；数组用 LBound/UBound 取边界，别写死。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "删表或改表名后，按序号取到了别的表",
+        "reason": "Worksheets(3) 是「当前第 3 张」，插表、删表、拖动标签都会让序号变化。",
+        "fix": "长期引用一律按名字取；确实要按序号时，先遍历打印 Name 核对。",
+        "level": "high",
+        "errorCode": "9"
+      }
+    ],
+    "related": [
+      {
+        "id": "collection-index",
+        "kind": "companion",
+        "why": "集合的序号/名字取法，是 9 的头号来源。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "用 On Error 捕获并打印 Err.Number/Description。"
+      }
+    ],
+    "oneLiner": "下标超出集合或数组的有效范围",
+    "summary": "触发点集中在三类：按序号取集合越界、按名字取工作表但表名不存在、数组下标越界。VBA 集合从 1 开始、数组默认从 0 开始，这两套规则最容易混，出问题先看这两处。"
+  },
+  {
+    "id": "runtime-13",
+    "enName": "Run-time error 13: Type mismatch",
+    "zhName": "运行时错误 13：类型不匹配",
+    "alias": [
+      "13",
+      "类型不匹配",
+      "Type mismatch",
+      "文本转数字失败"
+    ],
+    "keywords": [
+      "类型不匹配",
+      "运行时错误13",
+      "单元格是文本不能算",
+      "赋值报错",
+      "CLng 报错"
+    ],
+    "kind": "error",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 13\nErr.Description = \"类型不匹配\"",
+    "examples": [
+      {
+        "title": "最小复现：文本塞进 Long",
+        "code": "Sub 复现类型不匹配()\n    On Error GoTo 处理\n    Dim n As Long\n    n = \"abc\"\n    MsgBox n\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「13 / 类型不匹配」，因为 \"abc\" 不是数字。"
+      },
+      {
+        "title": "修法：先判断再转换",
+        "code": "Sub 先判断再转换()\n    Dim s As String, n As Long\n    s = \"123\"\n    If IsNumeric(s) Then\n        n = CLng(s)\n        MsgBox \"乘 2 得 \" & n * 2\n    Else\n        MsgBox \"不是数字：\" & s\n    End If\nEnd Sub",
+        "howToRun": "把 s 改成 \"123\" 和 \"abc\" 各跑一次。",
+        "result": "\"123\" 显示 246；\"abc\" 显示「不是数字：abc」，不报错。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "单元格里看着是数字，其实是文本",
+        "reason": "从系统导出、或单元格格式是文本时，Value 是字符串；直接参与算术就会 13。",
+        "fix": "用 IsNumeric 判断后再 CLng/CDbl，或先用 Value2 取值再转换。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "空单元格参与运算，结果不是 0 而是报错",
+        "reason": "空单元格取出来是 Empty，某些组合运算（尤其与文本混算）会触发 13。",
+        "fix": "取数时先 `If IsEmpty(cell.Value) Then cell.Value = 0`，或统一用 Val() 转数字。",
+        "level": "mid",
+        "errorCode": "13"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "变量类型声明决定能不能接住这个值。"
+      },
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "Value/Value2 取出来是什么类型，是 13 的源头。"
+      }
+    ],
+    "oneLiner": "把不兼容的值塞进变量或参与运算",
+    "summary": "13 的本质是「这个位置只能放 A 类型，你给了 B 类型」。Excel 里最常见的来源是文本型数字、空单元格、日期和错误值混进算术式。先 IsNumeric/IsDate/IsError 判断，再转换。"
+  },
+  {
+    "id": "runtime-91",
+    "enName": "Run-time error 91: Object variable or With block variable not set",
+    "zhName": "运行时错误 91：对象变量未设置",
+    "alias": [
+      "91",
+      "对象变量未设置",
+      "Object variable not set",
+      "忘记 Set"
+    ],
+    "keywords": [
+      "对象变量未设置",
+      "运行时错误91",
+      "忘记Set",
+      "Nothing 报错",
+      "Range 没赋值"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 91\nErr.Description = \"对象变量或 With 块变量未设置\"",
+    "examples": [
+      {
+        "title": "最小复现：声明了 Range 却没 Set",
+        "code": "Sub 复现未设置对象()\n    On Error GoTo 处理\n    Dim r As Range\n    MsgBox r.Address\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「91 / 对象变量或 With 块变量未设置」，因为 r 还是 Nothing。"
+      },
+      {
+        "title": "修法：Set 之后再使用，并判断 Is Nothing",
+        "code": "Sub 赋值前先Set()\n    Dim r As Range\n    Set r = Range(\"A1\")\n    If r Is Nothing Then\n        MsgBox \"没取到单元格\"\n        Exit Sub\n    End If\n    MsgBox \"地址：\" & r.Address\nEnd Sub",
+        "howToRun": "按 F5；A1 存在时正常显示。",
+        "result": "显示「地址：$A$1」，不再报 91。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "写了 `r = Range(\"A1\")`，漏了 Set",
+        "reason": "对象变量保存的是「引用」，必须用 Set 赋值；直接等号会被当成默认属性赋值。",
+        "fix": "对象一律 `Set r = ...`；不确定时加 `If r Is Nothing`。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "表被删/工作簿被关掉后，变量还指着旧对象",
+        "reason": "对象变量只是引用，目标没了不会自动变 Nothing，调用时才报 91 或 424。",
+        "fix": "操作前重新 Set；跨工作簿时先确认工作簿仍打开（Is Nothing / 遍历 Workbooks）。",
+        "level": "mid",
+        "errorCode": "91"
+      }
+    ],
+    "related": [
+      {
+        "id": "set",
+        "kind": "companion",
+        "why": "Set 是对象赋值的唯一入口。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "用 Err.Number 区分 91 与 424。"
+      }
+    ],
+    "oneLiner": "对象变量还指向 Nothing 就拿来用",
+    "summary": "91 几乎都是「忘 Set」或「对象已经失效」。和 424 的区别：91 是对象变量本身没设置；424 是代码要求一个对象，你给了一个普通值。"
+  },
+  {
+    "id": "runtime-1004",
+    "enName": "Run-time error 1004: Application-defined or object-defined error",
+    "zhName": "运行时错误 1004：应用程序定义错误",
+    "alias": [
+      "1004",
+      "应用程序定义或对象定义错误",
+      "Application-defined error",
+      "Excel 万能报错"
+    ],
+    "keywords": [
+      "1004",
+      "应用程序定义错误",
+      "Range 地址非法",
+      "工作表保护写入报错",
+      "名称不存在报错",
+      "宏报1004"
+    ],
+    "kind": "error",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 1004\nErr.Description = \"应用程序定义或对象定义错误\"",
+    "examples": [
+      {
+        "title": "复现一：单元格地址不合法（A0）",
+        "code": "Sub 复现1004地址()\n    On Error GoTo 处理\n    Range(\"A0\").Value = 1\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「1004 / 应用程序定义或对象定义错误」，因为 A0 不是有效地址。"
+      },
+      {
+        "title": "复现二：往受保护的工作表写值",
+        "code": "Sub 复现1004保护()\n    On Error GoTo 处理\n    Worksheets(\"Sheet1\").Range(\"A1\").Value = 1\n    Exit Sub\n处理:\n    MsgBox \"先撤销工作表保护，或用宏 Unprotect 后再写\"\nEnd Sub",
+        "howToRun": "先「审阅 → 保护工作表」给 Sheet1 加保护（不设密码），再按 F5。",
+        "result": "写入被拒，进入处理段，提示先撤销保护。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 1004 当成一个具体错误去背",
+        "reason": "1004 是 Excel 的「兜底错误」，地址非法、表被保护、名称不存在、文件被占用、图表引用错都可能报它。",
+        "fix": "先看 Err.Description 的原文，再按触发场景排查；不要只记错误码。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "工作表保护时用宏写入，误以为是代码写错",
+        "reason": "保护状态下即使宏也不能直接写锁定单元格（除非 UserInterfaceOnly 或先 Unprotect）。",
+        "fix": "写入前 Unprotect（需要密码就传密码），写完再 Protect；或只写未锁定单元格。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "地址写法（A0、整列、跨表）是 1004 的高频来源。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "工作表保护/隐藏/不存在，都会以 1004 冒出来。"
+      }
+    ],
+    "oneLiner": "Excel 最常见的「万能报错」",
+    "summary": "1004 不代表某一种具体毛病，而是 Excel 把「这个操作做不了」统一报成 1004。排查顺序：地址/表名是否有效 → 表是否被保护 → 名称/图表引用是否存在 → 文件是否被占用。"
+  },
+  {
+    "id": "runtime-424",
+    "enName": "Run-time error 424: Object required",
+    "zhName": "运行时错误 424：需要对象",
+    "alias": [
+      "424",
+      "需要对象",
+      "Object required",
+      "Set 给了值"
+    ],
+    "keywords": [
+      "需要对象",
+      "运行时错误424",
+      "Set 报错",
+      "对象赋值给值变量"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 424\nErr.Description = \"需要对象\"",
+    "examples": [
+      {
+        "title": "最小复现：用 Set 接一个数值",
+        "code": "Sub 复现424()\n    On Error GoTo 处理\n    Dim r As Range\n    Set r = Range(\"A1\").Value\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「424 / 需要对象」：Set 右边必须是对象，而 .Value 是数值。"
+      },
+      {
+        "title": "修法：值用普通赋值，对象才用 Set",
+        "code": "Sub 值用等号对象用Set()\n    Dim v As Variant, r As Range\n    v = Range(\"A1\").Value\n    Set r = Range(\"A1\")\n    MsgBox \"值是 \" & v & \"，地址是 \" & r.Address\nEnd Sub",
+        "howToRun": "A1 随便填个值后按 F5。",
+        "result": "同时显示 A1 的值和地址，不再报 424。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Set 与普通赋值混用",
+        "reason": "Set 只接对象（Range、Worksheet、Collection…）；普通变量接值，两者不能互换。",
+        "fix": "先想清楚右边是对象还是值：对象用 Set，值用等号。",
+        "level": "high",
+        "errorCode": "424"
+      },
+      {
+        "title": "对象已经是 Nothing，还调用它的方法",
+        "reason": "Nothing 不是「空对象」，对它取属性会直接 424（有时是 91）。",
+        "fix": "调用前 `If Not obj Is Nothing Then`，或重新 Set。",
+        "level": "mid",
+        "errorCode": "424"
+      }
+    ],
+    "related": [
+      {
+        "id": "set",
+        "kind": "companion",
+        "why": "Set 的适用范围是 424 的分界线。"
+      },
+      {
+        "id": "object-property-method",
+        "kind": "companion",
+        "why": "先分清对象、属性、方法，才不会乱 Set。"
+      }
+    ],
+    "oneLiner": "代码要对象，你却给了一个普通值",
+    "summary": "424 和 91 是一对：91 是对象变量没设置，424 是「这里需要对象，但你给的不是对象」。看到 424 先检查 Set 右边是不是 .Value、字符串或数字。"
+  },
+  {
+    "id": "runtime-438",
+    "enName": "Run-time error 438: Object doesn't support this property or method",
+    "zhName": "运行时错误 438：方法或属性不存在",
+    "alias": [
+      "438",
+      "方法或属性不存在",
+      "Object doesn't support",
+      "对象不支持该属性"
+    ],
+    "keywords": [
+      "方法或属性不存在",
+      "运行时错误438",
+      "Worksheet 没有 Value",
+      "属性拼错",
+      "对象不支持"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 438\nErr.Description = \"对象不支持该属性或方法\"",
+    "examples": [
+      {
+        "title": "最小复现：把 Value 写在 Worksheet 上",
+        "code": "Sub 复现438()\n    On Error GoTo 处理\n    Worksheets(\"Sheet1\").Value = 1\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "存在 Sheet1 时按 F5。",
+        "result": "弹出「438 / 对象不支持该属性或方法」：Value 属于 Range，不属于 Worksheet。"
+      },
+      {
+        "title": "修法：成员挂到正确的对象上",
+        "code": "Sub 成员挂对对象()\n    Worksheets(\"Sheet1\").Range(\"A1\").Value = 1\n    MsgBox \"已写入 A1\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A1 变成 1，提示「已写入 A1」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "成员挂错层级：Worksheet 当 Range 用",
+        "reason": "Value、NumberFormat、Interior 都是 Range 的成员；Worksheet 只有 Cells、Range、Name 等。",
+        "fix": "先写到 `Worksheets(\"表\").Range(\"A1\")`，再挂属性。",
+        "level": "high",
+        "errorCode": "438"
+      },
+      {
+        "title": "属性名拼错，或用了别的 Office 版本才有的成员",
+        "reason": "VBA 不检查拼写，运行到那一行才 438；旧版本也没有新成员。",
+        "fix": "用对象浏览器（F2）确认成员名；跨版本时先判断版本或改用兼容写法。",
+        "level": "mid",
+        "errorCode": "438"
+      }
+    ],
+    "related": [
+      {
+        "id": "object-property-method",
+        "kind": "companion",
+        "why": "对象/属性/方法的层级关系，直接决定 438。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "Worksheet 与 Range 的成员边界最容易搞错。"
+      }
+    ],
+    "oneLiner": "对象不支持你写的属性或方法",
+    "summary": "438 不是「对象不存在」，而是「对象在，但它没有这个成员」。最常见是层级挂错（Worksheet 上写 Value）和拼错属性名。用 F2 对象浏览器核对，比反复试快。"
+  },
+  {
+    "id": "runtime-440",
+    "enName": "Run-time error 440: Automation error",
+    "zhName": "运行时错误 440：自动化错误",
+    "alias": [
+      "440",
+      "自动化错误",
+      "Automation error",
+      "组件加载失败"
+    ],
+    "keywords": [
+      "自动化错误",
+      "运行时错误440",
+      "CreateObject 失败",
+      "加载项报错",
+      "COM 组件"
+    ],
+    "kind": "error",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 440\nErr.Description = \"自动化错误\"",
+    "examples": [
+      {
+        "title": "复现路径：创建脚本运行时对象失败",
+        "code": "Sub 复现440()\n    On Error GoTo 处理\n    Dim d As Object\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    d.Add \"a\", 1\n    MsgBox \"条目数：\" & d.Count\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "正常机器会成功；若脚本运行库被禁用/注册损坏，则进入处理段（可能报 440，也可能报 429）。",
+        "result": "正常显示「条目数：1」；异常机器弹出 440/429 与描述。"
+      },
+      {
+        "title": "修法：先降级到 VBA 自带集合",
+        "code": "Sub 用Collection兜底()\n    Dim c As Collection\n    Set c = New Collection\n    c.Add 1, \"a\"\n    MsgBox \"条目数：\" & c.Count\nEnd Sub",
+        "howToRun": "按 F5；不依赖外部 COM 组件。",
+        "result": "显示「条目数：1」，不需要 Scripting.Runtime。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "440 当成代码逻辑错误去改",
+        "reason": "440 多半是组件/加载项/自动化通道的问题，代码本身可能没问题。",
+        "fix": "先确认组件是否安装并注册、加载项是否被禁用；换一台机器对比。",
+        "level": "high",
+        "errorCode": "440"
+      },
+      {
+        "title": "跨应用自动化时目标程序弹窗/未就绪",
+        "reason": "被调用的程序在弹窗、忙、或已退出，自动化调用就会中断成 440。",
+        "fix": "加超时与重试，确保目标程序可见/已就绪；能不用跨应用就不用。",
+        "level": "mid",
+        "errorCode": "440"
+      }
+    ],
+    "related": [
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "440 需要靠 Err.Description 和场景定位，不能只看号。"
+      },
+      {
+        "id": "macro-security",
+        "kind": "companion",
+        "why": "宏安全策略与加载项状态会影响自动化调用。"
+      }
+    ],
+    "oneLiner": "外部组件或自动化调用失败",
+    "summary": "440 是「自动化错误」的笼统说法，通常不是语法问题，而是 COM 组件、加载项、跨应用调用出的岔子。排查顺序：组件是否存在 → 是否注册/被禁用 → 目标程序是否就绪。能用 VBA 自带对象就别依赖外部组件。"
+  },
+  {
+    "id": "runtime-457",
+    "enName": "Run-time error 457: This key is already associated with an element of this collection",
+    "zhName": "运行时错误 457：键重复",
+    "alias": [
+      "457",
+      "键重复",
+      "This key is already associated",
+      "Collection 重复键"
+    ],
+    "keywords": [
+      "键重复",
+      "运行时错误457",
+      "Collection 重复添加",
+      "Dictionary 键已存在"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 457\nErr.Description = \"该键已与集合中的元素关联\"",
+    "examples": [
+      {
+        "title": "最小复现：Collection 同一个键加两次",
+        "code": "Sub 复现457()\n    On Error GoTo 处理\n    Dim c As Collection\n    Set c = New Collection\n    c.Add 1, \"甲\"\n    c.Add 2, \"甲\"\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「457 / 该键已与集合中的元素关联」，第二个「甲」加不进去。"
+      },
+      {
+        "title": "修法：先查键，或改用 Dictionary 覆盖",
+        "code": "Sub 先查重再加()\n    Dim c As Collection\n    Set c = New Collection\n    On Error Resume Next\n    c.Add 1, \"甲\"\n    If Err.Number = 457 Then\n        MsgBox \"键「甲」已存在，跳过\"\n    End If\n    On Error GoTo 0\nEnd Sub",
+        "howToRun": "按 F5；把第二次 Add 换成同一个键可复现跳过逻辑。",
+        "result": "重复键不再中断，提示已存在。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用循环批量加键，没考虑重复",
+        "reason": "Collection 的键必须唯一，重复 Add 直接 457。",
+        "fix": "加之前判断键是否存在（On Error Resume Next + Err 判断），或换 Dictionary 用 `d(key)=value` 覆盖。",
+        "level": "high",
+        "errorCode": "457"
+      },
+      {
+        "title": "Dictionary 用 Add 加重复键也一样报 457",
+        "reason": "`d.Add key, value` 要求键唯一；键已存在就中断，和 Collection 的表现一致。",
+        "fix": "改用赋值语法 `d(key) = value`：存在即覆盖，不存在即新增，不会报 457。",
+        "level": "mid",
+        "errorCode": "457"
+      }
+    ],
+    "related": [
+      {
+        "id": "collection-index",
+        "kind": "companion",
+        "why": "Collection 的 Add/Item/键规则在这里。"
+      },
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "先声明好 Collection/Dictionary 变量再操作。"
+      }
+    ],
+    "oneLiner": "往集合里加了已经存在的键",
+    "summary": "457 只发生在「带键的集合」：Collection.Add 的第二个参数、Dictionary.Add 的 key。批量导入、按名称建索引时最容易撞。要么先查重，要么用 Dictionary 的赋值语法覆盖。"
+  },
+  {
+    "id": "runtime-6",
+    "enName": "Run-time error 6: Overflow",
+    "zhName": "运行时错误 6：溢出",
+    "alias": [
+      "6",
+      "溢出",
+      "Overflow",
+      "Integer 不够大"
+    ],
+    "keywords": [
+      "溢出",
+      "运行时错误6",
+      "Integer 最大值",
+      "数字太大报错",
+      "Long 替换 Integer"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 6\nErr.Description = \"溢出\"",
+    "examples": [
+      {
+        "title": "最小复现：Integer 装 40000",
+        "code": "Sub 复现溢出()\n    On Error GoTo 处理\n    Dim n As Integer\n    n = 40000\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「6 / 溢出」：Integer 上限是 32767。"
+      },
+      {
+        "title": "修法：换成 Long",
+        "code": "Sub 用Long装大数()\n    Dim n As Long\n    n = 40000\n    MsgBox n * 2\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示 80000，不再溢出。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "循环变量习惯性写 Integer",
+        "reason": "行数超过 32767 的表现在很常见，Integer 循环到一半就 6。",
+        "fix": "行号、计数一律用 Long；只有确定范围很小才用 Integer。",
+        "level": "high",
+        "errorCode": "6"
+      },
+      {
+        "title": "乘法中间结果超出变量类型",
+        "reason": "即使最终结果不大，中间乘积也可能先溢出。",
+        "fix": "先把参与运算的数转成 Double/LongLong，或调整运算顺序。",
+        "level": "mid",
+        "errorCode": "6"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "变量类型的取值范围决定何时溢出。"
+      },
+      {
+        "id": "for-next",
+        "kind": "companion",
+        "why": "循环计数器是最常见的溢出位置。"
+      }
+    ],
+    "oneLiner": "数字超出变量类型能装的范围",
+    "summary": "Integer 只到 32767、Long 到约 21 亿。现代 Excel 行数早就超过 32767，所以行号/计数默认用 Long。乘法要注意中间结果，必要时先转 Double。"
+  },
+  {
+    "id": "runtime-11",
+    "enName": "Run-time error 11: Division by zero",
+    "zhName": "运行时错误 11：除零",
+    "alias": [
+      "11",
+      "除零",
+      "Division by zero",
+      "分母为 0"
+    ],
+    "keywords": [
+      "除零",
+      "运行时错误11",
+      "分母为空",
+      "除法报错",
+      "平均值报错"
+    ],
+    "kind": "error",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 11\nErr.Description = \"除零\"",
+    "examples": [
+      {
+        "title": "最小复现：10 / 0",
+        "code": "Sub 复现除零()\n    On Error GoTo 处理\n    MsgBox 10 / 0\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「11 / 除零」。"
+      },
+      {
+        "title": "修法：先看分母再算",
+        "code": "Sub 先判断分母()\n    Dim a As Double, b As Double\n    a = 10: b = Range(\"A1\").Value\n    If b = 0 Then\n        MsgBox \"分母是 0，先补数据\"\n    Else\n        MsgBox \"结果：\" & a / b\n    End If\nEnd Sub",
+        "howToRun": "A1 分别填 0 和 2 各跑一次。",
+        "result": "A1=0 时提示分母为 0；A1=2 时显示 5。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "空单元格当分母",
+        "reason": "空单元格取出来是 Empty，参与除法按 0 处理，直接 11。",
+        "fix": "取分母后先 `If IsEmpty(x) Or x = 0` 判断。",
+        "level": "high",
+        "errorCode": "11"
+      },
+      {
+        "title": "平均/占比公式里分母是动态的",
+        "reason": "筛选后行数为 0、分组里没有记录，分母就变成 0。",
+        "fix": "用 IIf 或 If 先兜底，分母为 0 时返回 0 或「无数据」。",
+        "level": "mid",
+        "errorCode": "11"
+      }
+    ],
+    "related": [
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "除法在循环里时，靠错误处理决定继续还是停。"
+      },
+      {
+        "id": "if-then-else",
+        "kind": "companion",
+        "why": "先判断分母，是最稳的预防方式。"
+      }
+    ],
+    "oneLiner": "除数是 0 或空",
+    "summary": "11 本身很好认，难的是找出「分母为什么是 0」：空单元格、筛选后 0 行、分组无数据。写法上先判分母，再算；批量处理时不要让一条坏数据中断整个循环。"
+  },
+  {
+    "id": "runtime-5",
+    "enName": "Run-time error 5: Invalid procedure call or argument",
+    "zhName": "运行时错误 5：无效的过程调用",
+    "alias": [
+      "5",
+      "无效的过程调用或参数",
+      "Invalid procedure call",
+      "Left 负数"
+    ],
+    "keywords": [
+      "无效的过程调用",
+      "运行时错误5",
+      "参数不合法",
+      "Left 报错",
+      "Sqr 负数"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 5\nErr.Description = \"无效的过程调用或参数\"",
+    "examples": [
+      {
+        "title": "最小复现：Left 给负数长度",
+        "code": "Sub 复现5()\n    On Error GoTo 处理\n    MsgBox Left(\"abc\", -1)\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出「5 / 无效的过程调用或参数」。"
+      },
+      {
+        "title": "修法：先把参数夹到合法范围",
+        "code": "Sub 参数先夹紧()\n    Dim s As String, n As Long\n    s = \"abc\": n = -1\n    If n < 0 Then n = 0\n    If n > Len(s) Then n = Len(s)\n    MsgBox \"取到：\" & Left(s, n)\nEnd Sub",
+        "howToRun": "按 F5；把 n 改成 -1、0、5 各试一次。",
+        "result": "n=-1 时按 0 处理，显示空串；n=5 时按长度 3 处理，显示 abc。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "字符串/数学函数收到越界参数",
+        "reason": "Left/Mid 的长度为负、Sqr 传负数、日期函数传非法日期，都会 5。",
+        "fix": "调用前校验范围；用 Len 夹住长度，Sqr 前判断非负。",
+        "level": "high",
+        "errorCode": "5"
+      },
+      {
+        "title": "把 5 和 13 混为一谈",
+        "reason": "5 是「参数值不合法」，13 是「类型不对」，修法完全不同。",
+        "fix": "看 Description：提到「参数」先查取值范围；提到「类型」先查数据类型。",
+        "level": "mid",
+        "errorCode": "5"
+      }
+    ],
+    "related": [
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "过程调用与参数传递规则在这里。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "批量调用时捕获 5，跳过坏参数继续跑。"
+      }
+    ],
+    "oneLiner": "参数值超出函数允许的范围",
+    "summary": "5 通常不是代码结构错，而是某个参数值不合法：负数长度、负数开方、非法日期、无效的过程名。先定位是哪一个参数，再夹范围。"
+  },
+  {
+    "id": "runtime-53",
+    "enName": "Run-time error 53: File not found",
+    "zhName": "运行时错误 53：文件未找到",
+    "alias": [
+      "53",
+      "文件未找到",
+      "File not found",
+      "打开文件报错"
+    ],
+    "keywords": [
+      "文件未找到",
+      "运行时错误53",
+      "Workbooks.Open 报错",
+      "路径不对",
+      "文件名拼错"
+    ],
+    "kind": "error",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 53\nErr.Description = \"文件未找到\"",
+    "examples": [
+      {
+        "title": "最小复现：打开不存在的文件",
+        "code": "Sub 复现53()\n    On Error GoTo 处理\n    Workbooks.Open ThisWorkbook.Path & \"\\不存在的文件.xlsx\"\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "工作簿所在目录没有「不存在的文件.xlsx」时按 F5。",
+        "result": "弹出「53 / 文件未找到」。"
+      },
+      {
+        "title": "修法：先 Dir 确认文件在不在",
+        "code": "Sub 先查文件再打开()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\不存在的文件.xlsx\"\n    If Dir(p) = \"\" Then\n        MsgBox \"文件不在：\" & p\n        Exit Sub\n    End If\n    Workbooks.Open p\nEnd Sub",
+        "howToRun": "文件不存在时按 F5；把文件名改成实际存在的文件可走成功分支。",
+        "result": "不存在时只提示路径，不再报 53。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "路径拼接漏了反斜杠",
+        "reason": "`ThisWorkbook.Path & \"文件名.xlsx\"` 会拼成 `...\\目录名文件名.xlsx`，自然找不到。",
+        "fix": "统一用 `Path & Application.PathSeparator & 文件名`，或先拼再 Debug.Print 核对。",
+        "level": "high",
+        "errorCode": "53"
+      },
+      {
+        "title": "OneDrive/网络盘上的文件还没同步到本地",
+        "reason": "路径看着对，文件实际只是云端占位符，VBA 打不开。",
+        "fix": "先在资源管理器里打开一次让它下载，或改用本地路径。",
+        "level": "mid",
+        "errorCode": "53"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "Workbooks.Open/Close 是 53 的主要入口。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "批量打开多个文件时，靠错误处理跳过缺失项。"
+      }
+    ],
+    "oneLiner": "按这个路径找不到文件",
+    "summary": "53 说明「路径语法没问题，但那个位置没有这个文件」。先 Debug.Print 完整路径，再 Dir 验证；网络盘/OneDrive 还要考虑同步状态。"
+  },
+  {
+    "id": "runtime-75",
+    "enName": "Run-time error 75: Path/File access error",
+    "zhName": "运行时错误 75：路径/文件访问错误",
+    "alias": [
+      "75",
+      "路径文件访问错误",
+      "Path/File access error",
+      "文件被占用"
+    ],
+    "keywords": [
+      "路径文件访问错误",
+      "运行时错误75",
+      "文件被占用",
+      "只读文件写入",
+      "文件锁"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 75\nErr.Description = \"路径/文件访问错误\"",
+    "examples": [
+      {
+        "title": "最小复现：同一个文件开两次写通道",
+        "code": "Sub 复现75()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\临时.txt\"\n    On Error GoTo 处理\n    Open p For Output As #1\n    Open p For Output As #2\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\n    Close #1\nEnd Sub",
+        "howToRun": "在工作簿所在目录可写时按 F5（会生成一个临时.txt）。",
+        "result": "第二次 Open 失败，弹出「75 / 路径/文件访问错误」；随后关闭 #1。"
+      },
+      {
+        "title": "修法：先写临时名，成功后再换名",
+        "code": "Sub 先写临时名()\n    Dim p As String, q As String\n    p = ThisWorkbook.Path & \"\\临时.txt\"\n    q = ThisWorkbook.Path & \"\\临时_new.txt\"\n    Open q For Output As #1\n    Print #1, \"内容\"\n    Close #1\n    If Dir(p) <> \"\" Then MsgBox \"目标已存在，确认后再替换\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "内容写到 _new 文件，不碰正在被占用的目标文件。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "文件正被 Excel/WPS/其他程序打开",
+        "reason": "Windows 文件锁：别的程序占着写句柄，你再写就是 75。",
+        "fix": "先关闭占用程序；批量处理时给每个文件单独的临时名。",
+        "level": "high",
+        "errorCode": "75"
+      },
+      {
+        "title": "目录只读或没有写权限",
+        "reason": "路径存在但当前用户不能写，表现为 75（有时是 70）。",
+        "fix": "换可写目录；必须写原目录时找管理员改权限。",
+        "level": "mid",
+        "errorCode": "75"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "保存/打开工作簿时最常见 75。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "失败后要保证已打开的文件句柄被关闭。"
+      }
+    ],
+    "oneLiner": "路径存在，但不允许这样访问",
+    "summary": "75 是「东西在，但访问被拒」：文件被占用、目录只读、共享冲突。和 53（找不到）、70（权限拒绝）要分开看。写文件时先写临时名，是避免锁冲突的常用做法。"
+  },
+  {
+    "id": "runtime-76",
+    "enName": "Run-time error 76: Path not found",
+    "zhName": "运行时错误 76：路径未找到",
+    "alias": [
+      "76",
+      "路径未找到",
+      "Path not found",
+      "目录不存在"
+    ],
+    "keywords": [
+      "路径未找到",
+      "运行时错误76",
+      "目录不存在",
+      "ChDir 报错",
+      "网络盘断开"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 76\nErr.Description = \"路径未找到\"",
+    "examples": [
+      {
+        "title": "最小复现：切到不存在的子目录",
+        "code": "Sub 复现76()\n    On Error GoTo 处理\n    ChDir ThisWorkbook.Path & \"\\不存在的子目录\"\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "工作簿目录下没有「不存在的子目录」时按 F5。",
+        "result": "弹出「76 / 路径未找到」。"
+      },
+      {
+        "title": "修法：先判断目录，必要时创建",
+        "code": "Sub 目录先确认()\n    Dim d As String\n    d = ThisWorkbook.Path & \"\\不存在的子目录\"\n    If Dir(d, vbDirectory) = \"\" Then\n        MsgBox \"目录不在：\" & d\n    Else\n        ChDir d\n        MsgBox \"已切到：\" & CurDir\n    End If\nEnd Sub",
+        "howToRun": "目录不存在时按 F5；手动建好目录再跑可走成功分支。",
+        "result": "不存在只提示；存在则切换并显示当前目录。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "路径里多空格/多一层目录",
+        "reason": "手拼路径时很容易多一个空格或少一层，文件在但目录层级对不上。",
+        "fix": "Debug.Print 完整路径，逐段和资源管理器核对。",
+        "level": "high",
+        "errorCode": "76"
+      },
+      {
+        "title": "网络盘/映射盘断开",
+        "reason": "盘符还在但连接断了，任何目录访问都是 76（有时 53）。",
+        "fix": "先确认网络位置可访问；用 UNC 路径（\\\\服务器\\共享）减少盘符依赖。",
+        "level": "mid",
+        "errorCode": "76"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "打开/另存工作簿时路径不存在就报 76。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "捕获后给出可读提示，而不是让宏崩掉。"
+      }
+    ],
+    "oneLiner": "这个目录层级不存在",
+    "summary": "76 是「路径本身找不到」，和 53（文件找不到）不同：目录都进不去。多一层、少一斜杠、盘符断开都会报它。先 Dir(path, vbDirectory) 验证目录，再操作。"
+  },
+  {
+    "id": "runtime-70",
+    "enName": "Run-time error 70: Permission denied",
+    "zhName": "运行时错误 70：权限被拒绝",
+    "alias": [
+      "70",
+      "权限被拒绝",
+      "Permission denied",
+      "只读文件写入"
+    ],
+    "keywords": [
+      "权限被拒绝",
+      "运行时错误70",
+      "只读文件不能写",
+      "保存被拒",
+      "文件属性只读"
+    ],
+    "kind": "error",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Err.Number = 70\nErr.Description = \"权限被拒绝\"",
+    "examples": [
+      {
+        "title": "最小复现：往只读文件写",
+        "code": "Sub 复现70()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\临时只读.txt\"\n    Open p For Output As #1\n    Close #1\n    SetAttr p, vbReadOnly\n    On Error GoTo 处理\n    Open p For Output As #1\n    Exit Sub\n处理:\n    MsgBox Err.Number & \" / \" & Err.Description\nEnd Sub",
+        "howToRun": "在工作簿目录可写时按 F5；会留下一个「临时只读.txt」，测完把只读属性去掉再删。",
+        "result": "第二次 Open 被拒，弹出「70 / 权限被拒绝」。"
+      },
+      {
+        "title": "修法：写之前先去掉只读，或换可写路径",
+        "code": "Sub 先恢复可写()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\临时只读.txt\"\n    If Dir(p) <> \"\" Then SetAttr p, vbNormal\n    Open p For Output As #1\n    Print #1, \"可以写了\"\n    Close #1\n    MsgBox \"写好了\"\nEnd Sub",
+        "howToRun": "接上例，文件存在且为只读时按 F5。",
+        "result": "属性恢复后写入成功，提示「写好了」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只读属性 / 只读目录没检查",
+        "reason": "文件属性只读、目录 ACL 不允许写，都会 70。",
+        "fix": "写前检查属性（GetAttr）并 SetAttr vbNormal，或直接换可写目录。",
+        "level": "high",
+        "errorCode": "70"
+      },
+      {
+        "title": "把 70 当成路径错误",
+        "reason": "70 是「有权限问题」，76 是「路径不存在」，排查方向不同。",
+        "fix": "先确认目录/文件存在，再看属性和权限；别反复改路径字符串。",
+        "level": "mid",
+        "errorCode": "70"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "保存到只读目录/只读工作簿时常见 70。"
+      },
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "失败后要提示用户处理权限，而不是静默失败。"
+      }
+    ],
+    "oneLiner": "有这个东西，但当前用户不许动",
+    "summary": "70 是权限/属性层面的拒绝：只读文件、只读目录、受控文件夹。和 75（被占用）经常一起出现，先看文件属性，再看是否有其他程序锁着。"
+  }
+]

@@ -1,0 +1,702 @@
+[
+  {
+    "id": "jsa-workbook",
+    "enName": "JSA Workbook",
+    "zhName": "JSA 工作簿",
+    "alias": [
+      "ActiveWorkbook",
+      "ThisWorkbook",
+      "工作簿"
+    ],
+    "keywords": [
+      "JSA 当前工作簿",
+      "保存工作簿",
+      "工作簿路径"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "ActiveWorkbook.Name\nActiveWorkbook.FullName\nActiveWorkbook.Save()",
+    "examples": [
+      {
+        "title": "读工作簿名与完整路径",
+        "code": "function 工作簿信息() {\n  const wb = ActiveWorkbook;\n  console.log(wb.Name);\n  console.log(wb.FullName);\n  console.log(wb.Path);\n}",
+        "howToRun": "打开任意工作簿，按 F5，看控制台。",
+        "result": "依次输出文件名、完整路径、所在目录。"
+      },
+      {
+        "title": "保存当前工作簿",
+        "code": "function 保存() {\n  const wb = ActiveWorkbook;\n  if (wb.Path === \"\") {\n    alert(\"新文件还没保存过，请手动另存\");\n    return;\n  }\n  wb.Save();\n}",
+        "howToRun": "在已保存过的文件里按 F5。",
+        "result": "工作簿保存到原路径。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "新文件没路径就 Save，报错或弹另存为",
+        "reason": "从未保存过的文件没有 Path。",
+        "fix": "先判断 Path 是否为空，必要时用 SaveAs。",
+        "level": "high"
+      },
+      {
+        "title": "把 ThisWorkbook 当成当前打开的文件",
+        "reason": "ThisWorkbook 指代码所在工作簿，不一定是前台文件。",
+        "fix": "要操作前台文件用 ActiveWorkbook。",
+        "level": "mid"
+      },
+      {
+        "title": "路径字符串直接拼文件名，少了分隔符",
+        "reason": "Path 不带末尾反斜杠。",
+        "fix": "拼路径时自己补 \"\\\\\"。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "activeworkbook",
+        "kind": "companion",
+        "why": "ActiveWorkbook 的 VBA 用法。"
+      },
+      {
+        "id": "workbook-save",
+        "kind": "companion",
+        "why": "Save 与 SaveAs 的差异。"
+      }
+    ],
+    "oneLiner": "拿到当前工作簿并保存",
+    "summary": "ActiveWorkbook 是前台文件，ThisWorkbook 是代码所在文件。新文件 Path 为空时不能直接 Save；Path 末尾没有反斜杠。"
+  },
+  {
+    "id": "jsa-currentregion",
+    "enName": "JSA CurrentRegion",
+    "zhName": "JSA 当前区域",
+    "alias": [
+      "CurrentRegion",
+      "连续数据区",
+      "数据块"
+    ],
+    "keywords": [
+      "JSA 自动识别数据区",
+      "CurrentRegion 用法",
+      "连续区域"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1\").CurrentRegion\nCurrentRegion.Rows.Count",
+    "examples": [
+      {
+        "title": "取 A1 所在的连续数据块",
+        "code": "function 数据块() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1\").CurrentRegion;\n  console.log(r.Address);\n  console.log(r.Rows.Count, r.Columns.Count);\n}",
+        "howToRun": "A1 开始放一块规则数据，按 F5。",
+        "result": "输出整块地址与行列数。"
+      },
+      {
+        "title": "按数据块行数遍历",
+        "code": "function 遍历块() {\n  const s = Sheets.Item(1);\n  const r = s.Range(\"A1\").CurrentRegion;\n  for (let i = 2; i <= r.Rows.Count; i++) {\n    console.log(s.Range(\"A\" + i).Value2);\n  }\n}",
+        "howToRun": "第 1 行是表头，下面几行数据，按 F5。",
+        "result": "从第 2 行开始逐行打印 A 列。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "数据中间有整行空行，CurrentRegion 只取到空行前",
+        "reason": "它按连续非空块扩张。",
+        "fix": "先删空行，或改用 UsedRange / 关键列找末尾。",
+        "level": "high"
+      },
+      {
+        "title": "从数据块中间单元格取，范围被截断",
+        "reason": "CurrentRegion 从起点向四周扩到空行空列。",
+        "fix": "统一从数据块左上角（通常是 A1）取。",
+        "level": "mid"
+      },
+      {
+        "title": "把 CurrentRegion 当地址字符串用",
+        "reason": "它返回 Range 对象。",
+        "fix": "要地址写 CurrentRegion.Address。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "current-region",
+        "kind": "companion",
+        "why": "CurrentRegion 的 VBA 用法。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "另一种确定数据范围的方式。"
+      }
+    ],
+    "oneLiner": "自动框住一块连续数据",
+    "summary": "CurrentRegion 从起点扩到空行空列为止，适合规则数据块。中间有整行空行会被截断，所以要从左上角取。"
+  },
+  {
+    "id": "jsa-end",
+    "enName": "JSA Range.End",
+    "zhName": "JSA 跳到边界",
+    "alias": [
+      "Range.End",
+      "xlDown",
+      "xlUp"
+    ],
+    "keywords": [
+      "JSA 找最后一行",
+      "End 用法",
+      "跳到数据边界"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1\").End(-4121)   // -4121 = xlDown\nRange(\"A1048576\").End(-4162).Row   // -4162 = xlUp",
+    "examples": [
+      {
+        "title": "从最底往上找最后一行",
+        "code": "function 最后一行() {\n  const s = Sheets.Item(1);\n  const last = s.Range(\"A1048576\").End(-4162).Row;\n  console.log(last);\n}",
+        "howToRun": "A 列填几行数据，按 F5。",
+        "result": "输出 A 列最后一个非空行号。"
+      },
+      {
+        "title": "从 A1 往右找最后一列",
+        "code": "function 最后一列() {\n  const s = Sheets.Item(1);\n  const col = s.Range(\"A1\").End(-4161).Column;\n  console.log(col);\n}",
+        "howToRun": "第 1 行填几列数据，按 F5。",
+        "result": "输出第 1 行最后一个非空列的列号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "从 A1 往下 End，遇到空行就停在空行前",
+        "reason": "End 遇空单元格即停。",
+        "fix": "找最后一行优先从底部往上（xlUp）。",
+        "level": "high"
+      },
+      {
+        "title": "整列都空时 End 跳到边界行，结果不准",
+        "reason": "没有数据时会落到工作表最后一行。",
+        "fix": "先判断起点是否为空，再决定是否采信结果。",
+        "level": "mid"
+      },
+      {
+        "title": "直接写 xlDown，运行时报未定义",
+        "reason": "部分 JSA 环境没有注入 VBA 常量。",
+        "fix": "用数值 -4121 / -4162，或先确认常量可用。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "end-xldown",
+        "kind": "companion",
+        "why": "End 的 VBA 用法与方向常量。"
+      },
+      {
+        "id": "jsa-usedrange",
+        "kind": "companion",
+        "why": "另一种找末尾的方法。"
+      }
+    ],
+    "oneLiner": "像 Ctrl+方向键一样跳到数据边界",
+    "summary": "End 模拟 Ctrl+方向键，常用来找最后一行/列。找末行从底部 xlUp（-4162）更稳；整列为空时会跳到边界，要先判空。"
+  },
+  {
+    "id": "jsa-autofit",
+    "enName": "JSA AutoFit",
+    "zhName": "JSA 自动列宽",
+    "alias": [
+      "AutoFit",
+      "自动列宽",
+      "自动行高"
+    ],
+    "keywords": [
+      "JSA 调整列宽",
+      "AutoFit 用法",
+      "自动行高"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A:C\").Columns.AutoFit()\nRange(\"1:3\").Rows.AutoFit()",
+    "examples": [
+      {
+        "title": "A 到 C 列自动列宽",
+        "code": "function 自动列宽() {\n  const s = Sheets.Item(1);\n  s.Range(\"A:C\").Columns.AutoFit();\n}",
+        "howToRun": "A:C 有内容，按 F5。",
+        "result": "三列宽度按内容自动调整。"
+      },
+      {
+        "title": "前 3 行自动行高",
+        "code": "function 自动行高() {\n  const s = Sheets.Item(1);\n  s.Range(\"1:3\").Rows.AutoFit();\n}",
+        "howToRun": "前 3 行有换行文本，按 F5。",
+        "result": "行高按内容自动调整。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对整列 AutoFit，列宽被最长的异常值撑爆",
+        "reason": "按该列最宽内容计算。",
+        "fix": "只对数据区 AutoFit，或手动设 ColumnWidth。",
+        "level": "mid"
+      },
+      {
+        "title": "合并单元格上 AutoFit 不生效",
+        "reason": "合并区域没有单一列宽可算。",
+        "fix": "先取消合并，调完再合并。",
+        "level": "high"
+      },
+      {
+        "title": "以为 AutoFit 会改字号或换行",
+        "reason": "它只调宽高。",
+        "fix": "换行要另设 WrapText。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "row-height-column-width",
+        "kind": "companion",
+        "why": "行高列宽的手动设置。"
+      },
+      {
+        "id": "format-column",
+        "kind": "companion",
+        "why": "整列格式化配方。"
+      }
+    ],
+    "oneLiner": "按内容自动调列宽行高",
+    "summary": "Columns.AutoFit 调列宽、Rows.AutoFit 调行高，只对目标区域生效。整列调会被异常长值撑爆，合并单元格上不生效。"
+  },
+  {
+    "id": "jsa-copy-paste",
+    "enName": "JSA Copy / PasteSpecial",
+    "zhName": "JSA 复制粘贴",
+    "alias": [
+      "Copy",
+      "PasteSpecial",
+      "只粘贴数值"
+    ],
+    "keywords": [
+      "JSA 复制区域",
+      "粘贴数值",
+      "CutCopyMode"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Range(\"A1\").Copy(Range(\"B1\"))\nRange(\"A1\").Copy(); Range(\"C1\").PasteSpecial(-4163)   // 只粘数值",
+    "examples": [
+      {
+        "title": "整块复制到另一处",
+        "code": "function 复制() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1:B3\").Copy(s.Range(\"D1\"));\n}",
+        "howToRun": "A1:B3 有数据，按 F5。",
+        "result": "D1:E3 得到同样的内容与格式。"
+      },
+      {
+        "title": "只粘贴数值",
+        "code": "function 只粘值() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1:A3\").Copy();\n  s.Range(\"C1\").PasteSpecial(-4163);\n  Application.CutCopyMode = 0;\n}",
+        "howToRun": "A1:A3 放公式或带格式数据，按 F5。",
+        "result": "C1:C3 只得到计算结果，不带公式和格式。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "粘贴后不退出复制模式，虚线框一直闪",
+        "reason": "剪贴板仍处于复制状态。",
+        "fix": "结束前设 Application.CutCopyMode = 0。",
+        "level": "mid"
+      },
+      {
+        "title": "PasteSpecial 参数写错，粘成了全部内容",
+        "reason": "不同粘贴类型对应不同数值。",
+        "fix": "只粘数值用 -4163，粘格式用 -4122。",
+        "level": "mid"
+      },
+      {
+        "title": "源区域和目标区域重叠，复制结果错乱",
+        "reason": "边复制边覆盖源数据。",
+        "fix": "目标区避开源区，或先复制到临时表。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "paste-special",
+        "kind": "companion",
+        "why": "PasteSpecial 的 VBA 参数。"
+      },
+      {
+        "id": "selection-clipboard",
+        "kind": "companion",
+        "why": "剪贴板与选择状态。"
+      }
+    ],
+    "oneLiner": "复制区域或只粘数值",
+    "summary": "Copy(目标) 连格式一起复制；PasteSpecial(-4163) 只粘数值。用完记得 CutCopyMode = 0，否则虚线框不消失。"
+  },
+  {
+    "id": "jsa-chart",
+    "enName": "JSA Chart",
+    "zhName": "JSA 建图表",
+    "alias": [
+      "ChartObjects",
+      "Chart",
+      "图表"
+    ],
+    "keywords": [
+      "JSA 插入图表",
+      "SetSourceData",
+      "ChartType"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "ActiveSheet.ChartObjects.Add(左, 上, 宽, 高)\nchart.Chart.SetSourceData(Range(...))\nchart.Chart.ChartType = 51",
+    "examples": [
+      {
+        "title": "用 A1:B4 建柱形图",
+        "code": "function 建图() {\n  const s = Sheets.Item(1);\n  const co = s.ChartObjects.Add(200, 20, 320, 220);\n  co.Chart.SetSourceData(s.Range(\"A1:B4\"));\n  co.Chart.ChartType = 51;\n}",
+        "howToRun": "A1:B4 有表头与数值，按 F5。",
+        "result": "表上出现一个柱形图，数据取自 A1:B4。"
+      },
+      {
+        "title": "改图表标题",
+        "code": "function 改标题() {\n  const s = Sheets.Item(1);\n  const co = s.ChartObjects.Item(1);\n  co.Chart.HasTitle = true;\n  co.Chart.ChartTitle.Text = \"月度销量\";\n}",
+        "howToRun": "先执行建图宏，再执行这个。",
+        "result": "图表顶部显示「月度销量」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "先建空图再设数据源，图表一片空白",
+        "reason": "没有数据源就没有系列。",
+        "fix": "建完立即 SetSourceData，或建图时直接指定区域。",
+        "level": "mid"
+      },
+      {
+        "title": "ChartType 用了不存在的枚举名，报错",
+        "reason": "部分 JSA 环境未注入 xl 常量。",
+        "fix": "用数值（柱形 51）或先确认常量可用。",
+        "level": "mid"
+      },
+      {
+        "title": "数据区没包含表头，系列名变成「系列1」",
+        "reason": "表头用于生成系列名。",
+        "fix": "数据源从表头行开始选。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-object",
+        "kind": "companion",
+        "why": "ChartObject 的 VBA 用法。"
+      },
+      {
+        "id": "chart-set-source",
+        "kind": "companion",
+        "why": "SetSourceData 参数。"
+      }
+    ],
+    "oneLiner": "用代码插一张图表",
+    "summary": "ChartObjects.Add 建图，SetSourceData 绑数据，ChartType 定类型（柱形 51）。数据源含表头才有正确系列名。"
+  },
+  {
+    "id": "jsa-pivot-refresh",
+    "enName": "JSA PivotTable",
+    "zhName": "JSA 透视表刷新",
+    "alias": [
+      "PivotTables",
+      "RefreshTable",
+      "透视表"
+    ],
+    "keywords": [
+      "JSA 刷新透视表",
+      "透视表字段",
+      "PivotTable 用法"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "ActiveSheet.PivotTables.Count\nActiveSheet.PivotTables.Item(1).RefreshTable()",
+    "examples": [
+      {
+        "title": "刷新当前表所有透视表",
+        "code": "function 刷新透视() {\n  const s = Sheets.Item(1);\n  const n = s.PivotTables.Count;\n  for (let i = 1; i <= n; i++) {\n    s.PivotTables.Item(i).RefreshTable();\n  }\n  console.log(\"刷新了 \" + n + \" 个\");\n}",
+        "howToRun": "表上有透视表，改完源数据后按 F5。",
+        "result": "所有透视表按最新源数据刷新。"
+      },
+      {
+        "title": "列出透视表字段名",
+        "code": "function 看字段() {\n  const s = Sheets.Item(1);\n  const pt = s.PivotTables.Item(1);\n  const fs = pt.PivotFields;\n  for (let i = 1; i <= fs.Count; i++) {\n    console.log(fs.Item(i).Name);\n  }\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "按顺序打印透视表可用字段名。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "源数据区域扩大了，透视表没跟着更新",
+        "reason": "透视表缓存还指向旧区域。",
+        "fix": "改源区域后刷新，必要时重建缓存。",
+        "level": "high"
+      },
+      {
+        "title": "表上没有透视表就取 Item(1)，报错",
+        "reason": "集合为空。",
+        "fix": "先判断 PivotTables.Count > 0。",
+        "level": "high"
+      },
+      {
+        "title": "以为 RefreshTable 会重算所有工作表",
+        "reason": "它只刷新当前表里的透视表。",
+        "fix": "要全工作簿就遍历 Worksheets 再逐个刷新。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-table-object",
+        "kind": "companion",
+        "why": "PivotTable 对象成员。"
+      },
+      {
+        "id": "pivot-refresh",
+        "kind": "companion",
+        "why": "RefreshTable 的 VBA 用法。"
+      }
+    ],
+    "oneLiner": "刷新或查看已有的透视表",
+    "summary": "PivotTables.Item(i).RefreshTable() 刷新单个透视表，先判断 Count 避免空集合报错。它不跨工作表，整簿刷新要自己遍历。"
+  },
+  {
+    "id": "jsa-inputbox",
+    "enName": "JSA InputBox",
+    "zhName": "JSA 输入框",
+    "alias": [
+      "InputBox",
+      "输入框",
+      "让用户填值"
+    ],
+    "keywords": [
+      "JSA 输入框",
+      "InputBox 返回值",
+      "取消输入"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "const v = InputBox(\"提示\", \"标题\", \"默认值\");",
+    "examples": [
+      {
+        "title": "输入姓名写进 A1",
+        "code": "function 录入() {\n  const s = Sheets.Item(1);\n  const v = InputBox(\"请输入姓名\", \"录入\", \"张三\");\n  if (!v) {\n    return;\n  }\n  s.Range(\"A1\").Value2 = v;\n}",
+        "howToRun": "按 F5，在弹窗里输入后确定。",
+        "result": "A1 写入输入的内容；点取消则什么都不做。"
+      },
+      {
+        "title": "输入数字并做加法",
+        "code": "function 加一() {\n  const v = InputBox(\"输入一个数字\", \"加一\", \"10\");\n  if (v === \"\") {\n    return;\n  }\n  alert(Number(v) + 1);\n}",
+        "howToRun": "按 F5，输入 10。",
+        "result": "弹 11。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把返回值直接当数字加，得到字符串拼接",
+        "reason": "InputBox 返回字符串。",
+        "fix": "先 Number(v) 或 parseInt(v) 再算。",
+        "level": "high"
+      },
+      {
+        "title": "点取消后仍继续写值，写进空字符串",
+        "reason": "取消通常返回空串或 false。",
+        "fix": "先 if (!v) return。",
+        "level": "mid"
+      },
+      {
+        "title": "一次弹太多输入框，用户不知道填哪个",
+        "reason": "每个 InputBox 都是独立弹窗。",
+        "fix": "把要填的项集中到一个表单，或写清标题。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "inputbox",
+        "kind": "companion",
+        "why": "InputBox 的 VBA 参数。"
+      },
+      {
+        "id": "jsa-msgbox",
+        "kind": "companion",
+        "why": "确认与提示用 MsgBox。"
+      }
+    ],
+    "oneLiner": "弹一个输入框拿用户输入",
+    "summary": "InputBox 返回字符串，取消时为空。拿数字要先 Number 转换；用户取消必须先判断再写值。"
+  },
+  {
+    "id": "jsa-msgbox",
+    "enName": "JSA MsgBox",
+    "zhName": "JSA 消息框",
+    "alias": [
+      "MsgBox",
+      "消息框",
+      "确认框"
+    ],
+    "keywords": [
+      "JSA 弹窗确认",
+      "MsgBox 返回值",
+      "是或否"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "const r = MsgBox(\"确认吗？\", 4, \"标题\");\n// 6 = 是，7 = 否",
+    "examples": [
+      {
+        "title": "确认后再删除一行",
+        "code": "function 确认删除() {\n  const s = Sheets.Item(1);\n  const r = MsgBox(\"确定删除第 2 行吗？\", 4, \"确认\");\n  if (r === 6) {\n    s.Rows.Item(2).Delete();\n  }\n}",
+        "howToRun": "按 F5，选「是」。",
+        "result": "第 2 行被删除；选「否」则不动。"
+      },
+      {
+        "title": "只做提示",
+        "code": "function 提示() {\n  MsgBox(\"处理完成\", 0, \"提示\");\n}",
+        "howToRun": "按 F5。",
+        "result": "弹出带「确定」按钮的提示框。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用字符串 \"6\" 和返回值比较，永远不相等",
+        "reason": "MsgBox 返回数字。",
+        "fix": "写 r === 6，不要加引号。",
+        "level": "high"
+      },
+      {
+        "title": "按钮类型写错，弹出来只有确定",
+        "reason": "第二个参数决定按钮组合。",
+        "fix": "「是/否」用 4；纯提示用 0。",
+        "level": "mid"
+      },
+      {
+        "title": "在循环里逐行弹确认，点到崩溃",
+        "reason": "MsgBox 阻塞执行。",
+        "fix": "只弹一次总确认，或先收集再统一处理。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "msgbox",
+        "kind": "companion",
+        "why": "MsgBox 的 VBA 参数与返回值。"
+      },
+      {
+        "id": "jsa-inputbox",
+        "kind": "companion",
+        "why": "需要用户填内容时用 InputBox。"
+      }
+    ],
+    "oneLiner": "弹提示或让用户点是/否",
+    "summary": "MsgBox 第二个参数 4 是「是/否」，返回 6 或 7，比较时用数字。它是阻塞弹窗，别在循环里逐行弹。"
+  },
+  {
+    "id": "jsa-application-run",
+    "enName": "JSA Application.Run",
+    "zhName": "JSA 调用宏",
+    "alias": [
+      "Application.Run",
+      "Run",
+      "调用另一个宏"
+    ],
+    "keywords": [
+      "JSA 调用宏",
+      "Run 传参",
+      "宏之间调用"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器/VBA 兼容对象模型口径编写，未逐条真机运行。",
+    "syntax": "Application.Run(\"宏名\", 参数1, 参数2)",
+    "examples": [
+      {
+        "title": "调用无参宏",
+        "code": "function 汇总() {\n  alert(\"汇总完成\");\n}\n\nfunction 入口() {\n  Application.Run(\"汇总\");\n}",
+        "howToRun": "按 F5 执行「入口」。",
+        "result": "弹出「汇总完成」。"
+      },
+      {
+        "title": "调用带参宏并拿返回值",
+        "code": "function 平方(n) {\n  return n * n;\n}\n\nfunction 调用() {\n  const v = Application.Run(\"平方\", 5);\n  alert(v);\n}",
+        "howToRun": "按 F5 执行「调用」。",
+        "result": "弹 25。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "宏名拼错或改名，运行时报找不到宏",
+        "reason": "Run 按名称查找，字符串不会自动补全。",
+        "fix": "统一用常量保存宏名，改名时一起改。",
+        "level": "high"
+      },
+      {
+        "title": "参数顺序或个数不对，被调宏拿到 undefined",
+        "reason": "Run 按位置传参。",
+        "fix": "对照被调宏的参数表逐个传。",
+        "level": "mid"
+      },
+      {
+        "title": "在被调宏里再 Run 回调用方，形成死循环",
+        "reason": "互相调用没有终止条件。",
+        "fix": "理清调用方向，只保留单向依赖。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "application-run",
+        "kind": "companion",
+        "why": "Application.Run 的 VBA 用法。"
+      },
+      {
+        "id": "jsa-function",
+        "kind": "companion",
+        "why": "被调宏也是函数。"
+      }
+    ],
+    "oneLiner": "按名字调用另一个 JSA 宏",
+    "summary": "Application.Run 按名称调用宏，参数按位置传，可拿返回值。宏名写错就找不到；相互调用要防死循环。"
+  }
+]

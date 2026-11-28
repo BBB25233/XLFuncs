@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "rows",
+    "enName": "Rows",
+    "zhName": "整行",
+    "alias": ["Rows", "整行", "行高", "删行"],
+    "keywords": ["插入一整行", "删除某一行", "设置行高", "一共多少行"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Rows(3)          ' 第 3 行\nRows(\"3:5\")      ' 3 到 5 行\nRows.Count       ' 工作表总行数",
+    "examples": [
+      {
+        "title": "在第 3 行上面插入一行并填内容",
+        "code": "Sub 插一行()\n    Rows(3).Insert\n    Rows(3).Value = Array(\"新增\", \"2026-11-27\", 0)\nEnd Sub",
+        "howToRun": "在第 3 行有数据时运行，能看出整体下移。",
+        "result": "原第 3 行下移到第 4 行，新第 3 行写入三个值。"
+      },
+      {
+        "title": "删掉第 5 行、把第 2 行调高",
+        "code": "Sub 删行调高()\n    Rows(5).Delete\n    Rows(2).RowHeight = 28\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "第 5 行被删除，其下各行整体上移；第 2 行行高变成 28。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Rows(3) 删掉的是活动表第 3 行，不是你要的那张",
+        "reason": "Rows 省略父对象时作用在活动工作表。",
+        "fix": "写成 ws.Rows(3).Delete，ws 用 Set 指定工作表。",
+        "level": "high"
+      },
+      {
+        "title": "Rows(\"3:5\") 用了中文冒号或空格报 1004",
+        "reason": "整行区域字符串必须是 \"3:5\" 这种英文冒号格式。",
+        "fix": "用 Rows(\"3:5\")，或 Range(Rows(3), Rows(5))。",
+        "level": "mid",
+        "errorCode": "1004"
+      },
+      {
+        "title": "拿 Rows.Count 当数据行数，得到 1048576",
+        "reason": "Rows.Count 是工作表总行数，不是已用行数。",
+        "fix": "数据末行用 Cells(Rows.Count, 1).End(xlUp).Row。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "columns", "kind": "companion", "why": "整列操作与整行完全对称，一起记。" },
+      { "id": "delete-empty-rows", "kind": "companion", "why": "删空行的配方就是靠 Rows(i).Delete。" }
+    ],
+    "oneLiner": "按行号整行处理",
+    "summary": "Rows 操作的是整行：插入、删除、调高、取总数。最容易出问题的是「没写父对象」和「把 Count 当数据行数」。"
+  },
+  {
+    "id": "columns",
+    "enName": "Columns",
+    "zhName": "整列",
+    "alias": ["Columns", "整列", "列宽", "AutoFit"],
+    "keywords": ["设置列宽", "按内容自动调宽", "删除一整列"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Columns(\"C\")        ' C 列\nColumns(3)          ' 也是 C 列\nColumns(\"C:E\")      ' C 到 E 列",
+    "examples": [
+      {
+        "title": "按内容自动调宽",
+        "code": "Sub 自动调宽()\n    Columns(\"A:E\").AutoFit\nEnd Sub",
+        "howToRun": "A:E 有长短不一的内容时运行。",
+        "result": "五列都按最长内容自动调整宽度，#### 消失。"
+      },
+      {
+        "title": "固定列宽 + 删除一列",
+        "code": "Sub 列宽与删列()\n    Columns(\"C\").ColumnWidth = 12\n    Columns(\"F\").Delete\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "C 列宽度固定为 12 字符；F 列被删除，右侧各列左移。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对整列设边框/底色，文件明显变大又卡",
+        "reason": "一整列 100 多万个单元格都被记上格式。",
+        "fix": "只对数据区操作：Range(\"C1:C\" & 末行)。",
+        "level": "high"
+      },
+      {
+        "title": "Columns(3) 以为是第 3 张表",
+        "reason": "Columns 的参数是列号或列字母，不是表序号。",
+        "fix": "取工作表用 Worksheets(3)，取列用 Columns(3)=C 列。",
+        "level": "mid"
+      },
+      {
+        "title": "删除列后循环坐标错位，后面数据漏处理",
+        "reason": "删列会让右侧列整体左移。",
+        "fix": "删除类操作一律从右往左（倒序）循环。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "rows", "kind": "companion", "why": "行列操作成对出现，语法一致。" },
+      { "id": "numberformat", "kind": "companion", "why": "列宽不够时格式再对也会显示 ####，两者要一起管。" }
+    ],
+    "oneLiner": "按列号整列处理",
+    "summary": "Columns 用于列宽、删除、整列格式。两条纪律：别对整列做格式化（文件会变大），删除列要从右往左。"
+  },
+  {
+    "id": "resize",
+    "enName": "Range.Resize",
+    "zhName": "调整区域大小",
+    "alias": ["Resize", "扩区域", "改尺寸"],
+    "keywords": ["从一个单元格扩展成一块", "动态确定区域大小", "和Offset一起用"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range对象.Resize(行数, 列数)",
+    "examples": [
+      {
+        "title": "从 A1 扩成 10 行 3 列",
+        "code": "Sub 扩区域()\n    Dim r As Range\n    Set r = Range(\"A1\").Resize(10, 3)\n    MsgBox r.Address & \" 共 \" & r.Cells.Count & \" 个单元格\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出 $A$1:$C$10，共 30 个单元格。"
+      },
+      {
+        "title": "按实际行数动态取数据区",
+        "code": "Sub 动态取区()\n    Dim 末行 As Long, r As Range\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    Set r = Range(\"A1\").Resize(末行, 4)\n    r.Interior.Color = RGB(242, 242, 242)\nEnd Sub",
+        "howToRun": "A 列有数据时运行。",
+        "result": "A1:D{末行} 整块被填上浅灰底，不用手写区域地址。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Resize(0, 3) 报 1004",
+        "reason": "行数或列数不能为 0，必须是正整数。",
+        "fix": "先判断末行 >= 1，否则跳过。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "以为 Resize 是「在原有区域基础上再扩」",
+        "reason": "Resize 是从左上角重新定义尺寸，不是叠加。",
+        "fix": "需要偏移后再定尺寸，就 Offset(...).Resize(...) 连着写。",
+        "level": "mid"
+      },
+      {
+        "title": "多单元格区域 Resize 后起点变了",
+        "reason": "Resize 以原区域的左上角为起点。",
+        "fix": "先 .Cells(1,1) 取左上角，再 Resize。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "offset", "kind": "companion", "why": "先 Offset 定位再 Resize 定大小，是动态区域的标配组合。" },
+      { "id": "end-xldown", "kind": "companion", "why": "行数往往来自 End(xlUp) 求出的末行。" }
+    ],
+    "oneLiner": "从左上角重新定义区域大小",
+    "summary": "Resize 解决「区域大小运行时才知道」的问题：起点固定、尺寸现算。和 Offset 组合就是最常用的动态区域写法。"
+  },
+  {
+    "id": "text-value",
+    "enName": "Range.Text",
+    "zhName": "显示出来的文字",
+    "alias": ["Text", "显示文本", "单元格显示", "####"],
+    "keywords": ["取单元格显示的样子", "为什么显示####", "值和显示不一样"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Text   ' 屏幕上显示的文字\nRange.Value  ' 真实的值",
+    "examples": [
+      {
+        "title": "同格对比 Value 与 Text",
+        "code": "Sub 值与显示()\n    Range(\"A1\").Value = 1234.567\n    Range(\"A1\").NumberFormat = \"#,##0.00\"\n    MsgBox \"Value：\" & Range(\"A1\").Value & vbCrLf & \"Text：\" & Range(\"A1\").Text\nEnd Sub",
+        "howToRun": "按 F5；若列宽太窄，Text 可能显示成 ####。",
+        "result": "Value 是 1234.567，Text 是「1,234.57」——一个真实值，一个显示样子。"
+      },
+      {
+        "title": "导出前先把显示文本收集起来",
+        "code": "Sub 收集显示文本()\n    Dim i As Long\n    For i = 2 To 5\n        Debug.Print Cells(i, 1).Address & \" → \" & Cells(i, 1).Text\n    Next i\nEnd Sub",
+        "howToRun": "A2:A5 填不同格式的内容后运行，看立即窗口。",
+        "result": "打印出来的都是屏幕上看到的字符串，与前导零、日期格式一致。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Text 拿到一堆 ####，以为是数据坏了",
+        "reason": "列宽不足时 Excel 的显示就是 ####，Text 忠实返回它。",
+        "fix": "先 AutoFit 或调宽，再取 Text；要真实值请用 Value。",
+        "level": "high"
+      },
+      {
+        "title": "用 Text 做数值计算，报类型不匹配",
+        "reason": "Text 是字符串，含千分位逗号与货币符号。",
+        "fix": "计算用 Value/Value2，只有展示/导出才用 Text。",
+        "level": "mid",
+        "errorCode": "13"
+      }
+    ],
+    "related": [
+      { "id": "value", "kind": "alternative", "why": "要算就用 Value，要看就用 Text。" },
+      { "id": "numberformat", "kind": "companion", "why": "Text 的样子完全由 NumberFormat 和列宽决定。" }
+    ],
+    "oneLiner": "屏幕上显示成什么，就返回什么",
+    "summary": "Text 返回「你眼睛看到的字符串」，受格式与列宽影响，甚至会返回 ####。它适合导出与核对显示效果，不适合参与计算。"
+  },
+  {
+    "id": "formula",
+    "enName": "Range.Formula",
+    "zhName": "写入公式",
+    "alias": ["Formula", "FormulaR1C1", "写公式", "公式字符串"],
+    "keywords": ["用代码写公式进去", "读取单元格公式", "批量填充公式"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Formula = \"=SUM(A1:A10)\"\nRange.FormulaR1C1 = \"=SUM(R[-9]C:R[-1]C)\"",
+    "examples": [
+      {
+        "title": "一列写公式并算出结果",
+        "code": "Sub 写公式列()\n    With Range(\"C2:C10\")\n        .Formula = \"=A2*B2\"\n        .NumberFormat = \"#,##0.00\"\n    End With\n    MsgBox \"C2 的结果是 \" & Range(\"C2\").Value\nEnd Sub",
+        "howToRun": "A、B 两列有数字时运行。",
+        "result": "C2:C10 都是同行相乘的公式，写入后立刻算出结果。"
+      },
+      {
+        "title": "读出现有公式（而不是值）",
+        "code": "Sub 读公式()\n    MsgBox Range(\"C2\").Formula & vbCrLf & \"值是：\" & Range(\"C2\").Value\nEnd Sub",
+        "howToRun": "先运行上一个示例，再运行这个。",
+        "result": "先显示「=A2*B2」，再显示算出来的数字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "公式里用了中文函数名，得到 #NAME?",
+        "reason": "代码写入的公式必须用英文函数名。",
+        "fix": "写 SUM/VLOOKUP，界面上的中文名只是翻译。",
+        "level": "high",
+        "errorCode": "#NAME?"
+      },
+      {
+        "title": "用 .Value 写公式，结果变成文本",
+        "reason": "Value 不解析等号。",
+        "fix": "公式用 .Formula / .FormulaR1C1，值才用 .Value。",
+        "level": "mid"
+      },
+      {
+        "title": "跨表公式没给表名加引号，报 1004",
+        "reason": "表名含空格或特殊字符时必须用单引号。",
+        "fix": "写成 \"='销售 明细'!A1\"。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      { "id": "relative-absolute-reference", "kind": "companion", "why": "写公式前先想清楚 $ 与相对引用的差别。" },
+      { "id": "value", "kind": "companion", "why": "读完公式要算结果时，Value 才是你要的。" }
+    ],
+    "oneLiner": "把一个公式写进单元格",
+    "summary": "Formula 写 A1 风格公式（英文函数名），FormulaR1C1 写相对风格。它和 Value 是两条路：一个写公式，一个写结果。"
+  },
+  {
+    "id": "interior",
+    "enName": "Range.Interior",
+    "zhName": "单元格底色",
+    "alias": ["Interior", "底色", "填充色", "ColorIndex"],
+    "keywords": ["给单元格上色", "取消底色", "隔行换色"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Range.Interior.Color = RGB(255, 242, 204)\nRange.Interior.ColorIndex = xlNone  ' 清除底色",
+    "examples": [
+      {
+        "title": "标黄 + 用 ColorIndex 清除",
+        "code": "Sub 上色再清除()\n    Range(\"A1:C3\").Interior.Color = RGB(255, 235, 156)\n    MsgBox \"已标黄，下面清除\"\n    Range(\"A1:C3\").Interior.ColorIndex = xlNone\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "先整块变成浅黄底，再恢复成无填充。"
+      },
+      {
+        "title": "隔行浅灰（只处理数据区）",
+        "code": "Sub 隔行底色()\n    Dim i As Long, 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    For i = 2 To 末行 Step 2\n        Rows(i).Interior.Color = RGB(245, 245, 245)\n    Next i\nEnd Sub",
+        "howToRun": "A 列有数据时运行。",
+        "result": "偶数行整行浅灰，形成条纹表格。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 ColorIndex 记颜色，换主题后颜色变了",
+        "reason": "ColorIndex 是调色板索引，不同版本/主题可能不同。",
+        "fix": "明确颜色用 RGB(）；清除统一用 xlNone。",
+        "level": "mid"
+      },
+      {
+        "title": "对整列上色，文件从几百 KB 涨到几 MB",
+        "reason": "整列 100 多万格都记录了填充格式。",
+        "fix": "只对 UsedRange 或实际数据区上色。",
+        "level": "high"
+      },
+      {
+        "title": "想恢复「无填充」，赋了白色",
+        "reason": "白色是真填充，筛选/打印时表现不同。",
+        "fix": "清除用 ColorIndex = xlNone。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "font", "kind": "companion", "why": "字体与底色一般同时设置。" },
+      { "id": "conditional-color", "kind": "companion", "why": "要「按值自动变色」用条件格式，而不是一次性上色。" }
+    ],
+    "oneLiner": "给单元格刷底色",
+    "summary": "Interior.Color 用 RGB 上色，ColorIndex = xlNone 清除。做隔行条纹或标黄重点行都靠它，但别对整列操作。"
+  },
+  {
+    "id": "font",
+    "enName": "Range.Font",
+    "zhName": "字体格式",
+    "alias": ["Font", "字体", "字号", "加粗"],
+    "keywords": ["统一字体字号", "整块加粗", "字体颜色"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Range.Font.Name / .Size / .Bold / .Italic / .Color",
+    "examples": [
+      {
+        "title": "表头改成黑体 12 号加粗",
+        "code": "Sub 表头格式()\n    With Range(\"A1:D1\").Font\n        .Name = \"微软雅黑\"\n        .Size = 12\n        .Bold = True\n        .Color = RGB(0, 0, 0)\n    End With\nEnd Sub",
+        "howToRun": "第一行有表头时运行。",
+        "result": "A1:D1 变成 12 号微软雅黑加粗黑字。"
+      },
+      {
+        "title": "整块恢复正常字体",
+        "code": "Sub 恢复字体()\n    With Range(\"A1:D10\").Font\n        .Name = \"宋体\"\n        .Size = 10\n        .Bold = False\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "区域字号与字重恢复成常规正文样式。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只设了 .Bold，忘了字号，结果大小不变",
+        "reason": "各属性独立，设置哪个改哪个。",
+        "fix": "需要整体统一时把 Name/Size/Bold 一起设。",
+        "level": "mid"
+      },
+      {
+        "title": "字体名写错（如「微软雅黑 」多空格），Excel 回退默认字体",
+        "reason": "字体名必须与系统里完全一致。",
+        "fix": "在 Excel 里手动设一次，再从 VBA 里读 .Name 出来确认。",
+        "level": "mid"
+      },
+      {
+        "title": "逐格设字体，几千行很慢",
+        "reason": "每次设置都要和界面交互。",
+        "fix": "对整块 Range 一次设置。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "interior", "kind": "companion", "why": "底色和字体是最常成对出现的两个格式属性。" },
+      { "id": "format-column", "kind": "companion", "why": "整列套格式的配方里就用了 Font。" }
+    ],
+    "oneLiner": "管字体、字号、粗细、颜色",
+    "summary": "Font 是格式里最常用的一组属性：Name/Size/Bold/Italic/Color，都是「设哪个改哪个」，整体统一时一起写。"
+  },
+  {
+    "id": "borders",
+    "enName": "Range.Borders",
+    "zhName": "边框",
+    "alias": ["Borders", "边框", "LineStyle", "表格线"],
+    "keywords": ["给区域加边框", "只加外框", "表内横线"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Borders.LineStyle = xlContinuous\nRange.Borders(xlEdgeBottom).Weight = xlMedium",
+    "examples": [
+      {
+        "title": "整块加细边框（含内部横竖线）",
+        "code": "Sub 加全框()\n    With Range(\"A1:D5\").Borders\n        .LineStyle = xlContinuous\n        .Weight = xlThin\n        .Color = RGB(0, 0, 0)\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A1:D5 每格都有细黑边框，像一张规整的表格。"
+      },
+      {
+        "title": "只加表格内部的横线",
+        "code": "Sub 加内横线()\n    Range(\"A1:D5\").Borders(xlInsideHorizontal).LineStyle = xlContinuous\nEnd Sub",
+        "howToRun": "在已有数据的表上运行。",
+        "result": "只出现行与行之间的横线，外框不动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "设了边框却看不见，以为是代码没执行",
+        "reason": "边框颜色与底色相同，或 Weight 太细。",
+        "fix": "显式设置 .Color 与 .Weight；先对一小块试。",
+        "level": "mid"
+      },
+      {
+        "title": "Borders 直接设不生效，必须用 LineStyle",
+        "reason": "边框显隐由 LineStyle 决定，只设 Weight/Color 不会出现线。",
+        "fix": "先 .LineStyle = xlContinuous，再调粗细颜色；清除用 xlNone。",
+        "level": "high"
+      },
+      {
+        "title": "对整列加边框，文件暴增、保存变慢",
+        "reason": "整列都被记上边框格式。",
+        "fix": "只对数据区加，必要时用 UsedRange 取范围。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "format-column", "kind": "companion", "why": "套格式脚本通常包含边框设置。" },
+      { "id": "usedrange", "kind": "companion", "why": "给现有数据加框，用 UsedRange 取范围最省事。" }
+    ],
+    "oneLiner": "给区域画表格线",
+    "summary": "Borders 的开关是 LineStyle：xlContinuous 有线、xlNone 清线，然后才谈粗细与颜色。要外框、要内横线，就指定对应的边框常量。"
+  },
+  {
+    "id": "autofilter",
+    "enName": "Range.AutoFilter",
+    "zhName": "自动筛选",
+    "alias": ["AutoFilter", "筛选", "过滤", "条件筛选"],
+    "keywords": ["按条件筛出数据", "关闭筛选", "多个条件筛选"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.AutoFilter Field:=列号, Criteria1:=\"条件\"\nActiveSheet.AutoFilterMode = False   ' 关闭",
+    "examples": [
+      {
+        "title": "按 B 列筛出大于等于 100 的行",
+        "code": "Sub 筛选金额()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    Range(\"A1:D\" & 末行).AutoFilter Field:=2, Criteria1:=\">=100\"\nEnd Sub",
+        "howToRun": "A1:D 有表头与数据时运行。",
+        "result": "只显示 B 列金额 ≥100 的行，其他行隐藏。"
+      },
+      {
+        "title": "取消筛选",
+        "code": "Sub 取消筛选()\n    If ActiveSheet.AutoFilterMode Then ActiveSheet.AutoFilterMode = False\nEnd Sub",
+        "howToRun": "在筛选状态下运行。",
+        "result": "所有行恢复显示，筛选按钮消失。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Field 写 1 却筛了别的列",
+        "reason": "Field 是区域内的相对列号，从筛选区最左列算 1。",
+        "fix": "先确认 Range 从哪一列开始，Field 从那里数。",
+        "level": "high"
+      },
+      {
+        "title": "代码里复制筛选结果，只复制到可见行之外",
+        "reason": "普通 Copy 会把隐藏行一起带上。",
+        "fix": "用 SpecialCells(xlCellTypeVisible).Copy，或直接读值再写。",
+        "level": "high"
+      },
+      {
+        "title": "没有表头就 AutoFilter，结果第一行被当成表头",
+        "reason": "AutoFilter 默认第一行是标题行。",
+        "fix": "保证区域第一行是表头；没有表头就加一行标题。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "sort", "kind": "companion", "why": "先排序再筛选，结果更符合阅读习惯。" },
+      { "id": "conditional-summary", "kind": "companion", "why": "筛选只是看，汇总要用 SUMIFS 另一套办法。" }
+    ],
+    "oneLiner": "代码版的下拉筛选",
+    "summary": "AutoFilter 用 Field（相对列号）+ Criteria1 控制筛选，关闭靠 AutoFilterMode。复制筛选结果必须用可见单元格，否则隐藏行也会被带走。"
+  },
+  {
+    "id": "sort",
+    "enName": "Range.Sort",
+    "zhName": "排序",
+    "alias": ["Sort", "排序", "多列排序", "降序"],
+    "keywords": ["按某列排序", "多个关键字排序", "表头不参与排序"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range.Sort Key1:=Range(\"C2\"), Order1:=xlDescending, Header:=xlYes",
+    "examples": [
+      {
+        "title": "按金额降序",
+        "code": "Sub 按金额降序()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    Range(\"A1:D\" & 末行).Sort Key1:=Range(\"D2\"), Order1:=xlDescending, Header:=xlYes\nEnd Sub",
+        "howToRun": "D 列是金额时运行。",
+        "result": "整张表按 D 列从大到小重排，表头留在第一行。"
+      },
+      {
+        "title": "两列排序：先部门再金额",
+        "code": "Sub 两列排序()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    With Range(\"A1:D\" & 末行)\n        .Sort Key1:=Range(\"B2\"), Order1:=xlAscending, _\n              Key2:=Range(\"D2\"), Order2:=xlDescending, Header:=xlYes\n    End With\nEnd Sub",
+        "howToRun": "B 列部门、D 列金额时运行。",
+        "result": "先按部门升序，同部门内按金额降序。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "忘写 Header:=xlYes，表头也被排进数据",
+        "reason": "默认会按当前区域推断，区域不规范时表头会被当成一行数据。",
+        "fix": "明确写 Header:=xlYes，并保证第一行确实是表头。",
+        "level": "high"
+      },
+      {
+        "title": "Key1 用了相对活动表的 Range，排错列",
+        "reason": "Key1 应是排序区域内的单元格，写错父对象会指向别的表。",
+        "fix": "写成 Range(\"D2\") 且排序区域包含它，或直接用列字母 \"D\"。",
+        "level": "mid"
+      },
+      {
+        "title": "排序后公式/格式错位",
+        "reason": "整表排序时，引用了固定区域的公式不会自动跟着走。",
+        "fix": "先把关键公式改成整列引用（如 $A:$A），排序后再检查结果。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "autofilter", "kind": "companion", "why": "排序与筛选常一起使用，注意两者都会改变可见行。" },
+      { "id": "usedrange", "kind": "companion", "why": "排序区域一般用 UsedRange 或末行来确定。" }
+    ],
+    "oneLiner": "按一列或多列重排数据",
+    "summary": "Sort 的关键参数是 Key1/Order1/Header。最常翻车的是表头被排进数据（忘写 Header:=xlYes）和排序区域没包住整行数据。"
+  },
+  {
+    "id": "end-xldown",
+    "enName": "Range.End(xlUp / xlDown)",
+    "zhName": "按方向找边界",
+    "alias": ["End", "xlUp", "xlDown", "最后一行", "最后一个非空"],
+    "keywords": ["找最后一行", "找第一处空白", "数据边界"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Cells(Rows.Count, 1).End(xlUp).Row   ' 从底往上找最后一格有值的行",
+    "examples": [
+      {
+        "title": "取 A 列最后一行（最常用的一行代码）",
+        "code": "Sub 最后一行()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    MsgBox \"A 列最后一行是 \" & 末行\nEnd Sub",
+        "howToRun": "A 列有数据时运行。",
+        "result": "返回最后一个非空单元格所在行号，空表返回 1。"
+      },
+      {
+        "title": "自下而上清除连续空行前的边界",
+        "code": "Sub 向下找边界()\n    Dim 边界 As Long\n    边界 = Range(\"A1\").End(xlDown).Row\n    MsgBox \"A1 往下第一处空白在第 \" & 边界 + 1 & \" 行\"\nEnd Sub",
+        "howToRun": "A 列从 A1 开始连续有值、中间留一个空行时运行。",
+        "result": "定位到连续数据块的末尾，提示下一行是空白。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "xlDown 遇到空列，直接冲到 1048576 行",
+        "reason": "End(xlDown) 相当于 Ctrl+↓，中间没有数据就一路到底。",
+        "fix": "求末行统一用 Cells(Rows.Count, 1).End(xlUp).Row。",
+        "level": "high"
+      },
+      {
+        "title": "A 列有公式返回空串，末行被判到最底",
+        "reason": "空串不是真正的空单元格，End(xlUp) 不会停在它上面。",
+        "fix": "改用 CountA 或按关键列判断，必要时清除尾部公式。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "cells", "kind": "companion", "why": "End 通常接在 Cells(Rows.Count, 1) 后面。" },
+      { "id": "usedrange", "kind": "alternative", "why": "整块取范围可以用 UsedRange，单列求末行用 End 更准。" }
+    ],
+    "oneLiner": "像 Ctrl+↑ 一样找数据边界",
+    "summary": "End(xlUp) 是「从最底往上找最后一个非空」，求末行的标准写法。反过来 xlDown 在空列上会冲到最底，几乎只在确定连续数据时使用。"
+  },
+  {
+    "id": "usedrange",
+    "enName": "Worksheet.UsedRange",
+    "zhName": "已用区域",
+    "alias": ["UsedRange", "已用区域", "数据范围"],
+    "keywords": ["表里到底有多少数据", "取整块数据区", "已用区域不准"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Worksheet.UsedRange          ' 整块已用区域\nWorksheet.UsedRange.Rows.Count ' 行数（含表头）",
+    "examples": [
+      {
+        "title": "看清已用区域",
+        "code": "Sub 看已用区域()\n    Dim ws As Worksheet\n    Set ws = ActiveSheet\n    With ws.UsedRange\n        MsgBox \"区域 \" & .Address & \"，\" & .Rows.Count & \" 行 \" & .Columns.Count & \" 列\"\n    End With\nEnd Sub",
+        "howToRun": "在有数据的表上运行。",
+        "result": "弹出实际数据块地址与行列数。"
+      },
+      {
+        "title": "按已用区域批量设格式",
+        "code": "Sub 整块加边框()\n    With ActiveSheet.UsedRange.Borders\n        .LineStyle = xlContinuous\n        .Weight = xlThin\n    End With\nEnd Sub",
+        "howToRun": "在数据表上运行。",
+        "result": "只给真正有内容的区域加框，不会碰到整列。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "UsedRange 比实际数据大很多",
+        "reason": "曾经设过格式、删过内容的区域仍被算作「已用」。",
+        "fix": "另存或清除多余行列格式后重开；精确范围请用末行+末列拼。",
+        "level": "high"
+      },
+      {
+        "title": "UsedRange 行数包含了表头",
+        "reason": "它从 A1 开始算整块，表头也是数据行。",
+        "fix": "数据条数 = UsedRange.Rows.Count - 1（前提是表头只有一行）。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "end-xldown", "kind": "alternative", "why": "只要单列末行时，End(xlUp) 比 UsedRange 更可靠。" },
+      { "id": "borders", "kind": "companion", "why": "给数据区加框，用 UsedRange 取范围最省事。" }
+    ],
+    "oneLiner": "工作表里真正用到的矩形区域",
+    "summary": "UsedRange 给出「从 A1 起的最小矩形」，方便整块处理和量尺寸。但它会把残留格式算进去，精确到行时还是要靠 End(xlUp)。"
+  },
+  {
+    "id": "worksheet",
+    "enName": "Worksheet",
+    "zhName": "工作表对象",
+    "alias": ["Worksheet", "工作表", "Sheets", "改名", "隐藏表"],
+    "keywords": ["取一张工作表", "复制工作表", "隐藏工作表", "删表"],
+    "kind": "member",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Worksheets(\"名\") / Worksheets(序号)\n.Name / .Copy / .Delete / .Visible / .Cells",
+    "examples": [
+      {
+        "title": "复制一张表并改名",
+        "code": "Sub 复制表()\n    Dim ws As Worksheet\n    Set ws = Worksheets(\"明细\")\n    ws.Copy After:=Worksheets(Worksheets.Count)\n    ActiveSheet.Name = \"明细_备份\"\nEnd Sub",
+        "howToRun": "存在名为「明细」的表时运行。",
+        "result": "在最后新增一张内容相同的表，名字是「明细_备份」。"
+      },
+      {
+        "title": "隐藏 / 显示一张表",
+        "code": "Sub 隐藏与显示()\n    Worksheets(\"明细_备份\").Visible = xlSheetHidden\n    MsgBox \"已隐藏，点确定后恢复\"\n    Worksheets(\"明细_备份\").Visible = xlSheetVisible\nEnd Sub",
+        "howToRun": "先运行上一个示例生成备份表。",
+        "result": "备份表先被隐藏，点确定后重新显示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "复制后没指定位置，新表跑到前面还改了活动表",
+        "reason": "Copy 不传 After/Before 时位置不确定，且新表会成为活动表。",
+        "fix": "显式写 After:=Worksheets(Worksheets.Count)，再设置 .Name。",
+        "level": "mid"
+      },
+      {
+        "title": "删除唯一可见的工作表，报 1004",
+        "reason": "工作簿至少要有一张可见工作表。",
+        "fix": "删表前检查 Worksheets.Count 与 Visible 状态。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "用 ActiveSheet 当目标表，切表后写错地方",
+        "reason": "ActiveSheet 会随用户点击变化。",
+        "fix": "用 Set ws = Worksheets(\"名\") 固定目标，别依赖活动表。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      { "id": "workbook", "kind": "companion", "why": "工作表属于工作簿，层级关系要清楚。" },
+      { "id": "collection-index", "kind": "companion", "why": "工作表是集合，按序号或名字取。" }
+    ],
+    "oneLiner": "一张工作表：改名、复制、隐藏",
+    "summary": "Worksheet 是日常操作的主战场：取表、改名、复制、隐藏、删除都在它身上。铁律是用 Set 固定目标表，不要依赖 ActiveSheet。"
+  },
+  {
+    "id": "workbook",
+    "enName": "Workbook",
+    "zhName": "工作簿对象",
+    "alias": ["Workbook", "工作簿", "ThisWorkbook", "ActiveWorkbook", "保存"],
+    "keywords": ["当前这个文件", "另一个文件里的表", "保存关闭"],
+    "kind": "member",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "ThisWorkbook           ' 代码所在的工作簿\nActiveWorkbook         ' 当前激活的工作簿\nWorkbooks(\"名字.xlsx\")",
+    "examples": [
+      {
+        "title": "打开另一个文件并读它的数据",
+        "code": "Sub 读外部文件()\n    Dim wb As Workbook\n    Set wb = Workbooks.Open(\"C:\\数据\\月报.xlsx\")\n    MsgBox wb.Worksheets(1).Range(\"A1\").Value\n    wb.Close SaveChanges:=False\nEnd Sub",
+        "howToRun": "把路径改成真实文件后运行；脚本会自动关闭该文件且不保存。",
+        "result": "弹出外部文件第一张表 A1 的值，随后文件被关闭。"
+      },
+      {
+        "title": "区分 ThisWorkbook 与 ActiveWorkbook",
+        "code": "Sub 区分两个工作簿()\n    MsgBox \"代码所在：\" & ThisWorkbook.Name\n    If ActiveWorkbook Is Nothing Then Exit Sub\n    MsgBox \"当前激活：\" & ActiveWorkbook.Name\nEnd Sub",
+        "howToRun": "打开两个工作簿，在其中一个里运行。",
+        "result": "两个名字可能相同也可能不同，取决于你从哪个文件里点的运行。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用了 ActiveWorkbook，结果改到了别人发来的文件",
+        "reason": "ActiveWorkbook 跟着激活窗口走，不受代码所在文件控制。",
+        "fix": "操作自家数据一律用 ThisWorkbook，外部文件用 Set 显式引用。",
+        "level": "high"
+      },
+      {
+        "title": "Open 了文件却忘了 Close，一堆隐藏的工作簿残留",
+        "reason": "打开的工作簿不会自动关闭。",
+        "fix": "用完 wb.Close SaveChanges:=False；出错路径也要关。",
+        "level": "high"
+      },
+      {
+        "title": "对未保存的新文件调用 Save，弹出「另存为」对话框",
+        "reason": "新工作簿没有路径，Save 等于另存为。",
+        "fix": "先 SaveAs 指定路径，再用 Save；批量场景避免弹出对话框。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "worksheet", "kind": "companion", "why": "工作簿里的内容都在工作表上。" },
+      { "id": "export-csv", "kind": "companion", "why": "另存为 CSV 就是对工作簿调用 SaveAs。" }
+    ],
+    "oneLiner": "一个 Excel 文件（工作簿）",
+    "summary": "Workbook 是文件级对象：打开、保存、关闭、遍历工作表。最需要分清的是 ThisWorkbook（代码所在文件）和 ActiveWorkbook（当前激活文件）。"
+  },
+  {
+    "id": "merge-two-sheets",
+    "enName": "Recipe: 两表按编号合并",
+    "zhName": "两表按编号合并",
+    "alias": ["合并两表", "按编号匹配", "跨表取数", "数据合并"],
+    "keywords": ["两张表按编号拼在一起", "把另一张表的信息带过来", "批量匹配"],
+    "kind": "recipe",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Sub 合并两表()\n    ' Dictionary 建索引 → 遍历目标表写入\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：主表按编号带出价格表的信息",
+        "code": "Sub 合并两表()\n    Dim 主表 As Worksheet, 价格表 As Worksheet\n    Dim d As Object, i As Long, 末行 As Long, 键 As String\n    Set 主表 = ThisWorkbook.Worksheets(\"订单\")\n    Set 价格表 = ThisWorkbook.Worksheets(\"价格\")\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    For i = 2 To 价格表.Cells(价格表.Rows.Count, 1).End(xlUp).Row\n        d(CStr(价格表.Cells(i, 1).Value)) = 价格表.Cells(i, 2).Value\n    Next i\n    末行 = 主表.Cells(主表.Rows.Count, 1).End(xlUp).Row\n    For i = 2 To 末行\n        键 = CStr(主表.Cells(i, 1).Value)\n        If d.Exists(键) Then\n            主表.Cells(i, 3).Value = d(键)\n        Else\n            主表.Cells(i, 3).Value = \"未匹配\"\n        End If\n    Next i\n    MsgBox \"处理 \" & 末行 - 1 & \" 行，价格表 \" & d.Count & \" 条\"\nEnd Sub",
+        "howToRun": "准备「订单」（A 编号、B 数量）与「价格」（A 编号、B 单价）两张表，把表名改成实际的再运行。",
+        "result": "订单表 C 列填入对应单价，找不到编号的行写「未匹配」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "编号一边是文本一边是数字，全部匹配不上",
+        "reason": "「001」与 1 在 Dictionary 里是两个键。",
+        "fix": "统一用 CStr 转字符串再比较（脚本里已这样做），或两边都转数值。",
+        "level": "high"
+      },
+      {
+        "title": "价格表里有重复编号，取到的是最后一条",
+        "reason": "Dictionary 同一个键重复赋值会覆盖。",
+        "fix": "合并前先去重，或明确保留第一条（加 If Not d.Exists(键)）。",
+        "level": "mid"
+      },
+      {
+        "title": "直接在主表上边读边写，行数算错",
+        "reason": "写入的列影响了末行判断或覆盖了源数据。",
+        "fix": "先算末行、再循环写；写入列不要与判断列重叠。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "vlookup", "kind": "alternative", "why": "只是想在表里带出数据，用 VLOOKUP 公式更省事；要固化结果、处理重复键才写代码。" },
+      { "id": "collection-index", "kind": "companion", "why": "跨表读取要先按名字取到工作表对象。" }
+    ],
+    "oneLiner": "按编号把两张表的数据拼起来",
+    "summary": "两张表按编号合并，本质是「建一个键值索引再查」。Dictionary 比套 VLOOKUP 快、也不怕列顺序变动；唯一要小心的是编号类型不一致与重复键。"
+  },
+  {
+    "id": "rename-sheets",
+    "enName": "Recipe: 批量重命名工作表",
+    "zhName": "批量重命名工作表",
+    "alias": ["批量改名", "重命名工作表", "按清单改名"],
+    "keywords": ["按A列清单改表名", "一次改很多表名", "表名带非法字符"],
+    "kind": "recipe",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Sub 批量改名()\n    ' 读清单 → 清洗非法字符 → 逐个改名\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：按 A 列清单从上到下改名",
+        "code": "Sub 批量改名()\n    Dim 清单 As Worksheet, i As Long, 末行 As Long\n    Dim 新名 As String, 原表 As Worksheet\n    Set 清单 = ThisWorkbook.Worksheets(\"清单\")\n    末行 = 清单.Cells(清单.Rows.Count, 1).End(xlUp).Row\n    Application.ScreenUpdating = False\n    For i = 2 To 末行\n        If i - 1 > ThisWorkbook.Worksheets.Count - 1 Then Exit For\n        新名 = CStr(清单.Cells(i, 1).Value)\n        新名 = Replace(Replace(Replace(新名, \"/\", \"_\"), \"*\", \"_\"), \":\", \"_\")\n        If Len(新名) > 31 Then 新名 = Left(新名, 31)\n        If 新名 = \"\" Then GoTo 下一个\n        Set 原表 = ThisWorkbook.Worksheets(i - 1)\n        On Error Resume Next\n        原表.Name = 新名\n        If Err.Number <> 0 Then Debug.Print 原表.Name & \" 改名失败：\" & Err.Description\n        Err.Clear\n        On Error GoTo 0\n下一个:\n    Next i\n    Application.ScreenUpdating = True\n    MsgBox \"改名完成\"\nEnd Sub",
+        "howToRun": "新建一张名为「清单」的表，A2 起逐行写新表名，与其余工作表顺序对应；先备份文件。",
+        "result": "其余工作表按清单顺序改名；非法字符被替换成下划线，超长被截到 31 字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "表名含 / * : ? [ ]，报 1004",
+        "reason": "Excel 工作表名不允许这些字符。",
+        "fix": "改名之前 Replace 掉，或整段用 On Error 兜住并记录失败项。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "两个表改成同一个名字，第二个失败",
+        "reason": "同一工作簿里工作表名必须唯一。",
+        "fix": "先检查重名，必要时加后缀 _2 区分。",
+        "level": "mid",
+        "errorCode": "1004"
+      },
+      {
+        "title": "清单条数比工作表多，越界报 9",
+        "reason": "循环按清单行数走，却按索引取表。",
+        "fix": "取表前判断 i - 1 不超过 Worksheets.Count（脚本里已加）。",
+        "level": "mid",
+        "errorCode": "9"
+      }
+    ],
+    "related": [
+      { "id": "worksheet", "kind": "companion", "why": "改名是 Worksheet.Name 的基本操作。" },
+      { "id": "on-error-resume-next", "kind": "companion", "why": "个别改名失败不该中断整批。" }
+    ],
+    "oneLiner": "按清单一次性改掉所有表名",
+    "summary": "批量改名的两个核心动作：清洗非法字符（/ * : ? [ ]、31 字上限），以及让个别失败不中断。清单与工作表按顺序对应，最容易错的是条数不一致。"
+  },
+  {
+    "id": "conditional-summary",
+    "enName": "Recipe: 按条件汇总到新表",
+    "zhName": "按条件汇总到新表",
+    "alias": ["汇总到新表", "分类汇总", "按部门统计", "求和汇总"],
+    "keywords": ["按分类统计金额", "生成汇总表", "多表数据汇总"],
+    "kind": "recipe",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Sub 条件汇总()\n    ' Dictionary 累加 → 写入新表 → 排序\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：按部门汇总金额到新表",
+        "code": "Sub 按部门汇总()\n    Dim 明细 As Worksheet, 汇总 As Worksheet\n    Dim d As Object, i As Long, 末行 As Long, k, 键 As String\n    Set 明细 = ThisWorkbook.Worksheets(\"明细\")\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    末行 = 明细.Cells(明细.Rows.Count, 1).End(xlUp).Row\n    For i = 2 To 末行\n        键 = CStr(明细.Cells(i, 2).Value)\n        d(键) = d(键) + CDbl(明细.Cells(i, 3).Value)\n    Next i\n    Set 汇总 = Worksheets.Add(After:=Worksheets(Worksheets.Count))\n    汇总.Name = \"汇总_\" & Format(Now, \"mmdd_hhmm\")\n    汇总.Range(\"A1:C1\").Value = Array(\"部门\", \"金额合计\", \"笔数\")\n    i = 2\n    For Each k In d.Keys\n        汇总.Cells(i, 1).Value = k\n        汇总.Cells(i, 2).Value = d(k)\n        汇总.Cells(i, 3).Value = Application.WorksheetFunction.CountIf(明细.Range(\"B2:B\" & 末行), k)\n        i = i + 1\n    Next k\n    汇总.Range(\"B2:B\" & i - 1).NumberFormat = \"#,##0.00\"\n    MsgBox \"已汇总 \" & d.Count & \" 个部门\"\nEnd Sub",
+        "howToRun": "「明细」表 A 编号、B 部门、C 金额；运行前备份（脚本会新增一张汇总表）。",
+        "result": "新增「汇总_日期_时间」表，列出每个部门、金额合计与笔数，金额带千分位。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "金额列有文本或空值，CDbl 报类型不匹配 13",
+        "reason": "CDbl 遇到空串或「未知」这类文本会失败。",
+        "fix": "先判断：If IsNumeric(明细.Cells(i, 3).Value) Then …。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "部门列有空行，汇总表里多出一个空部门",
+        "reason": "空单元格被当成空串键统计进去了。",
+        "fix": "循环里跳过空白键：If 键 = \"\" Then GoTo 下一个。",
+        "level": "mid"
+      },
+      {
+        "title": "每次运行都新建一张汇总表，越堆越多",
+        "reason": "Worksheets.Add 每次都新增。",
+        "fix": "先判断同名表是否存在，存在就清空重写。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "sumifs", "kind": "alternative", "why": "只是想在表里看到汇总，SUMIFS 公式更透明；要批量生成独立汇总表才写脚本。" },
+      { "id": "worksheet", "kind": "companion", "why": "新增、命名汇总表都要用 Worksheet 对象。" }
+    ],
+    "oneLiner": "按分类把明细汇总成一张新表",
+    "summary": "汇总的通用套路：Dictionary 按分类累加，再写到新表；笔数这类统计可以借 WorksheetFunction。三个坑：金额有文本、空部门、重复新增汇总表。"
+  },
+  {
+    "id": "export-csv",
+    "enName": "Recipe: 导出为 CSV",
+    "zhName": "导出为 CSV",
+    "alias": ["导出CSV", "另存CSV", "Excel转CSV", "数据导出"],
+    "keywords": ["把表存成csv", "交给系统导入", "导出带日期文件名"],
+    "kind": "recipe",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Sub 导出CSV()\n    ' 复制成新工作簿 → SaveAs xlCSV → 关闭\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：把当前表导出成带日期的 CSV",
+        "code": "Sub 导出CSV()\n    Dim 源 As Worksheet, wb As Workbook, 路径 As String\n    Set 源 = ActiveSheet\n    路径 = ThisWorkbook.Path & \"\\导出_\" & Format(Now, \"yyyymmdd_hhmm\") & \".csv\"\n    If ThisWorkbook.Path = \"\" Then\n        MsgBox \"请先保存当前工作簿，才能确定导出目录\"\n        Exit Sub\n    End If\n    源.Copy\n    Set wb = ActiveWorkbook\n    Application.DisplayAlerts = False\n    wb.SaveAs 路径, FileFormat:=xlCSV\n    wb.Close SaveChanges:=False\n    Application.DisplayAlerts = True\n    MsgBox \"已导出：\" & 路径\nEnd Sub",
+        "howToRun": "先保存工作簿（未保存时没有目录），然后在要导出的表上运行。",
+        "result": "工作簿所在目录出现「导出_日期_时间.csv」，只含当前这张表的数据。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "CSV 打开后中文全是乱码",
+        "reason": "xlCSV 默认按本地编码写文件，部分系统/工具按 UTF-8 读。",
+        "fix": "给对方说明编码；或导出后用记事本另存为 UTF-8；对编码要求高的场景改用 ADODB.Stream 写 UTF-8。",
+        "level": "high"
+      },
+      {
+        "title": "导出后原工作簿变成了 CSV，公式全没了",
+        "reason": "对原工作簿直接 SaveAs 会改掉格式。",
+        "fix": "先把表 Copy 成新工作簿，再对新工作簿 SaveAs（脚本里就是这么做的）。",
+        "level": "high"
+      },
+      {
+        "title": "数字变成科学计数、长编号丢位",
+        "reason": "CSV 没有格式，长数字按数值写出会失真。",
+        "fix": "导出前把编号列设成文本（NumberFormat = \"@\"），或前面加单引号。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "workbook", "kind": "companion", "why": "SaveAs 是 Workbook 的方法，路径与格式都在这层。" },
+      { "id": "value", "kind": "companion", "why": "CSV 只存值不存格式，导出前要确认列的值本身是对的。" }
+    ],
+    "oneLiner": "把一张表存成 CSV 文件",
+    "summary": "导出 CSV 的正确姿势是「复制成新工作簿 → 另存为 → 关闭」，别对原文件直接 SaveAs。三个常见后续问题：中文编码、长数字丢位、原文件被改格式。"
+  },
+  {
+    "id": "clear-formats",
+    "enName": "Recipe: 一键清除格式",
+    "zhName": "一键清除格式",
+    "alias": ["清除格式", "恢复默认格式", "去掉底色和边框"],
+    "keywords": ["表格格式乱了想重来", "保留内容只清格式", "清掉所有底色"],
+    "kind": "recipe",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Sub 清除格式()\n    ' UsedRange.ClearFormats\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：只清格式，保留内容",
+        "code": "Sub 清除格式()\n    Dim 结果 As Long\n    结果 = MsgBox(\"将清除当前表所有格式（内容保留），继续吗？\", vbYesNo + vbQuestion, \"确认\")\n    If 结果 <> vbYes Then Exit Sub\n    With ActiveSheet.UsedRange\n        .ClearFormats\n        .Font.Name = \"宋体\"\n        .Font.Size = 10\n        .NumberFormat = \"General\"\n    End With\n    MsgBox \"格式已清除\"\nEnd Sub",
+        "howToRun": "在格式混乱的表上运行；先备份，格式清掉不可撤销。",
+        "result": "底色、边框、字号颜色全部恢复默认，单元格内容与公式不变。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 Clear 而不是 ClearFormats，内容也没了",
+        "reason": "Clear 会连内容、批注、格式一起清掉。",
+        "fix": "只清格式用 ClearFormats；只清内容用 ClearContents。",
+        "level": "high"
+      },
+      {
+        "title": "清完格式，数字列全变成日期或长整数",
+        "reason": "General 格式下，日期序列号与长数字会按默认规则显示。",
+        "fix": "清完按列重新设 NumberFormat（金额、日期、文本各一遍）。",
+        "level": "mid"
+      },
+      {
+        "title": "清了整张表，连表头样式和打印设置也没了",
+        "reason": "UsedRange 覆盖表头，ClearFormats 一并处理。",
+        "fix": "先清数据区再单独重设表头；打印区域设置不受影响但要复查。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "usedrange", "kind": "companion", "why": "清除范围一般就是 UsedRange。" },
+      { "id": "format-column", "kind": "companion", "why": "清完通常要按新的规范重新套一遍格式。" }
+    ],
+    "oneLiner": "内容留下，格式全部恢复默认",
+    "summary": "格式被复制粘贴搞乱时，最快的复位办法是 ClearFormats。分清三个 Clear：Clear 全清、ClearContents 只清内容、ClearFormats 只清格式。"
+  },
+  {
+    "id": "conditional-color",
+    "enName": "Recipe: 条件变色",
+    "zhName": "按数值自动变色",
+    "alias": ["条件变色", "变色", "条件格式", "自动标色"],
+    "keywords": ["数值超标自动标红", "按条件上色", "数据条/色阶"],
+    "kind": "recipe",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Sub 条件变色()\n    ' FormatConditions.Add 建规则，跟着数据自动变\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：金额≥1000 标红，<0 标黄",
+        "code": "Sub 条件变色()\n    Dim r As Range\n    Set r = Range(\"C2:C\" & Cells(Rows.Count, 1).End(xlUp).Row)\n    r.FormatConditions.Delete\n    r.FormatConditions.Add Type:=xlCellValue, Operator:=xlGreaterEqual, Formula1:=\"1000\"\n    r.FormatConditions(1).Interior.Color = RGB(255, 199, 206)\n    r.FormatConditions(1).Font.Color = RGB(156, 0, 6)\n    r.FormatConditions.Add Type:=xlCellValue, Operator:=xlLess, Formula1:=\"0\"\n    r.FormatConditions(2).Interior.Color = RGB(255, 235, 156)\n    MsgBox \"规则已建立，改 C 列数值会自动变色\"\nEnd Sub",
+        "howToRun": "C 列是金额、A 列有数据时运行；改 C 列数值验证是否自动变色。",
+        "result": "C2 起：≥1000 的单元格淡红底深红字，<0 的淡黄底；改数值颜色立即跟着变。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用循环直接刷底色，改完数据颜色不更新",
+        "reason": "手工上色是一次性快照，不随数值变化。",
+        "fix": "要「跟着变」就用条件格式（FormatConditions），不要用 Interior.Color 刷一遍。",
+        "level": "high"
+      },
+      {
+        "title": "重复运行脚本，规则越叠越多",
+        "reason": "每次 Add 都新增一条规则，旧规则仍在。",
+        "fix": "先 r.FormatConditions.Delete，再重建（脚本里第一行就是）。",
+        "level": "high"
+      },
+      {
+        "title": "规则建在整列上，文件变大、滚动变卡",
+        "reason": "整列 100 多万格都挂规则。",
+        "fix": "只对数据区建规则：Range(\"C2:C\" & 末行)。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "interior", "kind": "confusable", "why": "Interior 是手工上色（一次性），条件格式才会自动跟随数值。" },
+      { "id": "numberformat", "kind": "companion", "why": "条件格式的视觉判断常与数字格式一起调。" }
+    ],
+    "oneLiner": "数值一变，颜色自动跟着变",
+    "summary": "「变色」有两种：手工刷底色（一次性）和条件格式（自动跟随）。脚本里要用 FormatConditions，并且每次重建前先 Delete 旧规则，范围只框数据区。"
+  },
+  {
+    "id": "dedupe",
+    "enName": "Recipe: 按列去重",
+    "zhName": "按列去重",
+    "alias": ["去重", "删除重复", "重复行", "保留第一条"],
+    "keywords": ["删掉重复的行", "按编号去重", "只保留第一次出现"],
+    "kind": "recipe",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Sub 按列去重()\n    ' Dictionary 记录已出现 → 倒序删重复行\nEnd Sub",
+    "examples": [
+      {
+        "title": "完整脚本：按 A 列去重，保留第一条",
+        "code": "Sub 按列去重()\n    Dim ws As Worksheet, d As Object\n    Dim i As Long, 末行 As Long, 键 As String\n    Set ws = ActiveSheet\n    末行 = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    Application.ScreenUpdating = False\n    For i = 末行 To 2 Step -1\n        键 = CStr(ws.Cells(i, 1).Value)\n        If Trim(键) = \"\" Then GoTo 下一个\n        If d.Exists(键) Then\n            ws.Rows(i).Delete\n        Else\n            d(键) = i\n        End If\n下一个:\n    Next i\n    Application.ScreenUpdating = True\n    MsgBox \"保留 \" & d.Count & \" 条不重复记录\"\nEnd Sub",
+        "howToRun": "在需要去重的表上运行（脚本作用于当前表，先备份）。",
+        "result": "A 列重复的行被删除，每组只保留最下面出现的那一条，弹框给出保留条数。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "正序删重复，删完还剩一堆",
+        "reason": "删行后下方行整体上移，计数器继续加，跳过了新的一行。",
+        "fix": "必须倒序（Step -1），脚本里就是这么做的。",
+        "level": "high"
+      },
+      {
+        "title": "用了 Excel 自带的「删除重复」按钮，但只想按一列判断",
+        "reason": "自带功能按勾选的列组合判断，容易把「编号相同但内容不同」也删掉。",
+        "fix": "明确判断列；多列组合判断时在循环里拼复合键。",
+        "level": "mid"
+      },
+      {
+        "title": "去重后公式引用错位",
+        "reason": "删行会让引用这些行的公式范围整体上移。",
+        "fix": "去重后重算/检查公式；关键场景先复制数据到新表再去重。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "delete-empty-rows", "kind": "companion", "why": "同一种「倒序删行」骨架，一个判空一个判重。" },
+      { "id": "for-next", "kind": "companion", "why": "倒序循环是删行不出错的根本。" }
+    ],
+    "oneLiner": "按一列判断，删掉重复的行",
+    "summary": "去重的骨架与删空行一样：倒序循环 + Dictionary 记录已出现的键。注意「保留哪一条」要先想清楚，倒序循环保留的是最后一条。"
+  }
+]

@@ -1,0 +1,975 @@
+[
+  {
+    "id": "collection-index",
+    "enName": "Worksheets / Count / Item",
+    "zhName": "集合与索引",
+    "alias": ["集合", "索引", "Worksheets", "Count", "Item"],
+    "keywords": ["第几个工作表", "按名字取表", "一共几张表", "遍历所有表"],
+    "kind": "concept",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Worksheets(1)          ' 第 1 张（从 1 开始）\nWorksheets(\"汇总\")     ' 按名字\nWorksheets.Count       ' 一共几张",
+    "examples": [
+      {
+        "title": "三种取法，指向同一张表",
+        "code": "Sub 取表三法()\n    Dim a As Worksheet, b As Worksheet, c As Worksheet\n    Set a = Worksheets(1)\n    Set b = Worksheets(ThisWorkbook.Worksheets.Count)\n    Set c = Worksheets(\"Sheet1\")\n    MsgBox a.Name & \" / \" & b.Name & \" / \" & c.Name\nEnd Sub",
+        "howToRun": "工作簿里至少有两张表，且存在名为 Sheet1 的表时运行（没有就改成你表里的名字）。",
+        "result": "弹出三个名字：第一张、最后一张、Sheet1。"
+      },
+      {
+        "title": "数一数、列一遍",
+        "code": "Sub 列所有表()\n    Dim i As Long, 名单 As String\n    For i = 1 To Worksheets.Count\n        名单 = 名单 & i & \". \" & Worksheets(i).Name & vbCrLf\n    Next i\n    MsgBox 名单\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "按标签顺序列出全部工作表，前面带序号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Worksheets(0) 报下标越界 9",
+        "reason": "VBA 的集合索引从 1 开始，不是 0。",
+        "fix": "用 1 到 Count；不确定就用 For Each 遍历。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "删掉中间一张表后，Worksheets(3) 指到了别的表",
+        "reason": "按序号取表是「当前位置」，删表/移动表后序号会变。",
+        "fix": "长期引用请按名字取：Worksheets(\"汇总\")。",
+        "level": "high"
+      },
+      {
+        "title": "图表工作表取不到，报下标越界",
+        "reason": "Worksheets 只包含普通工作表，图表页属于 Charts。",
+        "fix": "改用 Sheets(i) 兼容两者，或明确用 Charts(1)。",
+        "level": "mid",
+        "errorCode": "9"
+      }
+    ],
+    "related": [
+      { "id": "worksheet", "kind": "companion", "why": "取到表之后，接下来就是它的属性与方法。" },
+      { "id": "for-each-next", "kind": "alternative", "why": "不需要序号时，For Each 比按索引循环更稳。" }
+    ],
+    "oneLiner": "按序号或名字取集合里的元素",
+    "summary": "工作表、工作簿、区域都是集合：能按序号取、按名字取、能数总数。序号从 1 开始，而且会随增删移动变化，长期引用一律按名字。"
+  },
+  {
+    "id": "relative-absolute-reference",
+    "enName": "$A$1 vs A1",
+    "zhName": "相对引用与绝对引用",
+    "alias": ["绝对引用", "相对引用", "$", "锁行锁列", "录制相对引用"],
+    "keywords": ["公式里的美元符号", "复制公式引用不乱跑", "宏里写公式"],
+    "kind": "concept",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Range(\"C2\").Formula = \"=$A$2*B2\"     ' 绝对 + 相对混合\nRange(\"C2\").FormulaR1C1 = \"=RC[-2]*RC[-1]\" ' 相对写法",
+    "examples": [
+      {
+        "title": "写入混合引用公式，再向下填充",
+        "code": "Sub 写公式()\n    Range(\"C2\").Formula = \"=$A$2*B2\"\n    Range(\"C2\").AutoFill Destination:=Range(\"C2:C10\")\nEnd Sub",
+        "howToRun": "A2 放单价、B2:B10 放数量后运行。",
+        "result": "C2:C10 都是「单价 × 同行数量」：A2 被锁住，B 列跟着行走。"
+      },
+      {
+        "title": "相对写法：永远取左边两格",
+        "code": "Sub 相对公式()\n    Range(\"C2\").FormulaR1C1 = \"=RC[-2]*RC[-1]\"\nEnd Sub",
+        "howToRun": "同样 A2、B2 有值时运行；FormulaR1C1 的 R/C 是相对当前位置。",
+        "result": "C2 计算 A2 × B2；把这个公式复制到别的单元格，它仍取自身左边两格。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 .Value 写 \"=$A$2*B2\"，单元格显示成一串文本",
+        "reason": "Value 只管值，不解析公式；等号只是普通字符。",
+        "fix": "公式要用 .Formula（A1 写法）或 .FormulaR1C1。",
+        "level": "high"
+      },
+      {
+        "title": "公式里写了中文函数名，Excel 报 #NAME?",
+        "reason": "VBA 写入的公式必须用英文函数名，中文名只是界面显示。",
+        "fix": "写 SUM、VLOOKUP，不要写「求和」「纵向查找」。",
+        "level": "mid"
+      },
+      {
+        "title": "跨表引用带空格的工作表名，公式报错",
+        "reason": "表名有空格或特殊字符时必须用单引号包起来。",
+        "fix": "写成 \"='销售 明细'!A1\"，单引号别漏。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "formula", "kind": "companion", "why": "写公式要用 Formula/FormulaR1C1，用 Value 写不进去。" },
+      { "id": "value", "kind": "alternative", "why": "只写结果不写公式时用 Value，省掉重算。" }
+    ],
+    "oneLiner": "$ 锁住行列，没有 $ 就跟着跑",
+    "summary": "同一个概念在两个地方出现：单元格公式里的 $，和录制宏时选的「相对引用」。前者决定复制公式时引用跑不跑，后者决定录出来的代码用绝对地址还是 Offset。"
+  },
+  {
+    "id": "events",
+    "enName": "Workbook_Open / Worksheet_Change",
+    "zhName": "事件是什么",
+    "alias": ["事件", "Worksheet_Change", "Workbook_Open", "SelectionChange", "自动触发"],
+    "keywords": ["一打开就执行", "改了单元格自动跑", "事件不触发"],
+    "kind": "concept",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Private Sub Worksheet_Change(ByVal Target As Range)\n    ' 单元格一变就执行\nEnd Sub",
+    "examples": [
+      {
+        "title": "打开工作簿就提醒",
+        "code": "Private Sub Workbook_Open()\n    MsgBox \"今天是 \" & Format(Date, \"yyyy年m月d日\") & \"，记得先备份\"\nEnd Sub",
+        "howToRun": "代码必须放在 ThisWorkbook 模块里；保存关闭再打开文件才会触发。",
+        "result": "每次打开工作簿都弹一次提醒。"
+      },
+      {
+        "title": "防止自己触发自己",
+        "code": "Private Sub Worksheet_Change(ByVal Target As Range)\n    If Target.Column <> 3 Then Exit Sub\n    Application.EnableEvents = False\n    Target.Offset(0, 1).Value = Now\n    Application.EnableEvents = True\nEnd Sub",
+        "howToRun": "放在工作表模块；在 C 列输入内容测试。",
+        "result": "C 列一改，D 列写入时间；写 D 列不会再触发一次事件，不会死循环。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在 Change 事件里改单元格，Excel 直接卡死",
+        "reason": "改单元格会再次触发 Change，层层递归直到崩溃。",
+        "fix": "进入处理前 Application.EnableEvents = False，结束再设回 True。",
+        "level": "high"
+      },
+      {
+        "title": "EnableEvents 忘了恢复，之后所有事件都失效",
+        "reason": "关掉开关后异常退出，代码没走到恢复那一行。",
+        "fix": "恢复语句放在错误处理块或过程末尾；调试时先手动设回 True。",
+        "level": "high"
+      },
+      {
+        "title": "事件代码放在标准模块里，怎么改都不触发",
+        "reason": "只有 ThisWorkbook 与工作表模块才认事件过程。",
+        "fix": "在 VBE 左侧双击对应对象，把代码贴进它的代码窗口。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "module-and-procedure", "kind": "companion", "why": "事件必须写在特定模块里，位置错了就不触发。" },
+      { "id": "error-handling-model", "kind": "companion", "why": "事件出错时要保证 EnableEvents 能被恢复。" }
+    ],
+    "oneLiner": "某个动作发生时自动执行代码",
+    "summary": "事件让宏从「点一下才跑」变成「一改就跑」。常见的有 Workbook_Open、Worksheet_Change、BeforeClose。写事件第一条纪律：会改单元格的事件必须临时关掉 EnableEvents。"
+  },
+  {
+    "id": "variable-scope",
+    "enName": "Variable Scope",
+    "zhName": "变量作用域",
+    "alias": ["作用域", "模块级变量", "全局变量", "Public", "Private"],
+    "keywords": ["变量跨过程用", "为什么变量值丢了", "同名变量"],
+    "kind": "concept",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "' 过程级：Sub 内 Dim\n' 模块级：模块顶部 Private / Dim\n' 全局：标准模块顶部 Public",
+    "examples": [
+      {
+        "title": "模块级变量：两个过程共用一份数据",
+        "code": "' 写在模块最上方（Sub 之外）\nDim 计数 As Long\n\nSub 加一()\n    计数 = 计数 + 1\n    MsgBox \"现在 \" & 计数\nEnd Sub\n\nSub 清零()\n    计数 = 0\nEnd Sub",
+        "howToRun": "连续运行几次「加一」，再运行「清零」。",
+        "result": "计数在两次运行之间保留，加一后继续累加；清零后回到 0。"
+      },
+      {
+        "title": "Public 让别的模块也能用",
+        "code": "' 标准模块 A\nPublic 当前表名 As String\n\nSub 记录表名()\n    当前表名 = ActiveSheet.Name\nEnd Sub\n\n' 标准模块 B\nSub 读表名()\n    MsgBox 当前表名\nEnd Sub",
+        "howToRun": "先运行「记录表名」，再运行「读表名」。",
+        "result": "第二个模块能读到第一个模块写入的表名。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "过程里又 Dim 了一个同名变量，改的不是模块级那个",
+        "reason": "局部变量会遮蔽同名的模块级变量，两个是不同的存储位置。",
+        "fix": "要么改名，要么过程内不要重复 Dim。",
+        "level": "high"
+      },
+      {
+        "title": "过程结束，变量值就没了",
+        "reason": "Sub 内 Dim 的是过程级变量，过程一结束即销毁。",
+        "fix": "要跨过程保留，就把声明移到模块顶部。",
+        "level": "mid"
+      },
+      {
+        "title": "调试时模块级变量突然变空",
+        "reason": "点「重置」按钮或代码执行到 End，都会清空模块级变量。",
+        "fix": "别依赖模块级变量做持久化，需要留存就写进单元格或名称。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "dim", "kind": "companion", "why": "作用域决定了 Dim 该写在哪里。" },
+      { "id": "const", "kind": "companion", "why": "常量也有作用域，模块级常量同样写在顶部。" }
+    ],
+    "oneLiner": "变量活多久、谁能看见它",
+    "summary": "VBA 的变量按声明位置分三层：过程内（跑完就没）、模块顶部（本模块内跨过程保留）、Public（全工程可见）。值「莫名其妙丢了」，九成是作用域搞错。"
+  },
+  {
+    "id": "error-handling-model",
+    "enName": "Err / On Error",
+    "zhName": "错误处理模型",
+    "alias": ["错误处理", "Err", "On Error", "异常", "报错"],
+    "keywords": ["出错怎么办", "捕获错误继续跑", "显示错误码"],
+    "kind": "concept",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "On Error GoTo 出错\n' 正常流程\nExit Sub\n出错:\n    MsgBox \"错误 \" & Err.Number & \"：\" & Err.Description\nEnd Sub",
+    "examples": [
+      {
+        "title": "把「表不存在」这种可预期错误说清楚",
+        "code": "Sub 安全取表()\n    Dim ws As Worksheet\n    On Error GoTo 出错\n    Set ws = Worksheets(\"汇总\")\n    MsgBox ws.Name & \" 有 \" & ws.UsedRange.Rows.Count & \" 行\"\n    Exit Sub\n出错:\n    MsgBox \"取不到这张表，错误 \" & Err.Number & \"：\" & Err.Description\nEnd Sub",
+        "howToRun": "先在没有「汇总」表的工作簿里试一次，再建一张同名表试第二次。",
+        "result": "第一次给出可读的错误码与原因；第二次正常显示表信息。"
+      },
+      {
+        "title": "清掉 Err，恢复默认处理",
+        "code": "Sub 清理错误()\n    On Error Resume Next\n    Debug.Print 1 / 0\n    Debug.Print \"错误码 \" & Err.Number\n    Err.Clear\n    On Error GoTo 0\n    MsgBox \"之后的错误会照常弹窗\"\nEnd Sub",
+        "howToRun": "按 F5，输出在立即窗口（Ctrl+G）。",
+        "result": "打印错误码 11，然后清零并恢复默认；此后的错误不再被吞。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "错误块写完却忘了 Exit Sub，正常流程也掉进错误处理",
+        "reason": "VBA 顺序执行，执行完正常逻辑会继续往下走到标签处。",
+        "fix": "在错误标签前加 Exit Sub。",
+        "level": "high"
+      },
+      {
+        "title": "用了 On Error Resume Next 之后，后面所有错误都看不见了",
+        "reason": "它一直生效，直到被 On Error GoTo 0 或新的 On Error 覆盖。",
+        "fix": "只包住可能失败的那一行，紧接着 On Error GoTo 0 恢复。",
+        "level": "high"
+      },
+      {
+        "title": "Err.Number 一直是上一个错误",
+        "reason": "Err 对象不会自动清零，处理完要手动 Err.Clear 或退出过程。",
+        "fix": "读取后立即 Clear，避免拿到旧值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "on-error-goto", "kind": "companion", "why": "最常用的结构化错误处理写法。" },
+      { "id": "on-error-resume-next", "kind": "alternative", "why": "只想跳过个别行时更省事，但必须复位。" }
+    ],
+    "oneLiner": "出错时跳到哪里、怎么读错误",
+    "summary": "VBA 没有 try/catch，只有 On Error：跳到标签、忽略继续、或恢复默认。错误信息在 Err.Number / Err.Description 里，处理完记得 Exit Sub 和 Err.Clear。"
+  },
+  {
+    "id": "recorded-macro",
+    "enName": "Recorded Macro",
+    "zhName": "录制宏怎么读",
+    "alias": ["录制宏", "录宏", "录制", "改成可维护代码"],
+    "keywords": ["录制出来的代码看不懂", "把录制宏改成通用", "去掉Select"],
+    "kind": "concept",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "' 录制典型产物（不要照抄）\nRange(\"A1\").Select\nSelection.Font.Bold = True",
+    "examples": [
+      {
+        "title": "把录制产物改成不依赖「选中」的写法",
+        "code": "Sub 改后加粗()\n    Application.ScreenUpdating = False\n    Range(\"A1:A10\").Font.Bold = True\n    Application.ScreenUpdating = True\nEnd Sub",
+        "howToRun": "先录制一次「选中 A1:A10 加粗」，会得到 Select + Selection 两行；再用这段替代。",
+        "result": "效果一样，但不再依赖当前选中区域，速度也更快。"
+      },
+      {
+        "title": "录制时选「相对引用」，代码就变成 Offset",
+        "code": "Sub 相对录制结果()\n    ActiveCell.Offset(1, 0).Range(\"A1\").Select\n    Selection.Value = \"下一行\"\nEnd Sub",
+        "howToRun": "录制前点「开发工具 → 使用相对引用」，录制「往下一格填字」的动作。",
+        "result": "代码用 Offset(1,0) 表示「往下走一格」，换起点也能用。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "录制代码换一张表就失效",
+        "reason": "录制会写死 Sheets(\"Sheet1\").Select 这类依赖活动表的语句。",
+        "fix": "把表名与区域显式写进 Range 的父对象，删掉 Select/Activate。",
+        "level": "high"
+      },
+      {
+        "title": "录制出来的宏跑得很慢",
+        "reason": "录下来的是逐个单元格、逐个属性的操作，还有大量选中动作。",
+        "fix": "合并成整块设置，关 ScreenUpdating，必要时用数组整块读写。",
+        "level": "mid"
+      },
+      {
+        "title": "录制时顺手点开的对话框/窗口也被记进去了",
+        "reason": "录制记录的是所有操作，不只是你想要的那几步。",
+        "fix": "只录必要动作；录完逐行删掉无关语句，先小范围试跑。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "relative-absolute-reference", "kind": "companion", "why": "录制时的「相对引用」开关，决定代码是绝对地址还是 Offset。" },
+      { "id": "format-column", "kind": "companion", "why": "把录制的逐格格式操作合并成整块，是这个配方的核心思路。" }
+    ],
+    "oneLiner": "录制只是草稿，要改成能复用的代码",
+    "summary": "录制宏是最快的入门方式，但产物是「照着你的鼠标动作写」的，依赖选中区域、写死表名、逐格操作。正确用法是：录一遍拿到属性名，再改写成不依赖 Select 的版本。"
+  },
+  {
+    "id": "select-case",
+    "enName": "Select Case",
+    "zhName": "多分支选择",
+    "alias": ["Select Case", "多条件", "分支", "Case"],
+    "keywords": ["好几个条件选一个", "比多个If好读", "按分类走不同分支"],
+    "kind": "statement",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Select Case 表达式\n    Case 值1, 值2\n    Case Is > 阈值\n    Case Else\nEnd Select",
+    "examples": [
+      {
+        "title": "按分数段给评级",
+        "code": "Sub 评级()\n    Select Case Range(\"A1\").Value\n        Case Is >= 90\n            Range(\"B1\").Value = \"优秀\"\n        Case Is >= 60\n            Range(\"B1\").Value = \"及格\"\n        Case Else\n            Range(\"B1\").Value = \"不及格\"\n    End Select\nEnd Sub",
+        "howToRun": "A1 填 0–100 的分数后运行。",
+        "result": "B1 按分数段写入优秀 / 及格 / 不及格。"
+      },
+      {
+        "title": "按文本分类走不同分支",
+        "code": "Sub 分类处理()\n    Select Case Trim(Range(\"A1\").Value)\n        Case \"北京\", \"上海\", \"广州\"\n            Range(\"B1\").Value = \"一线\"\n        Case \"杭州\", \"成都\"\n            Range(\"B1\").Value = \"新一线\"\n        Case Else\n            Range(\"B1\").Value = \"其他\"\n    End Select\nEnd Sub",
+        "howToRun": "A1 填城市名后运行。",
+        "result": "B1 按城市分组写入一线 / 新一线 / 其他。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Case 120 To 90 这样写，永远不命中",
+        "reason": "To 区间要求小值在前：90 To 120。",
+        "fix": "写成 Case 90 To 120；比大小用 Case Is >= 90。",
+        "level": "high"
+      },
+      {
+        "title": "分支顺序放错，所有值都进了第一个分支",
+        "reason": "Select Case 从上往下匹配，先命中的生效。",
+        "fix": "范围条件从窄到宽排，Else 兜底放最后。",
+        "level": "mid"
+      },
+      {
+        "title": "Select Case 写成 Select 多了个 End Select 少写",
+        "reason": "Select Case 必须用 End Select 收尾，且不能与 End If 混用。",
+        "fix": "检查每个 Select Case 都有对应 End Select。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "if-then-else", "kind": "alternative", "why": "分支只有两三个、条件各不相同的时候，If 更直接。" },
+      { "id": "goto-statement", "kind": "confusable", "why": "别用 GoTo 模拟多分支，Select Case 才是正规写法。" }
+    ],
+    "oneLiner": "同一个值，按不同情况分流",
+    "summary": "当你在对同一个值做三分支以上的判断时，Select Case 比一串 ElseIf 好读好改。范围条件从窄往宽排，Else 兜底，别再拿 GoTo 硬跳。"
+  },
+  {
+    "id": "do-loop",
+    "enName": "Do...Loop",
+    "zhName": "条件循环",
+    "alias": ["Do Loop", "Do While", "Do Until", "Exit Do"],
+    "keywords": ["一直循环到条件满足", "不确定循环几次", "死循环怎么停"],
+    "kind": "statement",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "Do While 条件\n    ' 循环体\n    If 该停了 Then Exit Do\nLoop",
+    "examples": [
+      {
+        "title": "累加到超过 100 就停",
+        "code": "Sub 累加到一百()\n    Dim i As Long, 合计 As Long\n    i = 1\n    Do While 合计 < 100\n        合计 = 合计 + i\n        i = i + 1\n    Loop\n    MsgBox \"加到 \" & i - 1 & \" 时合计 \" & 合计\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹框显示加到第几个数时合计超过 100。"
+      },
+      {
+        "title": "往下填，直到遇到空单元格",
+        "code": "Sub 填到空为止()\n    Dim r As Long\n    r = 1\n    Do Until IsEmpty(Cells(r, 1))\n        Cells(r, 1).Offset(0, 1).Value = Cells(r, 1).Value * 2\n        r = r + 1\n    Loop\nEnd Sub",
+        "howToRun": "A 列放一列有值的数据，B 列留空，运行后看结果。",
+        "result": "A 列每一行有值的数据，B 列都得到它的两倍；遇到第一个空单元停止。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "循环里没改条件变量，Excel 卡死",
+        "reason": "Do While 的条件永远为真，循环就不会结束。",
+        "fix": "循环体内一定推进条件变量；调试时先加计数上限（如 i > 1000 就 Exit Do）。",
+        "level": "high"
+      },
+      {
+        "title": "Loop While 与 Do While 位置不同，结果差一轮",
+        "reason": "条件写在前是「先判断后执行」，写在后是「先执行一次再判断」。",
+        "fix": "至少执行一次用 Do ... Loop While；可能一次都不执行用 Do While ... Loop。",
+        "level": "mid"
+      },
+      {
+        "title": "条件变量类型不对，比较永远成立",
+        "reason": "文本与数字比较时结果可能不符合直觉（如 \"10\" 与 10）。",
+        "fix": "先转换类型：CLng、CDbl，再参与比较。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "for-next", "kind": "alternative", "why": "已知循环次数时，For…Next 更不容易写出死循环。" },
+      { "id": "exit-sub", "kind": "companion", "why": "需要提前跳出时用 Exit Do，退出整个过程用 Exit Sub，别混。" }
+    ],
+    "oneLiner": "只要条件成立就一直转",
+    "summary": "次数不确定时用 Do…Loop：条件写前面是先判断、写后面是先执行一次。写它的第一件事是确保循环体内有让条件变化的语句，否则就是死循环。"
+  },
+  {
+    "id": "with-end-with",
+    "enName": "With...End With",
+    "zhName": "With 语句块",
+    "alias": ["With", "End With", "省略对象", "批量设置属性"],
+    "keywords": ["同一个对象设置多个属性", "少写重复对象名"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "With 对象\n    .属性 = 值\n    .方法 参数\nEnd With",
+    "examples": [
+      {
+        "title": "一块区域同时设字体、底色、对齐",
+        "code": "Sub 一次设完()\n    With Range(\"A1:C3\")\n        .Font.Bold = True\n        .Interior.Color = RGB(255, 242, 204)\n        .HorizontalAlignment = xlCenter\n    End With\nEnd Sub",
+        "howToRun": "按 F5，看 A1:C3 的变化。",
+        "result": "区域加粗、浅黄底、水平居中，三行代码只写了一次 Range(\"A1:C3\")。"
+      },
+      {
+        "title": "嵌套 With：先表、再区域",
+        "code": "Sub 嵌套With()\n    Dim ws As Worksheet\n    Set ws = ThisWorkbook.Worksheets(1)\n    With ws\n        .Name = \"汇总\"\n        With .Range(\"A1\")\n            .Value = \"合计\"\n            .Font.Size = 12\n        End With\n    End With\nEnd Sub",
+        "howToRun": "在只有一张表的工作簿上运行（改名会成功）。",
+        "result": "第一张表改名为「汇总」，A1 写入「合计」并设为 12 号字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "With 里面的语句漏了点号，结果设到了活动表",
+        "reason": "没有点号就不属于 With 的对象，会被当成全局/活动表操作。",
+        "fix": "With 内每个属性前都要有「.」，包括 .Value、.Font。",
+        "level": "high"
+      },
+      {
+        "title": "With 里又 Set 了同名变量，后面全乱",
+        "reason": "With 只影响带点号的语句，赋值给变量照常生效，容易误以为改的是 With 对象。",
+        "fix": "With 块里尽量只写「.属性 = 值」，需要变量就另起名字。",
+        "level": "mid"
+      },
+      {
+        "title": "End With 漏写，编译报错",
+        "reason": "With 必须闭合。",
+        "fix": "写完立刻补 End With，再往里填内容。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "object-property-method", "kind": "companion", "why": "With 只是省略对象名的语法糖，属性/方法的规则不变。" },
+      { "id": "format-column", "kind": "companion", "why": "批量套格式的脚本里，With 是标准写法。" }
+    ],
+    "oneLiner": "同一个对象，只写一次名字",
+    "summary": "要给一个对象设一堆属性时，With 省掉重复的对象名。记住两点：块内语句必须带点号；必须用 End With 收尾。"
+  },
+  {
+    "id": "on-error-resume-next",
+    "enName": "On Error Resume Next",
+    "zhName": "跳过错误继续",
+    "alias": ["On Error Resume Next", "忽略错误", "跳过报错"],
+    "keywords": ["出错也继续往下跑", "批量处理跳过失败项"],
+    "kind": "statement",
+    "level": 2,
+    "host": ["excel"],
+    "syntax": "On Error Resume Next\n' 可能失败的一行\nOn Error GoTo 0   ' 必须复位",
+    "examples": [
+      {
+        "title": "批量改表名，个别失败也不中断",
+        "code": "Sub 批量改名()\n    Dim i As Long\n    For i = 1 To Worksheets.Count\n        On Error Resume Next\n        Worksheets(i).Name = \"数据\" & i\n        If Err.Number <> 0 Then Debug.Print \"第 \" & i & \" 张改名失败：\" & Err.Description\n        Err.Clear\n        On Error GoTo 0\n    Next i\n    MsgBox \"处理完毕\"\nEnd Sub",
+        "howToRun": "在工作簿里跑一次；已存在同名表或名字非法时会失败但不会中断。",
+        "result": "能改的都改了，失败的在立即窗口里有记录，最后正常弹出「处理完毕」。"
+      },
+      {
+        "title": "只忽略某一行的失败",
+        "code": "Sub 只忽略一行()\n    On Error Resume Next\n    Workbooks(\"不存在的工作簿.xlsx\").Close\n    On Error GoTo 0\n    MsgBox \"这一行失败也不影响后面\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "关闭失败被跳过，仍然弹出提示，后续代码照常执行。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用完不复位，后面真正的错误全被吞了",
+        "reason": "On Error Resume Next 会一直生效，直到被覆盖。",
+        "fix": "紧跟 On Error GoTo 0 恢复默认；或用 On Error GoTo 标签做结构化处理。",
+        "level": "high"
+      },
+      {
+        "title": "拿它盖住整段代码，结果算错了也查不出来",
+        "reason": "所有错误都被跳过，错误结果继续参与计算。",
+        "fix": "只包住已知可能失败的单行，并检查 Err.Number。",
+        "level": "high"
+      },
+      {
+        "title": "在循环里累积 Err，判断永远成立",
+        "reason": "Err 不会自动清零，上一轮的错会被当成这一轮的。",
+        "fix": "每轮结束 Err.Clear。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "error-handling-model", "kind": "companion", "why": "先弄清 Err 与三种 On Error 的差别。" },
+      { "id": "on-error-goto", "kind": "alternative", "why": "要区分「哪一步失败、怎么补救」时，GoTo 写法更可控。" }
+    ],
+    "oneLiner": "出错不弹窗，继续往下跑",
+    "summary": "批量任务里最实用的写法：个别行失败不影响整体。纪律是「包住单行 + 检查 Err.Number + 立刻复位」，否则会把严重错误也一起吞掉。"
+  },
+  {
+    "id": "on-error-goto",
+    "enName": "On Error GoTo",
+    "zhName": "跳到错误处理",
+    "alias": ["On Error GoTo", "错误标签", "Resume", "异常处理"],
+    "keywords": ["出错跳到指定位置", "统一处理错误", "Resume Next重试"],
+    "kind": "statement",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "On Error GoTo 处理\n' 正常代码\nExit Sub\n处理:\n    ' Err.Number / Err.Description\n    Resume Next",
+    "examples": [
+      {
+        "title": "打开不存在的工作簿，给出人话提示",
+        "code": "Sub 打开文件()\n    On Error GoTo 处理\n    Workbooks.Open \"C:\\数据\\月报.xlsx\"\n    MsgBox \"打开成功\"\n    Exit Sub\n处理:\n    MsgBox \"打不开，错误 \" & Err.Number & \"：\" & Err.Description\nEnd Sub",
+        "howToRun": "把路径改成真实文件；先故意写错文件名试一次。",
+        "result": "成功时弹「打开成功」；失败时显示错误码与原因，不会直接崩到 VBA 报错框。"
+      },
+      {
+        "title": "Resume Next：失败就跳过这一条继续",
+        "code": "Sub 跳过一条()\n    Dim i As Long\n    For i = 1 To 3\n        On Error GoTo 跳过\n        Debug.Print 10 / (i - 2)\n        Exit Sub\n跳过:\n        Debug.Print \"第 \" & i & \" 次失败，继续\"\n        Resume Next\n    Next i\nEnd Sub",
+        "howToRun": "按 F5，结果在立即窗口里看。",
+        "result": "i=2 时除零失败，打印「第 2 次失败，继续」后继续循环。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "标签拼错，编译直接报「标签未定义」",
+        "reason": "GoTo 后面的标签必须真实存在，且以冒号结尾。",
+        "fix": "复制粘贴标签名，别手打；标签行写成「处理:」。",
+        "level": "high"
+      },
+      {
+        "title": "正常流程执行完掉进错误块，又弹一次错误",
+        "reason": "缺 Exit Sub，代码顺序滑到标签处。",
+        "fix": "错误标签前放 Exit Sub。",
+        "level": "high"
+      },
+      {
+        "title": "在错误块里用 Resume 而不是 Resume Next，重复执行同一行",
+        "reason": "Resume 会回到出错那一行重跑，如果条件没变就再次失败。",
+        "fix": "不确定能否成功就用 Resume Next；确定修好了才用 Resume。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "error-handling-model", "kind": "companion", "why": "这是最常用的结构化写法，先看概念再看细节。" },
+      { "id": "goto-statement", "kind": "companion", "why": "GoTo 除了错误处理，也能做普通跳转。" }
+    ],
+    "oneLiner": "出错就跳到标签处统一收拾",
+    "summary": "On Error GoTo 是 VBA 里最接近 try/catch 的写法：正常流程 - Exit Sub - 错误标签。三个必查项：标签存在、标签前有 Exit Sub、错误块里 Resume 用得对。"
+  },
+  {
+    "id": "exit-sub",
+    "enName": "Exit Sub / Exit Function",
+    "zhName": "提前退出过程",
+    "alias": ["Exit Sub", "Exit Function", "提前结束", "中途返回"],
+    "keywords": ["条件满足就结束", "别再往下执行"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Exit Sub\nExit Function\nExit For\nExit Do",
+    "examples": [
+      {
+        "title": "没数据就提前收工",
+        "code": "Sub 只处理有数据的表()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    If 末行 < 2 Then\n        MsgBox \"A 列没有数据，不用处理\"\n        Exit Sub\n    End If\n    MsgBox \"共 \" & 末行 - 1 & \" 条数据，开始处理\"\nEnd Sub",
+        "howToRun": "先清空 A 列试一次，再填几行试第二次。",
+        "result": "空表时直接提示并结束；有数据时继续往下。"
+      },
+      {
+        "title": "循环里找到就停",
+        "code": "Sub 找到就停()\n    Dim i As Long\n    For i = 1 To 20\n        If Cells(i, 1).Value = \"目标\" Then\n            MsgBox \"在第 \" & i & \" 行找到\"\n            Exit For\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "A1:A20 里放一个「目标」再运行。",
+        "result": "命中第一处就停止循环并提示行号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在错误处理块之前忘了 Exit Sub，正常流程也报错",
+        "reason": "顺序执行会滑到错误标签。",
+        "fix": "错误标签前一律加 Exit Sub。",
+        "level": "high"
+      },
+      {
+        "title": "循环里写了 Exit Sub，结果整个宏都结束了",
+        "reason": "Exit Sub 退出的是整个过程，不只是循环。",
+        "fix": "只想跳出循环用 Exit For / Exit Do。",
+        "level": "mid"
+      },
+      {
+        "title": "Function 里写 Exit Sub，编译报错",
+        "reason": "Function 里只能 Exit Function，不能 Exit Sub。",
+        "fix": "按当前过程类型选择对应的 Exit 语句。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "do-loop", "kind": "companion", "why": "循环里的提前退出用 Exit Do，别误用 Exit Sub。" },
+      { "id": "on-error-goto", "kind": "companion", "why": "错误块前的 Exit Sub 是标准写法。" }
+    ],
+    "oneLiner": "条件不满足就别往下跑了",
+    "summary": "Exit Sub/Function 是「提前收工」，Exit For/Do 才是「跳出循环」。分不清这两个，最容易出现「只想跳过一行，结果整个宏结束了」。"
+  },
+  {
+    "id": "call",
+    "enName": "Call",
+    "zhName": "调用另一个过程",
+    "alias": ["Call", "调用", "子过程", "传参"],
+    "keywords": ["调用另一个宏", "把代码拆成几段", "参数怎么传"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Call 过程名(参数1, 参数2)\n' 或者省略 Call：过程名 参数1, 参数2",
+    "examples": [
+      {
+        "title": "把公共动作抽成一个 Sub",
+        "code": "Sub 主流程()\n    Call 清空结果\n    Call 写表头(\"A1:C1\")\n    MsgBox \"完成\"\nEnd Sub\nSub 清空结果()\n    Range(\"A2:C100\").ClearContents\nEnd Sub\nSub 写表头(区域 As String)\n    Range(区域).Value = Array(\"编号\", \"名称\", \"金额\")\nEnd Sub",
+        "howToRun": "三个过程放在同一个模块，运行「主流程」。",
+        "result": "先清空结果区，再写入三个表头，最后弹「完成」。"
+      },
+      {
+        "title": "省略 Call 的写法（参数不加括号）",
+        "code": "Sub 简写()\n    写表头 \"E1:G1\"\nEnd Sub",
+        "howToRun": "紧接上面的模块运行。",
+        "result": "E1:G1 写入同样的三个表头；省略 Call 时参数不能加括号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "省略 Call 却给参数加了括号，结果参数被当表达式算掉",
+        "reason": "不带 Call 时括号会被解析成「先算表达式再传值」，多参数直接报错。",
+        "fix": "要么写 Call 过程(参数)，要么写 过程 参数 且不加括号。",
+        "level": "high"
+      },
+      {
+        "title": "想拿返回值却调用了 Sub",
+        "reason": "Sub 没有返回值，拿不到结果。",
+        "fix": "把要返回值的部分写成 Function，用变量接：结果 = 函数(参数)。",
+        "level": "mid"
+      },
+      {
+        "title": "同名过程分散在多个模块，Call 时行为不一致",
+        "reason": "同名过程会按作用域解析，甚至报二义性名称。",
+        "fix": "公共过程统一放一个标准模块，不同模块内的用 Private 限制。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "sub-vs-function", "kind": "companion", "why": "调 Sub 不取返回值，调 Function 才接结果。" },
+      { "id": "module-and-procedure", "kind": "companion", "why": "过程放哪个模块，决定别的模块能不能直接调。" }
+    ],
+    "oneLiner": "把一段逻辑交给另一个过程执行",
+    "summary": "Call 是把长脚本拆短的唯一办法。记住两个坑：省略 Call 时参数别加括号；要返回值就必须用 Function。"
+  },
+  {
+    "id": "msgbox",
+    "enName": "MsgBox",
+    "zhName": "弹窗提示",
+    "alias": ["MsgBox", "弹窗", "提示框", "确认框"],
+    "keywords": ["给用户提示", "让用户点确定/取消", "弹个确认框"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "MsgBox 提示文字, 按钮常量, 标题\n结果 = MsgBox(提示文字, vbYesNo)",
+    "examples": [
+      {
+        "title": "确认框：点了才继续",
+        "code": "Sub 确认再删()\n    Dim 结果 As Long\n    结果 = MsgBox(\"要清空 A2:C100 吗？此操作不可撤销\", vbYesNo + vbQuestion, \"确认\")\n    If 结果 = vbYes Then\n        Range(\"A2:C100\").ClearContents\n        MsgBox \"已清空\"\n    Else\n        MsgBox \"已取消，什么都没做\"\n    End If\nEnd Sub",
+        "howToRun": "按 F5，先点「否」试一次，再点「是」试一次。",
+        "result": "点否时数据不动；点是才清空并提示。"
+      },
+      {
+        "title": "多行提示：把统计结果一次说清",
+        "code": "Sub 汇报结果()\n    Dim 末行 As Long\n    末行 = Cells(Rows.Count, 1).End(xlUp).Row\n    MsgBox \"共 \" & 末行 - 1 & \" 条数据\" & vbCrLf & \"最后一行：\" & 末行, vbInformation, \"统计\"\nEnd Sub",
+        "howToRun": "A 列有数据时运行。",
+        "result": "两行文字的提示框，标题是「统计」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "弹了确认框，但没接返回值，点什么结果都一样",
+        "reason": "MsgBox 不接返回值时，用户的点击被丢弃。",
+        "fix": "用变量接：结果 = MsgBox(..., vbYesNo)，再判断 vbYes。",
+        "level": "high"
+      },
+      {
+        "title": "循环里每行都弹一次，几十次点不完",
+        "reason": "MsgBox 是阻塞的，放在循环里会反复打断。",
+        "fix": "循环里只累积结果，循环结束后弹一次。",
+        "level": "mid"
+      },
+      {
+        "title": "提示文字太长，弹窗显示不全",
+        "reason": "MsgBox 对长度有限制，超长会被截断。",
+        "fix": "长内容写进单元格或 Debug.Print，弹窗只给结论。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "inputbox", "kind": "companion", "why": "需要用户输入内容时用 InputBox，只提示/确认用 MsgBox。" },
+      { "id": "if-then-else", "kind": "companion", "why": "确认框必须配合 If 判断返回值才有意义。" }
+    ],
+    "oneLiner": "给用户看一句话、要一个确认",
+    "summary": "MsgBox 既是提示也是最简单的交互：vbYesNo 问一句，接住返回值再决定往下做什么。别把长报告塞进弹窗，也别在循环里弹。"
+  },
+  {
+    "id": "inputbox",
+    "enName": "InputBox",
+    "zhName": "让用户输入",
+    "alias": ["InputBox", "输入框", "让用户填", "Application.InputBox"],
+    "keywords": ["弹框让用户输入一个值", "输入数字", "取用户填的内容"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "变量 = InputBox(提示, 标题, 默认值)\n变量 = Application.InputBox(提示, 标题, , , , , , 类型)",
+    "examples": [
+      {
+        "title": "问一个名字，写进 A1",
+        "code": "Sub 问名字()\n    Dim 名字 As String\n    名字 = InputBox(\"请输入客户名称\", \"录入\", \"\")\n    If 名字 = \"\" Then\n        MsgBox \"没有输入，已取消\"\n        Exit Sub\n    End If\n    Range(\"A1\").Value = 名字\nEnd Sub",
+        "howToRun": "按 F5，输入文字点确定；再试一次直接点取消。",
+        "result": "确定时 A1 写入内容；取消时提示「没有输入」，不写入。"
+      },
+      {
+        "title": "只收数字：Application.InputBox(Type:=1)",
+        "code": "Sub 只要数字()\n    Dim 金额 As Variant\n    金额 = Application.InputBox(\"请输入金额（只收数字）\", \"金额\", , , , , , 1)\n    If 金额 = False Then Exit Sub\n    Range(\"B1\").Value = 金额\nEnd Sub",
+        "howToRun": "输入文字会被拒绝并要求重输；点取消则什么都不做。",
+        "result": "B1 得到用户输入的数字；非数字输入会被 Excel 拦住。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用户点了取消，空串参与计算报类型不匹配 13",
+        "reason": "普通 InputBox 取消时返回空串，直接拿去做算术就会报错。",
+        "fix": "先判断 If 输入 = \"\" Then Exit Sub，再参与计算。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "把 InputBox 的返回值当数字用，结果是文本",
+        "reason": "普通 InputBox 永远返回字符串。",
+        "fix": "用 CLng/CDbl 转换，或改用 Application.InputBox 的 Type:=1。",
+        "level": "mid"
+      },
+      {
+        "title": "取消与「输入空内容」分不清",
+        "reason": "普通 InputBox 两种情况都返回空串。",
+        "fix": "需要区分就用 Application.InputBox：取消返回 False，空内容返回空串。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "msgbox", "kind": "companion", "why": "一个负责提示/确认，一个负责收内容。" },
+      { "id": "if-then-else", "kind": "companion", "why": "输入必须校验，校验就靠 If。" }
+    ],
+    "oneLiner": "弹个框让用户填一个值",
+    "summary": "InputBox 拿用户输入，但永远返回字符串；取消时是空串。要数字、要区分取消，就用 Application.InputBox 并传 Type:=1。"
+  },
+  {
+    "id": "redim",
+    "enName": "ReDim / ReDim Preserve",
+    "zhName": "动态数组",
+    "alias": ["ReDim", "动态数组", "Preserve", "数组扩容"],
+    "keywords": ["数组长度运行时才知道", "往数组里追加", "保留已有数据"],
+    "kind": "statement",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "Dim 数组() As Variant\nReDim 数组(1 To 行数)\nReDim Preserve 数组(1 To 新行数)",
+    "examples": [
+      {
+        "title": "先读整列，再按需扩数组",
+        "code": "Sub 动态数组()\n    Dim v As Variant, 结果() As Variant, i As Long, n As Long\n    v = Range(\"A1:A20\").Value\n    ReDim 结果(1 To 20)\n    For i = 1 To 20\n        If IsNumeric(v(i, 1)) Then\n            n = n + 1: 结果(n) = v(i, 1) * 2\n        End If\n    Next i\n    If n >= 1 Then ReDim Preserve 结果(1 To n)\n    MsgBox \"有效 \" & n & \" 条\"\nEnd Sub",
+        "howToRun": "A1:A20 混着数字与文字时运行。",
+        "result": "只保留数字行的两倍值，数组被裁到实际有效条数。"
+      },
+      {
+        "title": "边读边扩：每找到一条加一格",
+        "code": "Sub 边读边扩()\n    Dim 结果() As String\n    Dim i As Long, n As Long\n    For i = 1 To 50\n        If Cells(i, 1).Value <> \"\" Then\n            n = n + 1\n            ReDim Preserve 结果(1 To n)\n            结果(n) = Cells(i, 1).Value\n        End If\n    Next i\n    MsgBox \"收集到 \" & n & \" 条\"\nEnd Sub",
+        "howToRun": "A1:A50 里放一些有值、一些空的行。",
+        "result": "只收集非空单元格的内容，条数与实际一致。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对二维数组 Preserve 时想改第一维，报下标越界",
+        "reason": "Preserve 只允许改最后一维的大小。",
+        "fix": "声明成 结果(1 To 列, 1 To 行) 让「行」成为最后一维再扩。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "ReDim 之后原有数据全没了",
+        "reason": "不带 Preserve 的 ReDim 会重新分配并清空数组。",
+        "fix": "要保留就写 ReDim Preserve；但要清楚它每次都会复制，别在万级循环里频繁调用。",
+        "level": "mid"
+      },
+      {
+        "title": "循环里每行都 Preserve，处理一万行慢到不可用",
+        "reason": "每次扩容都要整体复制一遍数组。",
+        "fix": "先 ReDim 到可能的最大长度，最后再按实际条数裁一次。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "dim", "kind": "companion", "why": "动态数组先 Dim 成空括号，再用 ReDim 定长度。" },
+      { "id": "value", "kind": "companion", "why": "整块读进数组后，才谈得上动态裁剪。" }
+    ],
+    "oneLiner": "长度运行时才确定的数组",
+    "summary": "ReDim 用来给数组定长度，Preserve 保留已有数据但只能改最后一维。实践口诀：先按最大可能分配，最后裁一次，别在循环里反复扩容。"
+  },
+  {
+    "id": "const",
+    "enName": "Const",
+    "zhName": "声明常量",
+    "alias": ["Const", "常量", "固定值", "税率"],
+    "keywords": ["把固定值起个名字", "不用每次改数字", "常量怎么定义"],
+    "kind": "statement",
+    "level": 1,
+    "host": ["excel"],
+    "syntax": "Const 名称 As 类型 = 值",
+    "examples": [
+      {
+        "title": "税率只写一次，全脚本引用",
+        "code": "Const 税率 As Double = 0.06\n\nSub 算含税价()\n    Dim 不含税 As Double\n    不含税 = Range(\"A1\").Value\n    Range(\"B1\").Value = 不含税 * (1 + 税率)\nEnd Sub",
+        "howToRun": "模块顶部放 Const，A1 填价格，运行。",
+        "result": "B1 得到含税价；以后税率变了只改 Const 那一行。"
+      },
+      {
+        "title": "常量参与条件判断",
+        "code": "Const 阈值 As Long = 100\n\nSub 标超标()\n    If Range(\"A1\").Value > 阈值 Then\n        Range(\"B1\").Value = \"超标\"\n    End If\nEnd Sub",
+        "howToRun": "A1 填 120 试一次，再填 80 试一次。",
+        "result": "超过 100 时 B1 写「超标」，否则不写。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Const 后面写了变量，编译报错",
+        "reason": "常量必须在编译期确定，不能用运行时才有的值。",
+        "fix": "需要运行时赋值就用 Dim + 赋值，别用 Const。",
+        "level": "high"
+      },
+      {
+        "title": "在过程里写 Const，别的过程用不到",
+        "reason": "过程级常量只在该过程内有效。",
+        "fix": "多处共用就写到模块顶部（Private Const / Public Const）。",
+        "level": "mid"
+      },
+      {
+        "title": "常量名写成小写，和变量混淆",
+        "reason": "VBA 不强制命名规范，读代码时分不清常量和变量。",
+        "fix": "约定常量全大写或用前缀，如 TAX_RATE。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      { "id": "dim", "kind": "alternative", "why": "值会变就用 Dim，不会变才用 Const。" },
+      { "id": "variable-scope", "kind": "companion", "why": "常量同样有过程级与模块级之分。" }
+    ],
+    "oneLiner": "给不会变的值起个名字",
+    "summary": "Const 适合税率、阈值、固定路径这类值：只写一次，全脚本引用，改的时候改一处。它必须在编译期确定，不能用单元格里的值初始化。"
+  },
+  {
+    "id": "goto-statement",
+    "enName": "GoTo",
+    "zhName": "跳转语句",
+    "alias": ["GoTo", "跳转", "标签"],
+    "keywords": ["跳到某一行", "跳过一段代码", "标签怎么用"],
+    "kind": "statement",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "GoTo 标签\n' ...\n标签:",
+    "examples": [
+      {
+        "title": "跳过不需要处理的情况",
+        "code": "Sub 只处理有值行()\n    Dim i As Long\n    For i = 1 To 10\n        If Cells(i, 1).Value = \"\" Then GoTo 下一行\n        Cells(i, 2).Value = Cells(i, 1).Value * 2\n下一行:\n    Next i\nEnd Sub",
+        "howToRun": "A1:A10 里留几个空格再运行。",
+        "result": "只对非空行写结果，空行被跳过。"
+      },
+      {
+        "title": "错误跳转（正规用法）",
+        "code": "Sub 出错就提示()\n    On Error GoTo 出错\n    Range(\"A1\").Value = 1 / Range(\"B1\").Value\n    Exit Sub\n出错:\n    MsgBox \"B1 不能是 0 或空\"\nEnd Sub",
+        "howToRun": "B1 留空或填 0 试一次，再填 2 试一次。",
+        "result": "异常时给一句人话提示；正常时 A1 得到商。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "标签写成「下一行：」（中文冒号），编译报标签未定义",
+        "reason": "VBA 标签必须用英文冒号结尾。",
+        "fix": "改成「下一行:」，并确认 GoTo 后面的名字一致。",
+        "level": "high"
+      },
+      {
+        "title": "用 GoTo 跳来跳去，代码没法读也没法改",
+        "reason": "跳转破坏了顺序执行，逻辑只能靠人工追。",
+        "fix": "分支用 If/Select Case，循环用 For/Do；GoTo 基本只留给错误处理。",
+        "level": "mid"
+      },
+      {
+        "title": "GoTo 跳进了循环内部，循环变量状态不可控",
+        "reason": "VBA 允许这种跳转，但循环计数与栈状态会变得不可预期。",
+        "fix": "不要跨结构跳转，只在同一过程内向前跳到错误/收尾块。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "on-error-goto", "kind": "companion", "why": "GoTo 最正当的用途就是错误处理。" },
+      { "id": "select-case", "kind": "alternative", "why": "多分支判断用 Select Case，不要用一串 GoTo 拼。" }
+    ],
+    "oneLiner": "无条件跳到某个标签",
+    "summary": "GoTo 是 VBA 里最原始的控制流：跳到标签继续执行。日常只剩两个正当用途——错误处理、跳到收尾块。其余场景请用 If / Select Case / 循环。"
+  },
+  {
+    "id": "end-statement",
+    "enName": "End",
+    "zhName": "强制结束程序",
+    "alias": ["End 语句", "强制结束", "停止宏"],
+    "keywords": ["立即停止宏", "End和End Sub区别", "结束所有代码"],
+    "kind": "statement",
+    "level": 3,
+    "host": ["excel"],
+    "syntax": "End",
+    "examples": [
+      {
+        "title": "End 会结束整个工程里正在跑的代码",
+        "code": "Sub 演示End()\n    MsgBox \"下面会直接结束，后面的代码不会执行\"\n    End\n    MsgBox \"这行永远看不到\"\nEnd Sub",
+        "howToRun": "按 F5，观察只弹了第一个框。",
+        "result": "只弹出第一个提示，第二个永远不会出现。"
+      },
+      {
+        "title": "正确做法：用 Exit Sub 代替 End",
+        "code": "Sub 用ExitSub()\n    If Range(\"A1\").Value = \"\" Then\n        MsgBox \"A1 是空的，先停一下\"\n        Exit Sub\n    End If\n    MsgBox \"继续处理\"\nEnd Sub",
+        "howToRun": "A1 先清空试一次，再填内容试一次。",
+        "result": "空值时提示后正常退出，有值时继续；不会影响别的正在运行的代码。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "End 之后模块级变量全被清空、事件也不再响应",
+        "reason": "End 会重置整个 VBA 工程状态，不执行任何清理。",
+        "fix": "改用 Exit Sub / Exit Function 正常退出。",
+        "level": "high"
+      },
+      {
+        "title": "把 End 当成 End Sub 用，编译报错",
+        "reason": "End 是独立语句，不能代替过程结束标记。",
+        "fix": "过程结束用 End Sub / End Function，判断结束用 End If。",
+        "level": "mid"
+      },
+      {
+        "title": "End 前关掉的 ScreenUpdating 没有恢复，界面一直不刷新",
+        "reason": "End 直接终止，跳过了恢复语句。",
+        "fix": "不用 End；必须终止时先恢复 Application 的各项开关。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      { "id": "exit-sub", "kind": "alternative", "why": "绝大多数「想立刻停」的场合，Exit Sub 才是正确写法。" },
+      { "id": "error-handling-model", "kind": "companion", "why": "异常收尾要靠错误处理块，而不是 End。" }
+    ],
+    "oneLiner": "立刻终止，连清理都不做",
+    "summary": "End 是「拔电源」：立即停止并重置工程状态，跳过所有清理与恢复。除非真需要强行终止，一律用 Exit Sub/Function 收尾。"
+  }
+]

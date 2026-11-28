@@ -1,0 +1,625 @@
+[
+  {
+    "id": "property-get-let",
+    "enName": "Property Get / Let / Set",
+    "zhName": "Property 语句",
+    "alias": [
+      "Property Get",
+      "Property Let",
+      "Property Set"
+    ],
+    "keywords": [
+      "VBA 属性语句",
+      "只读属性",
+      "类属性"
+    ],
+    "kind": "statement",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Public Property Get Name() As String\nPublic Property Let Name(v As String)\nPublic Property Set Child(v As Object)",
+    "examples": [
+      {
+        "title": "Get + Let 组成可读写属性",
+        "code": "Private mName As String\n\nPublic Property Get Name() As String\n    Name = mName\nEnd Property\n\nPublic Property Let Name(v As String)\n    mName = v\nEnd Property",
+        "howToRun": "放进类模块，外部 o.Name = \"A\" 后再读 o.Name。",
+        "result": "赋值后能读回 \"A\"。"
+      },
+      {
+        "title": "只写 Get，做成只读属性",
+        "code": "Private mTotal As Double\n\nPublic Property Get Total() As Double\n    Total = mTotal\nEnd Property\n\nPublic Sub Add(v As Double)\n    mTotal = mTotal + v\nEnd Sub",
+        "howToRun": "外部只能读 o.Total，不能 o.Total = 10。",
+        "result": "o.Total 可读；直接赋值编译报错。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对象属性误用 Let，编译不通过",
+        "reason": "对象赋值必须 Set。",
+        "fix": "对象属性写 Property Set，值属性写 Property Let。",
+        "level": "high"
+      },
+      {
+        "title": "Get 与 Let 类型不一致，赋值时类型不匹配",
+        "reason": "两端声明应一致。",
+        "fix": "Get As T 对应 Let(v As T)。",
+        "level": "mid"
+      },
+      {
+        "title": "Property 写在标准模块里，外部无法按对象访问",
+        "reason": "Property 属于类/对象模块。",
+        "fix": "放进类模块或用 UserForm 模块。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "property-procedure",
+        "kind": "companion",
+        "why": "属性过程的概念解释。"
+      },
+      {
+        "id": "class-module",
+        "kind": "companion",
+        "why": "Property 通常写在类里。"
+      }
+    ],
+    "oneLiner": "声明属性的读、写、对象赋值",
+    "summary": "Property Get 读、Let 值写、Set 对象写，类型要对称。对象属性用 Let 是最常见的编译错误。"
+  },
+  {
+    "id": "raiseevent",
+    "enName": "RaiseEvent",
+    "zhName": "触发自定义事件",
+    "alias": [
+      "RaiseEvent",
+      "自定义事件",
+      "类事件"
+    ],
+    "keywords": [
+      "类里触发事件",
+      "WithEvents",
+      "自定义回调"
+    ],
+    "kind": "statement",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Public Event Changed(ByVal v As Long)\nRaiseEvent Changed(100)",
+    "examples": [
+      {
+        "title": "类里声明并触发事件",
+        "code": "Public Event Changed(ByVal v As Long)\n\nPublic Sub Update(ByVal v As Long)\n    RaiseEvent Changed(v)\nEnd Sub",
+        "howToRun": "类模块里写；标准模块用 WithEvents 接收。",
+        "result": "调用 Update 时触发 Changed，接收端拿到 v。"
+      },
+      {
+        "title": "标准模块里用 WithEvents 接收",
+        "code": "Private WithEvents obj As MyClass\n\nPrivate Sub Class_Init()\n    Set obj = New MyClass\nEnd Sub\n\nPrivate Sub obj_Changed(ByVal v As Long)\n    MsgBox v\nEnd Sub",
+        "howToRun": "把 MyClass 换成实际类名，先执行 Class_Init。",
+        "result": "obj.Update 100 时弹出 100。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "事件名和接收过程名不匹配，永远不触发",
+        "reason": "接收过程必须是 对象名_事件名。",
+        "fix": "WithEvents 变量名 + 下划线 + 事件名，大小写不敏感但拼写要对。",
+        "level": "high"
+      },
+      {
+        "title": "在类模块里直接调用事件名当过程",
+        "reason": "事件只能用 RaiseEvent 触发。",
+        "fix": "写 RaiseEvent 事件名(参数)。",
+        "level": "mid"
+      },
+      {
+        "title": "WithEvents 变量是局部变量，过程结束就没了",
+        "reason": "局部变量生命周期短，事件接收失效。",
+        "fix": "WithEvents 变量放模块级（声明区）。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "events",
+        "kind": "companion",
+        "why": "事件机制总览。"
+      },
+      {
+        "id": "class-module",
+        "kind": "companion",
+        "why": "自定义事件写在类里。"
+      }
+    ],
+    "oneLiner": "类主动通知外部发生了什么",
+    "summary": "类里 Public Event 声明，RaiseEvent 触发；外部用模块级 WithEvents 变量接收。过程名必须「变量名_事件名」。"
+  },
+  {
+    "id": "implements",
+    "enName": "Implements",
+    "zhName": "实现接口",
+    "alias": [
+      "Implements",
+      "接口实现",
+      "类接口"
+    ],
+    "keywords": [
+      "VBA 接口",
+      "Implements 用法",
+      "多态"
+    ],
+    "kind": "statement",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Implements IShape\nPrivate Sub IShape_Draw()\nEnd Sub",
+    "examples": [
+      {
+        "title": "类实现一个接口",
+        "code": "Implements IShape\n\nPrivate Sub IShape_Draw()\n    MsgBox \"画一个形状\"\nEnd Sub",
+        "howToRun": "先建 IShape 类（只放 Public Sub Draw()），再建实现类写上面代码。",
+        "result": "实现类具备 IShape 约定的 Draw 方法。"
+      },
+      {
+        "title": "用接口变量统一调用",
+        "code": "Dim s As IShape\nSet s = New Circle\ns.Draw",
+        "howToRun": "Circle 已 Implements IShape，按 F5。",
+        "result": "通过接口调用到 Circle 的实现。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "接口里的方法在实现类写成 Public，没生效",
+        "reason": "实现接口的方法必须是 Private 且带接口前缀。",
+        "fix": "写 Private Sub IShape_Draw()。",
+        "level": "high"
+      },
+      {
+        "title": "接口类里写了实现代码，接口变成空壳才正确",
+        "reason": "接口类只声明签名，不写逻辑。",
+        "fix": "接口类方法留空，逻辑放实现类。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 VBA 接口支持继承",
+        "reason": "VBA 只有 Implements，没有类继承。",
+        "fix": "用接口 + 组合模拟多态，别找继承语法。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "class-module",
+        "kind": "companion",
+        "why": "接口也是类模块。"
+      },
+      {
+        "id": "object-property-method",
+        "kind": "companion",
+        "why": "方法与对象基础。"
+      }
+    ],
+    "oneLiner": "让多个类遵守同一套方法签名",
+    "summary": "接口类只放空签名，实现类用 Implements + Private 前缀方法。VBA 没有继承，接口是模拟多态的主要手段。"
+  },
+  {
+    "id": "declare-api",
+    "enName": "Declare Statement",
+    "zhName": "声明外部 API",
+    "alias": [
+      "Declare",
+      "PtrSafe",
+      "Win32 API"
+    ],
+    "keywords": [
+      "调用系统 API",
+      "Declare Function",
+      "64位兼容"
+    ],
+    "kind": "statement",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "#If VBA7 Then\nDeclare PtrSafe Function GetTickCount Lib \"kernel32\" () As Long\n#End If",
+    "examples": [
+      {
+        "title": "声明并调用 GetTickCount",
+        "code": "#If VBA7 Then\n    Declare PtrSafe Function GetTickCount Lib \"kernel32\" () As Long\n#End If\n\nSub 计时()\n    Dim t As Long\n    t = GetTickCount()\n    MsgBox t\nEnd Sub",
+        "howToRun": "声明放模块顶部，按 F5。",
+        "result": "弹出系统启动以来的毫秒数。"
+      },
+      {
+        "title": "用 API 做精确等待",
+        "code": "#If VBA7 Then\n    Declare PtrSafe Sub Sleep Lib \"kernel32\" (ByVal ms As Long)\n#End If\n\nSub 睡一秒()\n    Sleep 1000\n    MsgBox \"醒了\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "约 1 秒后弹窗。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "64 位 Office 里没写 PtrSafe，编译报错",
+        "reason": "新版 VBA 要求 PtrSafe 标记。",
+        "fix": "用 #If VBA7 Then + PtrSafe 包起来，保留 32 位分支。",
+        "level": "high"
+      },
+      {
+        "title": "参数类型写错，Excel 直接崩溃",
+        "reason": "API 调用绕过 VBA 类型检查，错误指针会崩进程。",
+        "fix": "严格对照官方签名，不确定就先在空工作簿试。",
+        "level": "high"
+      },
+      {
+        "title": "把 API 声明放进了工作表模块",
+        "reason": "Declare 只能放标准模块顶部。",
+        "fix": "移到 Module1 等标准模块的声明区。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "application-wait",
+        "kind": "alternative",
+        "why": "简单等待可用 Wait，不必上 API。"
+      },
+      {
+        "id": "vba-project-model",
+        "kind": "companion",
+        "why": "声明区在标准模块。"
+      }
+    ],
+    "oneLiner": "调用 Windows 系统函数",
+    "summary": "Declare 必须放标准模块顶部，64 位要 PtrSafe。参数签名写错会崩 Excel，能用内置方法就别上 API。"
+  },
+  {
+    "id": "erase",
+    "enName": "Erase Statement",
+    "zhName": "清空数组",
+    "alias": [
+      "Erase",
+      "清空数组",
+      "释放数组内存"
+    ],
+    "keywords": [
+      "数组清零",
+      "释放数组",
+      "Erase 用法"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Erase arr          ' 固定数组：元素清零/置空\nErase arr          ' 动态数组：释放内存",
+    "examples": [
+      {
+        "title": "用完动态数组释放内存",
+        "code": "Sub 释放()\n    Dim a() As Long, i As Long\n    ReDim a(1 To 100000)\n    For i = 1 To 100000\n        a(i) = i\n    Next i\n    Erase a\n    MsgBox \"已释放\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "数组内存释放，变量仍在但不能再直接下标访问。"
+      },
+      {
+        "title": "固定数组清零",
+        "code": "Sub 清固定()\n    Dim a(1 To 3) As Long\n    a(1) = 10\n    Erase a\n    MsgBox a(1)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹 0，固定数组元素被重置。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Erase 后再用 UBound，报下标越界",
+        "reason": "动态数组已被释放，没有维度。",
+        "fix": "Erase 后要重新 ReDim 再用。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "以为 Erase 会把数组变量变成 Nothing",
+        "reason": "它只清内容/释放存储，变量本身还在。",
+        "fix": "要彻底不用就配合 Set 或让作用域结束。",
+        "level": "mid"
+      },
+      {
+        "title": "对非数组用 Erase，编译报错",
+        "reason": "Erase 只接受数组变量。",
+        "fix": "普通变量清零直接赋 0 / \"\"。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "redim",
+        "kind": "companion",
+        "why": "动态数组声明与重设。"
+      },
+      {
+        "id": "static-vs-dynamic-array",
+        "kind": "companion",
+        "why": "数组类型基础。"
+      }
+    ],
+    "oneLiner": "清空或释放一个数组",
+    "summary": "固定数组 Erase 后元素归零，动态数组 Erase 后内存释放、维度消失。释放后要 UBound 会报 9，必须重新 ReDim。"
+  },
+  {
+    "id": "option-base",
+    "enName": "Option Base",
+    "zhName": "数组下标起点",
+    "alias": [
+      "Option Base",
+      "数组从1开始",
+      "下标起点"
+    ],
+    "keywords": [
+      "数组默认下标",
+      "Option Base 1",
+      "LBound"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Option Base 1   ' 模块顶部，数组默认从 1 开始\nOption Base 0   ' 默认，从 0 开始",
+    "examples": [
+      {
+        "title": "模块里改成 1 基",
+        "code": "Option Base 1\n\nSub 看下界()\n    Dim a(3) As Long\n    Debug.Print LBound(a), UBound(a)\nEnd Sub",
+        "howToRun": "Option Base 1 必须在模块最顶部，按 F5。",
+        "result": "打印 1 和 3。"
+      },
+      {
+        "title": "显式写上下界，不依赖 Option Base",
+        "code": "Sub 显式()\n    Dim a(1 To 3) As Long\n    Debug.Print LBound(a), UBound(a)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "打印 1 和 3，与模块设置无关。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Option Base 没放模块最顶部，编译报错",
+        "reason": "它只能出现在声明区最前面。",
+        "fix": "放在所有 Dim/Sub 之前。",
+        "level": "high"
+      },
+      {
+        "title": "不同模块 Option Base 不一致，数组行为混乱",
+        "reason": "该设置按模块生效。",
+        "fix": "统一用 0 基，或全部显式写 1 To N。",
+        "level": "mid"
+      },
+      {
+        "title": "以为 Option Base 影响 Range.Value 数组",
+        "reason": "Range 返回的二维数组始终 1 基。",
+        "fix": "别用 Option Base 去“修正”它，用 LBound 判断。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "arrays-vs-ranges",
+        "kind": "companion",
+        "why": "Range 数组始终 1 基。"
+      },
+      {
+        "id": "static-vs-dynamic-array",
+        "kind": "companion",
+        "why": "数组声明方式。"
+      }
+    ],
+    "oneLiner": "改数组默认从 0 还是从 1 开始",
+    "summary": "Option Base 按模块改默认下界，但只在模块顶部有效。最稳的做法是显式写 1 To N，不依赖全局设置。"
+  },
+  {
+    "id": "option-compare",
+    "enName": "Option Compare",
+    "zhName": "字符串比较模式",
+    "alias": [
+      "Option Compare",
+      "Text Compare",
+      "Binary Compare"
+    ],
+    "keywords": [
+      "字符串不区分大小写",
+      "文本比较",
+      "Option Compare Text"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Option Compare Text     ' 不区分大小写\nOption Compare Binary   ' 默认，按字符编码",
+    "examples": [
+      {
+        "title": "Text 模式下 ABC 等于 abc",
+        "code": "Option Compare Text\n\nSub 比文本()\n    If \"ABC\" = \"abc\" Then\n        MsgBox \"相等\"\n    Else\n        MsgBox \"不等\"\n    End If\nEnd Sub",
+        "howToRun": "Option Compare Text 放模块顶部，按 F5。",
+        "result": "弹「相等」。"
+      },
+      {
+        "title": "Binary 模式下区分大小写",
+        "code": "Option Compare Binary\n\nSub 比二进制()\n    MsgBox (\"ABC\" = \"abc\")\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹 False。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "模块设置是 Text，但字典/Find 仍区分大小写",
+        "reason": "Option Compare 只影响该模块里的比较运算，不影响对象内部规则。",
+        "fix": "对象比较单独设 CompareMode / MatchCase。",
+        "level": "high"
+      },
+      {
+        "title": "Option Compare 写在过程里，编译报错",
+        "reason": "只能放模块声明区。",
+        "fix": "移到模块最顶部。",
+        "level": "mid"
+      },
+      {
+        "title": "不同模块设置不同，同一段逻辑结果不一致",
+        "reason": "比较模式按模块生效。",
+        "fix": "统一项目口径，或用 LCase/UCase 显式归一。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "string-encoding",
+        "kind": "companion",
+        "why": "字符串处理基础。"
+      },
+      {
+        "id": "dictionary",
+        "kind": "companion",
+        "why": "字典的 CompareMode。"
+      }
+    ],
+    "oneLiner": "让字符串比较忽略大小写",
+    "summary": "Option Compare Text 让本模块的 = 和 Like 不区分大小写。它不管字典、Find 等对象内部比较，别混为一谈。"
+  },
+  {
+    "id": "explicit-let",
+    "enName": "Let Statement",
+    "zhName": "Let 赋值语句",
+    "alias": [
+      "Let",
+      "显式赋值",
+      "Let 语句"
+    ],
+    "keywords": [
+      "Let 有什么用",
+      "显式赋值",
+      "Let 和 Set 区别"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Let x = 10       ' 可省略 Let\nLet s = \"abc\"",
+    "examples": [
+      {
+        "title": "显式写 Let",
+        "code": "Sub 显式()\n    Dim x As Long\n    Let x = 10\n    MsgBox x\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹 10。"
+      },
+      {
+        "title": "省略 Let，效果一样",
+        "code": "Sub 省略()\n    Dim x As Long\n    x = 10\n    MsgBox x\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "同样弹 10。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对对象变量用 Let，报「需要对象」",
+        "reason": "对象赋值必须 Set。",
+        "fix": "Set r = Range(\"A1\")，不要 Let r = ...。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "以为 Let 会做类型转换",
+        "reason": "Let 只赋值，隐式转换由 VBA 规则决定。",
+        "fix": "需要转换就显式 CStr/CLng。",
+        "level": "mid"
+      },
+      {
+        "title": "Let 后面接函数名，误以为是调用",
+        "reason": "Let 是赋值语句。",
+        "fix": "调用过程直接写过程名或 Call。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "set",
+        "kind": "companion",
+        "why": "对象赋值必须 Set。"
+      },
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "变量声明。"
+      }
+    ],
+    "oneLiner": "最普通的赋值语句",
+    "summary": "Let 是显式赋值，平时可省略。它只能赋普通值，对象必须用 Set，这是 91 错误的常见来源。"
+  },
+  {
+    "id": "paramarray",
+    "enName": "ParamArray",
+    "zhName": "参数数组",
+    "alias": [
+      "ParamArray",
+      "可变参数",
+      "任意个参数"
+    ],
+    "keywords": [
+      "函数接收多个参数",
+      "可变参数写法",
+      "ParamArray 用法"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Public Function SumAll(ParamArray nums() As Variant) As Double",
+    "examples": [
+      {
+        "title": "任意个数求和",
+        "code": "Public Function SumAll(ParamArray nums() As Variant) As Double\n    Dim i As Long, t As Double\n    For i = LBound(nums) To UBound(nums)\n        t = t + nums(i)\n    Next i\n    SumAll = t\nEnd Function\n\nSub 测试()\n    MsgBox SumAll(1, 2, 3, 4)\nEnd Sub",
+        "howToRun": "标准模块里写，按 F5。",
+        "result": "弹 10。"
+      },
+      {
+        "title": "参数数组和普通参数混用",
+        "code": "Public Function Tagged(prefix As String, ParamArray nums() As Variant) As String\n    Tagged = prefix & \":\" & UBound(nums) - LBound(nums) + 1\nEnd Function\n\nSub 测试2()\n    MsgBox Tagged(\"共\", 1, 2, 3)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹「共:3」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "ParamArray 不是最后一个参数，编译报错",
+        "reason": "它必须放在参数列表最后。",
+        "fix": "把固定参数放前面，ParamArray 放最后。",
+        "level": "high"
+      },
+      {
+        "title": "ParamArray 声明成具体类型，报错",
+        "reason": "只能声明为 Variant 数组。",
+        "fix": "写 ParamArray nums() As Variant。",
+        "level": "high"
+      },
+      {
+        "title": "以为 ParamArray 可以一个参数都不传",
+        "reason": "不传时数组没有元素，UBound 会报错。",
+        "fix": "先判断 UBound >= LBound，或处理空数组。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "optional-args",
+        "kind": "companion",
+        "why": "可选参数与可变参数。"
+      },
+      {
+        "id": "arrays-vs-ranges",
+        "kind": "companion",
+        "why": "参数数组也是数组。"
+      }
+    ],
+    "oneLiner": "让函数接收任意个参数",
+    "summary": "ParamArray 必须是最后一个参数且只能声明为 Variant 数组。调用时可能一个都不传，取 UBound 前先判空。"
+  }
+]

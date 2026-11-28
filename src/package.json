@@ -1,17 +1,21 @@
 {
   "name": "excel-function-guide",
   "private": true,
-  "version": "1.6.0",
+  "version": "1.7.0",
   "type": "module",
-  "description": "Excel 函数速查网页：收录 414 个 Excel 函数，中文助记名 + 英文对照，在线试算与一键复制",
+  "description": "Excel 函数速查网页：收录 414 个 Excel 函数与 271 条 VBA / JSA 宏写法（含概念、语句、配方、对象成员与错误码），中文助记名 + 英文对照，在线试算与一键复制",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:single": "tsc --noEmit && cross-env SINGLE_FILE=1 vite build",
     "build:deliver": "npm run build:single && node scripts/finalize-cp.mjs",
+    "build:folder": "node scripts/build-folder.mjs",
     "preview": "vite preview",
     "gen:pinyin": "node scripts/gen-pinyin.mjs",
+    "gen:macro-pinyin": "node scripts/gen-macro-pinyin.mjs",
     "gen:catalog": "node scripts/regen-catalog.mjs",
+    "gaps": "node scripts/list-content-gaps.mjs",
+    "size": "node scripts/check-bundle-size.mjs",
     "finalize": "node scripts/finalize-cp.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
@@ -48,3 +52,4 @@
     "vitest": "^2.1.2"
   }
 }
+

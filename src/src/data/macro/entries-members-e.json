@@ -1,0 +1,1079 @@
+[
+  {
+    "id": "chart-object",
+    "enName": "Worksheet.ChartObjects",
+    "zhName": "图表对象",
+    "alias": [
+      "ChartObject",
+      "Chart",
+      "图表集合"
+    ],
+    "keywords": [
+      "操作已有图表",
+      "遍历图表",
+      "图表标题"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.ChartObjects(\"图表 1\").Chart          ' 按名称\nws.ChartObjects(1).Chart                ' 按序号\nws.ChartObjects.Count",
+    "examples": [
+      {
+        "title": "列出当前表所有图表",
+        "code": "Sub 列表()\n    Dim co As ChartObject\n    For Each co In ActiveSheet.ChartObjects\n        Debug.Print co.Name, co.Chart.ChartType\n    Next co\nEnd Sub",
+        "howToRun": "表里有图表时按 F5。",
+        "result": "立即窗口打印每个图表的名称和类型编号。"
+      },
+      {
+        "title": "改图表标题",
+        "code": "Sub 改标题()\n    Dim co As ChartObject\n    Set co = ActiveSheet.ChartObjects(1)\n    co.Chart.HasTitle = True\n    co.Chart.ChartTitle.Text = \"月度趋势\"\nEnd Sub",
+        "howToRun": "表里至少有一个图表，按 F5。",
+        "result": "第一个图表顶部显示「月度趋势」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 ChartObjects 当成 Charts，取不到图表",
+        "reason": "ChartObjects 是嵌在普通表里的浮动图表；Charts 是独立图表工作表。",
+        "fix": "普通表里的图表用 ChartObjects，独立图表表用 Charts。",
+        "level": "high"
+      },
+      {
+        "title": "按名称取图表，名字被用户改过就报错",
+        "reason": "图表名称可以手动修改，也可能自动编号。",
+        "fix": "按序号取，或先遍历比对 Name 再操作。",
+        "level": "mid"
+      },
+      {
+        "title": "图表在别的表上，ActiveSheet 里找不到",
+        "reason": "ChartObjects 属于具体工作表。",
+        "fix": "明确写 Worksheets(\"表名\").ChartObjects。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-add",
+        "kind": "companion",
+        "why": "先创建再操作。"
+      },
+      {
+        "id": "chart-set-source",
+        "kind": "companion",
+        "why": "图表的数据源设置。"
+      },
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "图表挂在工作表下。"
+      }
+    ],
+    "oneLiner": "操作表里已有的图表",
+    "summary": "ChartObjects 管的是嵌在普通工作表里的浮动图表，独立图表工作表要用 Charts。按名称取不稳，序号或遍历更可靠。"
+  },
+  {
+    "id": "chart-add",
+    "enName": "Worksheet.ChartObjects.Add",
+    "zhName": "新建图表",
+    "alias": [
+      "ChartObjects.Add",
+      "添加图表",
+      "生成图表"
+    ],
+    "keywords": [
+      "VBA 创建图表",
+      "批量生成图表",
+      "图表位置"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set co = ws.ChartObjects.Add(Left:=100, Top:=50, Width:=400, Height:=300)",
+    "examples": [
+      {
+        "title": "用 A1:B6 生成柱形图",
+        "code": "Sub 建图表()\n    Dim co As ChartObject\n    Set co = ActiveSheet.ChartObjects.Add(100, 50, 400, 300)\n    co.Chart.SetSourceData Source:=ActiveSheet.Range(\"A1:B6\")\n    co.Chart.ChartType = xlColumnClustered\nEnd Sub",
+        "howToRun": "A1:B6 是两列数据（含表头），按 F5。",
+        "result": "表上出现一个 400×300 的柱形图。"
+      },
+      {
+        "title": "删掉当前表所有图表再重建",
+        "code": "Sub 重建()\n    Dim co As ChartObject\n    For Each co In ActiveSheet.ChartObjects\n        co.Delete\n    Next co\n    ActiveSheet.ChartObjects.Add(100, 50, 400, 300).Chart.SetSourceData _\n        Source:=ActiveSheet.Range(\"A1:B6\")\nEnd Sub",
+        "howToRun": "表里已有图表时按 F5。",
+        "result": "旧图表全部删除，只留一个新柱形图。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Left/Top/Width/Height 单位是磅，不是像素",
+        "reason": "参数按 points 计，和单元格行列宽不是同一套单位。",
+        "fix": "按需要试几次记住比例，或用单元格位置换算。",
+        "level": "mid"
+      },
+      {
+        "title": "不指定位置，多个图表叠在一起",
+        "reason": "默认参数可能落在同一位置。",
+        "fix": "循环创建时按序号错开 Left/Top。",
+        "level": "mid"
+      },
+      {
+        "title": "图表建成了但没数据，一片空白",
+        "reason": "只 Add 没 SetSourceData。",
+        "fix": "Add 后立刻 SetSourceData，再设 ChartType。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-object",
+        "kind": "companion",
+        "why": "创建后拿 ChartObject 操作。"
+      },
+      {
+        "id": "chart-set-source",
+        "kind": "companion",
+        "why": "必须设置数据源。"
+      },
+      {
+        "id": "chart-type",
+        "kind": "companion",
+        "why": "创建后选图表类型。"
+      }
+    ],
+    "oneLiner": "在工作表上放一个新图表",
+    "summary": "ChartObjects.Add 的位置和大小按磅算，Add 完必须 SetSourceData 才有内容。批量创建要自己错开坐标，否则会叠在一起。"
+  },
+  {
+    "id": "chart-type",
+    "enName": "Chart.ChartType",
+    "zhName": "图表类型",
+    "alias": [
+      "ChartType",
+      "图表类型",
+      "柱形图改折线图"
+    ],
+    "keywords": [
+      "切换图表类型",
+      "批量改图表",
+      "xlColumnClustered"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "co.Chart.ChartType = xlColumnClustered   ' 簇状柱形\nco.Chart.ChartType = xlLine                ' 折线",
+    "examples": [
+      {
+        "title": "把第一个图表改成折线图",
+        "code": "Sub 改折线()\n    ActiveSheet.ChartObjects(1).Chart.ChartType = xlLine\nEnd Sub",
+        "howToRun": "表里至少一个图表，按 F5。",
+        "result": "图表从原类型切换为折线图。"
+      },
+      {
+        "title": "批量把所有图表统一成柱形图",
+        "code": "Sub 统一类型()\n    Dim co As ChartObject\n    For Each co In ActiveSheet.ChartObjects\n        co.Chart.ChartType = xlColumnClustered\n    Next co\nEnd Sub",
+        "howToRun": "表里有多个图表时按 F5。",
+        "result": "所有图表都变成簇状柱形图。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "常量名写错，报「要求对象」或 1004",
+        "reason": "图表类型常量必须以 xl 开头且拼写准确。",
+        "fix": "先用录制宏看 Excel 生成的常量名，再照抄。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "饼图套多系列数据，显示混乱",
+        "reason": "饼图只适合单一系列。",
+        "fix": "先用 PlotBy 或只选一列数据，再设饼图。",
+        "level": "mid"
+      },
+      {
+        "title": "三维图表批量生成后文件变大、变慢",
+        "reason": "3D 图表渲染成本高。",
+        "fix": "默认用二维类型，确有需要再上三维。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-object",
+        "kind": "companion",
+        "why": "先拿到图表对象。"
+      },
+      {
+        "id": "chart-add",
+        "kind": "companion",
+        "why": "创建时就要定类型。"
+      }
+    ],
+    "oneLiner": "切换图表的呈现类型",
+    "summary": "ChartType 用一个 xl 常量切换图表形态。常量名最容易写错，拿录制宏对照最稳；饼图别套多系列。"
+  },
+  {
+    "id": "chart-set-source",
+    "enName": "Chart.SetSourceData",
+    "zhName": "图表数据源",
+    "alias": [
+      "SetSourceData",
+      "图表数据源",
+      "改图表区域"
+    ],
+    "keywords": [
+      "图表绑定区域",
+      "换数据源",
+      "图表空白"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "co.Chart.SetSourceData Source:=ws.Range(\"A1:B10\"), PlotBy:=xlColumns",
+    "examples": [
+      {
+        "title": "把图表数据源换成 A1:C10",
+        "code": "Sub 换源()\n    Dim co As ChartObject\n    Set co = ActiveSheet.ChartObjects(1)\n    co.Chart.SetSourceData Source:=ActiveSheet.Range(\"A1:C10\")\nEnd Sub",
+        "howToRun": "表里有图表和 A1:C10 数据，按 F5。",
+        "result": "图表改为按 A1:C10 重新绘制。"
+      },
+      {
+        "title": "按行取系列而不是按列",
+        "code": "Sub 按行()\n    ActiveSheet.ChartObjects(1).Chart.SetSourceData _\n        Source:=ActiveSheet.Range(\"A1:D3\"), PlotBy:=xlRows\nEnd Sub",
+        "howToRun": "A1:D3 是三行数据，按 F5。",
+        "result": "每一行变成一个数据系列。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "源区域不含表头，系列名变成「系列1」",
+        "reason": "Excel 默认拿首行/首列当系列名。",
+        "fix": "区域把表头一起选进去，或手动改系列名称。",
+        "level": "mid"
+      },
+      {
+        "title": "跨表引用只写 Range(\"A1:B10\")，指到了当前表",
+        "reason": "Range 默认属于 ActiveSheet。",
+        "fix": "写全：Worksheets(\"数据\").Range(\"A1:B10\")。",
+        "level": "high"
+      },
+      {
+        "title": "把空区域设成数据源，图表报错",
+        "reason": "Source 不能是空范围。",
+        "fix": "先判断区域非空，再 SetSourceData。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-add",
+        "kind": "companion",
+        "why": "新建图表后立刻设源。"
+      },
+      {
+        "id": "chart-object",
+        "kind": "companion",
+        "why": "操作图表对象的入口。"
+      },
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "数据源本质是一个 Range。"
+      }
+    ],
+    "oneLiner": "指定图表画哪块数据",
+    "summary": "SetSourceData 决定图表的数据范围，PlotBy 决定按行还是按列成系列。跨表必须写全工作表名，区域要含表头。"
+  },
+  {
+    "id": "shape-object",
+    "enName": "Worksheet.Shapes",
+    "zhName": "形状对象",
+    "alias": [
+      "Shape",
+      "Shapes",
+      "图形对象"
+    ],
+    "keywords": [
+      "操作形状",
+      "遍历图形",
+      "改形状颜色"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.Shapes(\"矩形 1\")\nws.Shapes.Count\nws.Shapes(1).Type",
+    "examples": [
+      {
+        "title": "列出所有形状的名称和类型",
+        "code": "Sub 列形状()\n    Dim sh As Shape\n    For Each sh In ActiveSheet.Shapes\n        Debug.Print sh.Name, sh.Type\n    Next sh\nEnd Sub",
+        "howToRun": "表里有形状/图片时按 F5。",
+        "result": "立即窗口打印每个形状的名称和类型编号。"
+      },
+      {
+        "title": "把指定形状填充成橙色",
+        "code": "Sub 改颜色()\n    Dim sh As Shape\n    Set sh = ActiveSheet.Shapes(\"矩形 1\")\n    sh.Fill.ForeColor.RGB = RGB(255, 192, 0)\nEnd Sub",
+        "howToRun": "表里有名为「矩形 1」的形状，按 F5。",
+        "result": "形状填充变橙色。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Shapes 里不只有图形，还有图表、图片、按钮",
+        "reason": "所有浮动对象都算 Shape。",
+        "fix": "按 Type 或 Name 过滤，别假设都是矩形。",
+        "level": "high"
+      },
+      {
+        "title": "按名称取形状，用户重命名后报错",
+        "reason": "形状名称可改，自动名称也会随增删变化。",
+        "fix": "遍历比对，或创建时立刻赋固定名称。",
+        "level": "mid"
+      },
+      {
+        "title": "Shape 与 ShapeRange 混用",
+        "reason": "多选时返回的是 ShapeRange，不是单个 Shape。",
+        "fix": "Selection.ShapeRange 逐项处理，或明确取单个形状。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "shape-add",
+        "kind": "companion",
+        "why": "创建形状。"
+      },
+      {
+        "id": "shape-text",
+        "kind": "companion",
+        "why": "改形状里的文字。"
+      }
+    ],
+    "oneLiner": "操作表上的图形对象",
+    "summary": "Shapes 是工作表上所有浮动对象的集合，不只是矩形。按名称取不稳，按 Type 过滤更安全；多选时得到的是 ShapeRange。"
+  },
+  {
+    "id": "shape-add",
+    "enName": "Worksheet.Shapes.AddShape",
+    "zhName": "新建形状",
+    "alias": [
+      "AddShape",
+      "添加形状",
+      "插入矩形"
+    ],
+    "keywords": [
+      "VBA 画矩形",
+      "插入箭头",
+      "批量加图形"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.Shapes.AddShape(Type:=msoShapeRectangle, Left:=100, Top:=50, Width:=200, Height:=80)",
+    "examples": [
+      {
+        "title": "插入一个带文字的矩形",
+        "code": "Sub 加矩形()\n    Dim sh As Shape\n    Set sh = ActiveSheet.Shapes.AddShape(msoShapeRectangle, 100, 50, 200, 80)\n    sh.TextFrame.Characters.Text = \"重点提示\"\n    sh.Fill.ForeColor.RGB = RGB(255, 235, 156)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "表上出现黄色矩形，写着「重点提示」。"
+      },
+      {
+        "title": "插入一个右箭头",
+        "code": "Sub 加箭头()\n    ActiveSheet.Shapes.AddShape(msoShapeRightArrow, 350, 60, 80, 40)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "表上出现一个右箭头。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "坐标单位是磅，不是单元格行列",
+        "reason": "Left/Top 相对工作表左上角，按 points 计。",
+        "fix": "用 Range.Left/Top 换算，或先试一次记比例。",
+        "level": "mid"
+      },
+      {
+        "title": "msoShapeRectangle 未定义，编译报错",
+        "reason": "Office 形状常量一般内建，但某些环境引用缺失。",
+        "fix": "直接写数值常量，或确认引用了 Office 对象库。",
+        "level": "mid"
+      },
+      {
+        "title": "批量插入形状重叠成一团",
+        "reason": "坐标没随循环变化。",
+        "fix": "按行号计算 Top，或横向递增 Left。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "shape-object",
+        "kind": "companion",
+        "why": "创建后拿 Shape 操作。"
+      },
+      {
+        "id": "shape-text",
+        "kind": "companion",
+        "why": "给形状写文字。"
+      }
+    ],
+    "oneLiner": "在工作表上画一个形状",
+    "summary": "AddShape 用磅做坐标和大小，类型常量决定形状。批量插入要自己算坐标，否则会叠在一起。"
+  },
+  {
+    "id": "shape-text",
+    "enName": "Shape.TextFrame",
+    "zhName": "形状文字",
+    "alias": [
+      "TextFrame",
+      "TextFrame2",
+      "形状文字"
+    ],
+    "keywords": [
+      "形状里写字",
+      "改形状字体",
+      "文本框内容"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "sh.TextFrame.Characters.Text = \"文字\"\nsh.TextFrame2.TextRange.Font.Size = 14",
+    "examples": [
+      {
+        "title": "给矩形写文字并居中",
+        "code": "Sub 写字()\n    Dim sh As Shape\n    Set sh = ActiveSheet.Shapes(1)\n    sh.TextFrame.Characters.Text = \"完成\"\n    sh.TextFrame.HorizontalAlignment = xlHAlignCenter\n    sh.TextFrame.VerticalAlignment = xlVAlignCenter\nEnd Sub",
+        "howToRun": "表里第一个形状是矩形/文本框，按 F5。",
+        "result": "形状内文字居中显示「完成」。"
+      },
+      {
+        "title": "改字号和颜色",
+        "code": "Sub 改字体()\n    With ActiveSheet.Shapes(1).TextFrame2.TextRange.Font\n        .Size = 18\n        .Fill.ForeColor.RGB = RGB(192, 0, 0)\n        .Bold = msoTrue\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "形状文字变成 18 号、深红、加粗。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对线条/图片设 TextFrame，报错",
+        "reason": "不是所有 Shape 都有文字框。",
+        "fix": "先判断 sh.HasTextFrame = msoTrue 再写。",
+        "level": "high"
+      },
+      {
+        "title": "TextFrame 与 TextFrame2 属性名不同",
+        "reason": "两套对象模型，字体颜色写法不一样。",
+        "fix": "统一用 TextFrame2（新版），或全程只用 TextFrame。",
+        "level": "mid"
+      },
+      {
+        "title": "文字太长被形状裁掉",
+        "reason": "默认不自动换行/不自动调整形状。",
+        "fix": "设 TextFrame.WordWrap = True，或 AutoSize。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "shape-object",
+        "kind": "companion",
+        "why": "先拿到形状。"
+      },
+      {
+        "id": "shape-add",
+        "kind": "companion",
+        "why": "创建带文字的形状。"
+      }
+    ],
+    "oneLiner": "读写形状里的文字",
+    "summary": "TextFrame 管文字内容和排版，但线条、图片没有文字框。TextFrame 和 TextFrame2 是两套模型，别混着用。"
+  },
+  {
+    "id": "pivot-table-object",
+    "enName": "Worksheet.PivotTables",
+    "zhName": "透视表对象",
+    "alias": [
+      "PivotTable",
+      "PivotTables",
+      "数据透视表"
+    ],
+    "keywords": [
+      "操作透视表",
+      "遍历透视表",
+      "透视表区域"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.PivotTables(\"透视表1\")\nws.PivotTables(1).TableRange1",
+    "examples": [
+      {
+        "title": "列出当前表所有透视表",
+        "code": "Sub 列透视表()\n    Dim pt As PivotTable\n    For Each pt In ActiveSheet.PivotTables\n        Debug.Print pt.Name, pt.TableRange1.Address\n    Next pt\nEnd Sub",
+        "howToRun": "表里有透视表时按 F5。",
+        "result": "打印透视表名称和占用区域地址。"
+      },
+      {
+        "title": "读取透视表汇总区域的第一个值",
+        "code": "Sub 读值()\n    Dim pt As PivotTable\n    Set pt = ActiveSheet.PivotTables(1)\n    MsgBox pt.DataBodyRange.Cells(1, 1).Value\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出透视表数据区左上角的值。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "透视表不在当前表，PivotTables 为空",
+        "reason": "PivotTables 属于具体工作表。",
+        "fix": "遍历 Worksheets，按名称找透视表。",
+        "level": "high"
+      },
+      {
+        "title": "用名称取，透视表被重命名后报错",
+        "reason": "透视表名称可手动改。",
+        "fix": "按序号取，或遍历比对 Name。",
+        "level": "mid"
+      },
+      {
+        "title": "DataBodyRange 为空时访问报错",
+        "reason": "没有行/列字段时数据区不存在。",
+        "fix": "先判断 Not pt.DataBodyRange Is Nothing。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-create",
+        "kind": "companion",
+        "why": "创建透视表。"
+      },
+      {
+        "id": "pivot-add-fields",
+        "kind": "companion",
+        "why": "给透视表加字段。"
+      },
+      {
+        "id": "pivot-refresh",
+        "kind": "companion",
+        "why": "刷新透视表。"
+      }
+    ],
+    "oneLiner": "操作已有的数据透视表",
+    "summary": "PivotTables 挂在具体工作表下，名称可改、数据区可能为空。找表要遍历，读值前先判 DataBodyRange。"
+  },
+  {
+    "id": "pivot-create",
+    "enName": "PivotCaches.Create",
+    "zhName": "新建透视表",
+    "alias": [
+      "PivotCaches.Create",
+      "CreatePivotTable",
+      "创建透视表"
+    ],
+    "keywords": [
+      "VBA 建透视表",
+      "自动生成透视表",
+      "透视表缓存"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set pc = ActiveWorkbook.PivotCaches.Create(xlDatabase, \"数据!A1:D100\")\npc.CreatePivotTable TableDestination:=\"汇总!A3\", TableName:=\"透视1\"",
+    "examples": [
+      {
+        "title": "按 A1:D100 新建透视表",
+        "code": "Sub 建透视表()\n    Dim pc As PivotCache, pt As PivotTable\n    Set pc = ActiveWorkbook.PivotCaches.Create( _\n        SourceType:=xlDatabase, SourceData:=ActiveSheet.Range(\"A1:D100\"))\n    Set pt = pc.CreatePivotTable( _\n        TableDestination:=Worksheets(\"汇总\").Range(\"A3\"), TableName:=\"透视1\")\n    MsgBox pt.Name\n End Sub",
+        "howToRun": "有「汇总」表且 A3 起为空，按 F5。",
+        "result": "「汇总」表 A3 处生成名为「透视1」的透视表。"
+      },
+      {
+        "title": "先清空目标区再建",
+        "code": "Sub 重建透视表()\n    Dim ws As Worksheet\n    Set ws = Worksheets(\"汇总\")\n    ws.Range(\"A3:Z100\").Clear\n    ActiveWorkbook.PivotCaches.Create(xlDatabase, _\n        Worksheets(\"数据\").Range(\"A1:D100\")).CreatePivotTable _\n        TableDestination:=ws.Range(\"A3\"), TableName:=\"透视1\"\n End Sub",
+        "howToRun": "按 F5。",
+        "result": "旧内容清掉后重建，不会因目标区非空报错。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "目标区域非空，报 1004",
+        "reason": "透视表要放在空白区域。",
+        "fix": "建之前先 Clear 目标区，或换一个空位置。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "表名重复，报错",
+        "reason": "同一工作表内透视表名称必须唯一。",
+        "fix": "用日期/序号生成唯一 TableName，或先删旧表。",
+        "level": "high"
+      },
+      {
+        "title": "源区域没含表头，字段名变成「列1」",
+        "reason": "透视表拿首行当字段名。",
+        "fix": "SourceData 从表头行开始选。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-table-object",
+        "kind": "companion",
+        "why": "创建后拿到 PivotTable。"
+      },
+      {
+        "id": "pivot-add-fields",
+        "kind": "companion",
+        "why": "建完要加字段。"
+      },
+      {
+        "id": "pivot-refresh",
+        "kind": "companion",
+        "why": "数据变了要刷新。"
+      }
+    ],
+    "oneLiner": "用代码生成数据透视表",
+    "summary": "先建 PivotCache，再 CreatePivotTable 指定空白目标和唯一名称。目标非空、名称重复、源区域缺表头，是三个最常见的 1004。"
+  },
+  {
+    "id": "pivot-add-fields",
+    "enName": "PivotTable.PivotFields",
+    "zhName": "透视表字段",
+    "alias": [
+      "PivotFields",
+      "透视表字段",
+      "行字段列字段"
+    ],
+    "keywords": [
+      "透视表加行字段",
+      "透视表加值字段",
+      "设置求和"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "pt.PivotFields(\"地区\").Orientation = xlRowField\npt.PivotFields(\"金额\").Orientation = xlDataField",
+    "examples": [
+      {
+        "title": "地区做行、金额求和",
+        "code": "Sub 配字段()\n    Dim pt As PivotTable\n    Set pt = ActiveSheet.PivotTables(1)\n    With pt.PivotFields(\"地区\")\n        .Orientation = xlRowField\n        .Position = 1\n    End With\n    With pt.PivotFields(\"金额\")\n        .Orientation = xlDataField\n        .Function = xlSum\n    End With\nEnd Sub",
+        "howToRun": "透视表源数据有「地区」「金额」两列，按 F5。",
+        "result": "透视表按地区分行，金额列求和并带千分位。"
+      },
+      {
+        "title": "再加一个列字段做交叉",
+        "code": "Sub 加列字段()\n    With ActiveSheet.PivotTables(1).PivotFields(\"月份\")\n        .Orientation = xlColumnField\n        .Position = 1\n    End With\nEnd Sub",
+        "howToRun": "源数据有「月份」列，按 F5。",
+        "result": "月份横向展开，形成地区 × 月份的交叉表。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "字段名和源表头差一个空格，报「无法找到字段」",
+        "reason": "PivotFields 按字段名精确匹配。",
+        "fix": "直接复制源表头，或先遍历 pt.PivotFields 打印名称核对。",
+        "level": "high"
+      },
+      {
+        "title": "把数值字段设成行字段，出来一长串明细",
+        "reason": "数值字段默认也可做行字段。",
+        "fix": "求和/计数要设 Orientation = xlDataField，并指定 Function。",
+        "level": "mid"
+      },
+      {
+        "title": "同一字段重复添加到数据区，出现「金额2」",
+        "reason": "重复设置会新增数据字段。",
+        "fix": "配置前先清空数据字段，或按需保留一个。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-table-object",
+        "kind": "companion",
+        "why": "先拿到透视表。"
+      },
+      {
+        "id": "pivot-create",
+        "kind": "companion",
+        "why": "创建透视表。"
+      },
+      {
+        "id": "pivot-refresh",
+        "kind": "companion",
+        "why": "改字段后刷新。"
+      }
+    ],
+    "oneLiner": "给透视表安排行、列、值",
+    "summary": "PivotFields 用源表头精确取字段，Orientation 决定行/列/值/筛选。数值求和必须设 xlDataField 并指定 Function。"
+  },
+  {
+    "id": "pivot-refresh",
+    "enName": "PivotTable.RefreshTable",
+    "zhName": "刷新透视表",
+    "alias": [
+      "RefreshTable",
+      "Update",
+      "刷新透视表"
+    ],
+    "keywords": [
+      "透视表不更新",
+      "刷新所有透视表",
+      "源数据变了"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "pt.RefreshTable      ' 刷新单张\nActiveWorkbook.RefreshAll   ' 刷新全部",
+    "examples": [
+      {
+        "title": "刷新当前表所有透视表",
+        "code": "Sub 刷新()\n    Dim pt As PivotTable\n    For Each pt In ActiveSheet.PivotTables\n        pt.RefreshTable\n    Next pt\nEnd Sub",
+        "howToRun": "改过源数据后按 F5。",
+        "result": "当前表透视表全部按最新源数据重算。"
+      },
+      {
+        "title": "刷新工作簿里所有连接和透视表",
+        "code": "Sub 全刷新()\n    ActiveWorkbook.RefreshAll\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有数据连接与透视表一起刷新。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "改了源数据但没刷新，看到旧数字",
+        "reason": "透视表不会自动感知手工改动的源区。",
+        "fix": "改完源数据显式 RefreshTable，或在 PivotTable 选项里开打开时刷新。",
+        "level": "high"
+      },
+      {
+        "title": "RefreshTable 与 Refresh 混用",
+        "reason": "RefreshTable 刷当前透视表，Refresh 是缓存级方法，行为不同。",
+        "fix": "单表用 RefreshTable，整簿用 RefreshAll。",
+        "level": "mid"
+      },
+      {
+        "title": "刷新后列宽/格式被重置",
+        "reason": "刷新可能重排布局。",
+        "fix": "刷新后再统一设列宽和 NumberFormat。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "pivot-table-object",
+        "kind": "companion",
+        "why": "刷新前先拿到透视表。"
+      },
+      {
+        "id": "pivot-add-fields",
+        "kind": "companion",
+        "why": "字段变更后刷新。"
+      },
+      {
+        "id": "calculation",
+        "kind": "companion",
+        "why": "重算与刷新常一起做。"
+      }
+    ],
+    "oneLiner": "让透视表重新取数",
+    "summary": "RefreshTable 刷单张，RefreshAll 刷整簿。改完源数据不刷新就会看到旧值，刷新后记得补列宽和格式。"
+  },
+  {
+    "id": "validation-object",
+    "enName": "Range.Validation",
+    "zhName": "数据验证对象",
+    "alias": [
+      "Validation",
+      "数据验证",
+      "有效性"
+    ],
+    "keywords": [
+      "单元格验证规则",
+      "读取下拉来源",
+      "验证类型"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.Validation.Type\nrng.Validation.Formula1\nrng.Validation.Value",
+    "examples": [
+      {
+        "title": "读取 A1 的验证类型和来源",
+        "code": "Sub 看验证()\n    With Range(\"A1\").Validation\n        Debug.Print .Type\n        Debug.Print .Formula1\n        Debug.Print .Value\n    End With\nEnd Sub",
+        "howToRun": "A1 设了下拉验证，按 F5。",
+        "result": "打印验证类型编号、来源公式和当前值。"
+      },
+      {
+        "title": "判断单元格有没有验证",
+        "code": "Sub 有无验证()\n    If Range(\"A1\").Validation.Type = xlNone Then\n        MsgBox \"没有验证\"\n    Else\n        MsgBox \"有验证\"\n    End If\nEnd Sub",
+        "howToRun": "分别在有/无验证的单元格上运行。",
+        "result": "弹出对应提示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没验证时读 Formula1，报错",
+        "reason": "xlNone 状态下很多属性不可用。",
+        "fix": "先判断 Type <> xlNone 再读其他属性。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Validation 能管所有输入限制",
+        "reason": "它只管用户输入，不阻止宏直接赋值。",
+        "fix": "宏写入前自己校验，别指望 Validation 拦截。",
+        "level": "mid"
+      },
+      {
+        "title": "多单元格区域验证规则不一致，读到意外值",
+        "reason": "一个 Range 可能包含多套验证。",
+        "fix": "逐单元格读，或先确保整块规则一致。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "validation-add",
+        "kind": "companion",
+        "why": "添加验证规则。"
+      },
+      {
+        "id": "validation-input-message",
+        "kind": "companion",
+        "why": "输入提示与出错警告。"
+      }
+    ],
+    "oneLiner": "读写单元格的验证规则",
+    "summary": "Validation 描述单元格允许输入什么。没有验证时先判 xlNone；它只约束用户输入，不拦宏赋值。"
+  },
+  {
+    "id": "validation-add",
+    "enName": "Validation.Add",
+    "zhName": "添加数据验证",
+    "alias": [
+      "Validation.Add",
+      "加下拉",
+      "序列验证"
+    ],
+    "keywords": [
+      "VBA 加下拉菜单",
+      "限制输入范围",
+      "数据有效性"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "rng.Validation.Add Type:=xlValidateList, Formula1:=\"是,否\"",
+    "examples": [
+      {
+        "title": "给 A1:A10 加「是/否」下拉",
+        "code": "Sub 加下拉()\n    With Range(\"A1:A10\").Validation\n        .Delete\n        .Add Type:=xlValidateList, Formula1:=\"是,否\"\n        .InCellDropdown = True\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A1:A10 每格出现「是/否」下拉。"
+      },
+      {
+        "title": "限制 B1:B20 只能填 1 到 100",
+        "code": "Sub 限范围()\n    With Range(\"B1:B20\").Validation\n        .Delete\n        .Add Type:=xlValidateWholeNumber, _\n            Operator:=xlBetween, Formula1:=\"1\", Formula2:=\"100\"\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "输入 0 或 101 会被拒绝。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "区域已有验证，直接 Add 报错",
+        "reason": "同一区域不能叠加两套验证。",
+        "fix": "先 .Delete 再 .Add。",
+        "level": "high"
+      },
+      {
+        "title": "列表来源用逗号，但系统分隔符是分号",
+        "reason": "Formula1 的列表分隔符跟随区域设置。",
+        "fix": "用命名区域或单列区域做来源，避免分隔符差异。",
+        "level": "mid"
+      },
+      {
+        "title": "下拉来源跨表直接写区域，Excel 拒绝",
+        "reason": "旧版验证不允许直接跨表引用。",
+        "fix": "把来源定义成名称，Formula1:=\"=名称\"。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "validation-object",
+        "kind": "companion",
+        "why": "验证对象的总入口。"
+      },
+      {
+        "id": "validation-input-message",
+        "kind": "companion",
+        "why": "配提示和错误警告。"
+      },
+      {
+        "id": "named-range",
+        "kind": "companion",
+        "why": "跨表下拉常用名称。"
+      }
+    ],
+    "oneLiner": "给单元格加输入限制",
+    "summary": "Add 前先 Delete，否则会因已有验证报错。列表分隔符跟系统区域设置走，跨表来源最稳的是定义名称。"
+  },
+  {
+    "id": "validation-input-message",
+    "enName": "Validation.InputMessage / ErrorMessage",
+    "zhName": "验证提示语",
+    "alias": [
+      "InputMessage",
+      "ErrorMessage",
+      "输入提示"
+    ],
+    "keywords": [
+      "下拉提示文字",
+      "输入错误警告",
+      "验证提示"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "v.InputMessage = \"请选择是或否\"\nv.ErrorMessage = \"只能填是或否\"\nv.ShowError = True",
+    "examples": [
+      {
+        "title": "给下拉加输入提示和错误警告",
+        "code": "Sub 配提示()\n    With Range(\"A1\").Validation\n        .InputTitle = \"选择\"\n        .InputMessage = \"请选择是或否\"\n        .ErrorTitle = \"输入无效\"\n        .ErrorMessage = \"只能填是或否\"\n        .ShowError = True\n    End With\nEnd Sub",
+        "howToRun": "A1 已有下拉验证，按 F5。",
+        "result": "选中 A1 显示提示，填错弹错误警告。"
+      },
+      {
+        "title": "关掉错误警告，允许自由输入",
+        "code": "Sub 只提示不拦()\n    Range(\"A1\").Validation.ShowError = False\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "输错不再弹警告，但提示语仍显示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没加验证就设 InputMessage，报错",
+        "reason": "提示语依附于验证规则。",
+        "fix": "先 Add 验证，再设提示。",
+        "level": "high"
+      },
+      {
+        "title": "提示文字太长被截断",
+        "reason": "输入提示框有长度限制（约 255 字符）。",
+        "fix": "精简到一两句话。",
+        "level": "mid"
+      },
+      {
+        "title": "ShowError=False 后以为数据就合法了",
+        "reason": "只是不拦截，非法值仍会写进去。",
+        "fix": "需要严格限制就保持 ShowError=True，宏侧再校验。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "validation-object",
+        "kind": "companion",
+        "why": "验证对象。"
+      },
+      {
+        "id": "validation-add",
+        "kind": "companion",
+        "why": "先加规则再配提示。"
+      }
+    ],
+    "oneLiner": "设置验证的提示和警告",
+    "summary": "InputMessage 是选中时的提示，ErrorMessage 是输错时的警告。必须先有验证规则；ShowError=False 只放行不校验。"
+  },
+  {
+    "id": "shape-position",
+    "enName": "Shape.Left / Top / Width / Height",
+    "zhName": "形状位置大小",
+    "alias": [
+      "Shape.Left",
+      "Shape.Top",
+      "形状位置"
+    ],
+    "keywords": [
+      "移动形状",
+      "对齐单元格",
+      "调整形状大小"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "sh.Left = 100\nsh.Top = Range(\"B2\").Top\nsh.Width = 200\nsh.Height = 80",
+    "examples": [
+      {
+        "title": "把形状对齐到 B2 单元格",
+        "code": "Sub 对齐单元格()\n    Dim sh As Shape, c As Range\n    Set sh = ActiveSheet.Shapes(1)\n    Set c = Range(\"B2\")\n    sh.Left = c.Left\n    sh.Top = c.Top\n    sh.Width = c.Width\n    sh.Height = c.Height\nEnd Sub",
+        "howToRun": "表里第一个形状和 B2 有内容时按 F5。",
+        "result": "形状正好盖住 B2 单元格。"
+      },
+      {
+        "title": "批量把形状向下错开排列",
+        "code": "Sub 排一排()\n    Dim sh As Shape, i As Long\n    i = 0\n    For Each sh In ActiveSheet.Shapes\n        sh.Left = 20\n        sh.Top = 20 + i * 60\n        i = i + 1\n    Next sh\nEnd Sub",
+        "howToRun": "表里有多个形状时按 F5。",
+        "result": "所有形状靠左，纵向等距排开。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接写 Left=100 以为是单元格列号",
+        "reason": "Left/Top 是相对工作表左上角的磅值，不是行列号。",
+        "fix": "用 Range.Left/Top 取值对齐，别手填行列号。",
+        "level": "high"
+      },
+      {
+        "title": "形状旋转过，Left/Top 与视觉位置对不上",
+        "reason": "旋转后边界框和原始坐标不一致。",
+        "fix": "必要时用 Rotation 归零再定位，或接受边界框偏差。",
+        "level": "mid"
+      },
+      {
+        "title": "单元格列宽改变后形状没跟着动",
+        "reason": "形状是浮动对象，不随单元格自动缩放。",
+        "fix": "设 Placement = xlMoveAndSize，或改列宽后重算位置。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "shape-object",
+        "kind": "companion",
+        "why": "形状对象。"
+      },
+      {
+        "id": "shape-add",
+        "kind": "companion",
+        "why": "创建时也要给坐标。"
+      }
+    ],
+    "oneLiner": "移动和缩放形状",
+    "summary": "Left/Top/Width/Height 都以磅计，不是行列号。对齐单元格用 Range.Left/Top 取值；浮动形状不会自动跟随列宽。"
+  }
+]

@@ -1,0 +1,447 @@
+[
+  {
+    "id": "date-precision",
+    "enName": "Date serial / numeric precision",
+    "zhName": "日期与数值精度",
+    "alias": [
+      "日期序列号",
+      "Double",
+      "浮点误差",
+      "日期相减",
+      "时间小数"
+    ],
+    "keywords": [
+      "日期怎么存",
+      "两个日期差几天",
+      "浮点比较",
+      "时间小数",
+      "1900 日期系统"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "' 日期本质是 Double：整数=天，小数=当天时刻\nCDbl(Now) / Int(d) / (d2 - d1)",
+    "examples": [
+      {
+        "title": "两个日期直接相减就是天数",
+        "code": "Sub 日期直接相减()\n    Dim d1 As Date, d2 As Date\n    d1 = DateSerial(2026, 1, 1)\n    d2 = DateSerial(2026, 3, 1)\n    MsgBox \"相差 \" & (d2 - d1) & \" 天\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「相差 59 天」（2026 年 1 月 31 天 + 2 月 28 天）。"
+      },
+      {
+        "title": "整数部分是日期，小数部分是时刻",
+        "code": "Sub 日期与时刻()\n    Dim t As Date\n    t = DateSerial(2026, 11, 28) + TimeSerial(9, 30, 0)\n    MsgBox \"整数：\" & Int(t) & vbCrLf & \"小数：\" & Format(t - Int(t), \"0.0000\")\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "整数部分显示日期序列号，小数部分约 0.3958（9:30 占一天的比例）。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 `=` 直接比较两个时间",
+        "reason": "Date 是 Double，几毫秒的误差就会让两个「看起来相同」的时间不相等。",
+        "fix": "用 DateDiff 比到秒/分（`DateDiff(\"s\", a, b)`），或允许误差范围。",
+        "level": "high"
+      },
+      {
+        "title": "忽略 1900 日期系统的历史兼容",
+        "reason": "Excel 为兼容 Lotus 把 1900 当闰年，序列号 60 对应不存在的 1900-02-29。",
+        "fix": "涉及 1900 年前后的日期差，用 DateSerial/DateDiff 并单独验证边界。",
+        "level": "mid"
+      },
+      {
+        "title": "金额用 Double 累加出现 0.1 + 0.2 问题",
+        "reason": "二进制浮点无法精确表示 0.1、0.2，累加后会出现 0.30000000000000004。",
+        "fix": "金额用 Currency/Decimal，或最后统一 Round 到分再比较。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "单元格里的日期取出来就是 Double 序列号。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "显示成日期/时间靠格式，值本身仍是数字。"
+      }
+    ],
+    "oneLiner": "日期是数字，精度有坑",
+    "summary": "Excel/VBA 里日期就是 Double：整数天、小数时刻。所以能直接相减，也因此不能用等号比时间、金额不能用 Double。理解这一层，日期差、时间取整、金额精度就都不会玄学。"
+  },
+  {
+    "id": "string-encoding",
+    "enName": "String / Len / LenB / AscW",
+    "zhName": "字符串与编码",
+    "alias": [
+      "Len",
+      "LenB",
+      "AscW",
+      "StrConv",
+      "编码",
+      "字节数"
+    ],
+    "keywords": [
+      "字符串长度",
+      "中文字节数",
+      "Asc 和 AscW 区别",
+      "乱码",
+      "Unicode"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Len(s)    ' 字符数\nLenB(s)   ' 字节数（随代码页变）\nAscW(s)   ' Unicode 码位",
+    "examples": [
+      {
+        "title": "字符数和字节数不是一回事",
+        "code": "Sub 字符与字节()\n    Dim s As String\n    s = \"Excel函数\"\n    MsgBox \"字符数：\" & Len(s) & \"，字节数：\" & LenB(s)\nEnd Sub",
+        "howToRun": "在中文 Windows 的 Excel 里按 F5。",
+        "result": "显示「字符数：7，字节数：9」——中文各占 2 字节（GBK 代码页）。"
+      },
+      {
+        "title": "AscW 取 Unicode 码位",
+        "code": "Sub 取字符编码()\n    MsgBox \"A=\" & AscW(\"A\") & \"，函=\" & AscW(\"函\")\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「A=65，函=20966」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用 LenB 判断中文长度",
+        "reason": "LenB 返回字节数，随系统 ANSI 代码页变化；同一字符串在不同机器可能不同。",
+        "fix": "按「字符」处理一律用 Len；只有对接定长字节字段才用 LenB。",
+        "level": "high"
+      },
+      {
+        "title": "文本比较大小写/全半角结果不一致",
+        "reason": "`Option Compare Binary`（默认）区分大小写与全半角，Text 则不区分。",
+        "fix": "需要忽略大小写时，比较前统一 `LCase`/`UCase`，或模块顶部显式 `Option Compare Text`。",
+        "level": "mid"
+      },
+      {
+        "title": "读写文本文件后中文乱码",
+        "reason": "`Open ... For Input` 按 ANSI 读，UTF-8 文件里的中文会变乱码。",
+        "fix": "UTF-8 用 ADODB.Stream（Charset=\"utf-8\"）读写，或先另存为 ANSI/GBK。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "text-value",
+        "kind": "companion",
+        "why": "单元格文本取值与格式转换是编码问题的入口。"
+      },
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "Value 与 Text 取到的内容/类型不同，影响后续字符串处理。"
+      }
+    ],
+    "oneLiner": "字符数、字节数、码位要分清",
+    "summary": "VBA 字符串内部是 Unicode，但 LenB、文件读写会碰到 ANSI 代码页。日常按字符处理用 Len；对接字节、UTF-8 文件时才需要 LenB/StrConv/ADODB.Stream。"
+  },
+  {
+    "id": "performance-trio",
+    "enName": "ScreenUpdating / Calculation / EnableEvents",
+    "zhName": "性能三件套",
+    "alias": [
+      "ScreenUpdating",
+      "Calculation",
+      "EnableEvents",
+      "宏很慢",
+      "关闭刷新"
+    ],
+    "keywords": [
+      "宏运行太慢",
+      "关闭屏幕刷新",
+      "手动计算",
+      "事件宏失效",
+      "批量提速"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Application.ScreenUpdating = False\nApplication.Calculation = xlCalculationManual\nApplication.EnableEvents = False\n' …恢复为 True / xlCalculationAutomatic",
+    "examples": [
+      {
+        "title": "批量写 1000 行，先关刷新和自动计算",
+        "code": "Sub 关掉再恢复()\n    Application.ScreenUpdating = False\n    Application.Calculation = xlCalculationManual\n    Dim i As Long\n    For i = 1 To 1000\n        Cells(i, 2).Value = Cells(i, 1).Value * 2\n    Next i\n    Application.Calculation = xlCalculationAutomatic\n    Application.ScreenUpdating = True\n    MsgBox \"完成\"\nEnd Sub",
+        "howToRun": "A1:A1000 有数字时按 F5。",
+        "result": "B 列很快填满，中途屏幕不闪；结束后恢复正常刷新与计算。"
+      },
+      {
+        "title": "出错也要把开关拨回来",
+        "code": "Sub 出错也恢复()\n    On Error GoTo 收尾\n    Application.ScreenUpdating = False\n    ' 这里放批量操作\n    Exit Sub\n收尾:\n    Application.ScreenUpdating = True\n    MsgBox \"已恢复显示\"\nEnd Sub",
+        "howToRun": "按 F5（把中间换成会报错的语句可验证收尾分支）。",
+        "result": "无论成功失败，ScreenUpdating 都会恢复，不会留下「界面不刷新」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "关了 ScreenUpdating 忘记开",
+        "reason": "宏结束后界面停在旧画面，用户以为卡死/数据没写。",
+        "fix": "成对写，并在错误处理/收尾段恢复为 True。",
+        "level": "high"
+      },
+      {
+        "title": "EnableEvents 关了没恢复，事件宏全失效",
+        "reason": "Worksheet_Change、Workbook_Open 等事件在你恢复之前都不会触发。",
+        "fix": "同样放收尾段 `Application.EnableEvents = True`；调试中断后手动在立即窗口恢复。",
+        "level": "high"
+      },
+      {
+        "title": "Calculation 手动后忘了重算",
+        "reason": "公式结果停在旧值，看起来像「公式坏了」。",
+        "fix": "收尾 `Application.Calculation = xlCalculationAutomatic`，必要时再 `Calculate`。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "批量写单元格的耗时大头在工作表刷新与重算。"
+      },
+      {
+        "id": "events",
+        "kind": "companion",
+        "why": "EnableEvents 与事件过程是一对，关之前先想清楚。"
+      }
+    ],
+    "oneLiner": "关刷新、关重算、关事件来提速",
+    "summary": "VBA 慢，多半不是循环慢，而是每写一格都刷新屏幕、重算全表、触发事件。三件套关掉，批量操作常常快一个数量级；关键是**一定要在收尾处恢复**。"
+  },
+  {
+    "id": "selection-clipboard",
+    "enName": "Selection / Copy / PasteSpecial",
+    "zhName": "选中区域与剪贴板",
+    "alias": [
+      "Selection",
+      "选中",
+      "Copy",
+      "PasteSpecial",
+      "剪贴板"
+    ],
+    "keywords": [
+      "当前选中的单元格",
+      "复制粘贴宏",
+      "Selection 报错",
+      "只粘贴值",
+      "清空剪贴板"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "TypeName(Selection)        ' 先确认选中的是不是 Range\nSelection.Address\nSelection.Copy / PasteSpecial xlPasteValues",
+    "examples": [
+      {
+        "title": "先确认选中的是什么",
+        "code": "Sub 看选中了什么()\n    If TypeName(Selection) <> \"Range\" Then\n        MsgBox \"选中的不是单元格：\" & TypeName(Selection)\n        Exit Sub\n    End If\n    MsgBox \"地址：\" & Selection.Address\nEnd Sub",
+        "howToRun": "选中一片单元格按 F5；再选中一个形状按 F5 对比。",
+        "result": "选单元格显示地址；选形状提示「选中的不是单元格：Shape」。"
+      },
+      {
+        "title": "只把值复制到右边一列",
+        "code": "Sub 复制值到右一列()\n    If TypeName(Selection) <> \"Range\" Then Exit Sub\n    Selection.Copy\n    Selection.Offset(0, 1).PasteSpecial xlPasteValues\n    Application.CutCopyMode = False\n    MsgBox \"已粘贴值\"\nEnd Sub",
+        "howToRun": "选中 A1:A3（有内容）后按 F5。",
+        "result": "B1:B3 得到同样的值（不带格式），剪贴板已清空。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "假设 Selection 一定是 Range",
+        "reason": "用户可能选中形状、图表、按钮，`Selection.Value` 直接报 438/424。",
+        "fix": "先 `TypeName(Selection)` 判断，不是 Range 就提示并退出。",
+        "level": "high",
+        "errorCode": "438"
+      },
+      {
+        "title": "依赖剪贴板，被别的程序抢走就失败",
+        "reason": "剪贴板是全局资源，复制后用户切到别的程序再粘贴，内容可能已变。",
+        "fix": "能用直接赋值就 `Range(\"B1\").Value = Range(\"A1\").Value`；必须复制时紧挨着 Copy/Paste。",
+        "level": "mid",
+        "errorCode": "32809"
+      },
+      {
+        "title": "大量 Select/Activate 让宏变慢且不稳",
+        "reason": "每次 Select 都切换界面状态，还会受当前活动表影响。",
+        "fix": "直接引用对象（`Worksheets(\"表\").Range(...)`），不要先 Select 再 Selection。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Selection 正常情况下就是一个 Range。"
+      },
+      {
+        "id": "cells",
+        "kind": "companion",
+        "why": "按行列直接定位比依赖选中更稳。"
+      }
+    ],
+    "oneLiner": "当前选中的区域与复制粘贴",
+    "summary": "Selection 是「用户此刻选中的东西」，类型不确定，必须先判断。剪贴板是全局状态，能不用就不用；直接赋值既快又不会受别的程序干扰。"
+  },
+  {
+    "id": "named-range",
+    "enName": "Names / Named range",
+    "zhName": "名称与命名区域",
+    "alias": [
+      "名称",
+      "命名区域",
+      "Names",
+      "RefersTo",
+      "定义名称"
+    ],
+    "keywords": [
+      "给单元格起名",
+      "名称管理器",
+      "公式里用名称",
+      "名称作用域",
+      "删除名称"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ThisWorkbook.Names.Add \"税率\", \"=Sheet1!$B$1\"\nRange(\"税率\").Value\nName.RefersTo",
+    "examples": [
+      {
+        "title": "新建名称，再用名称读值",
+        "code": "Sub 建名称并读()\n    ThisWorkbook.Names.Add \"税率\", \"=Sheet1!$B$1\"\n    Range(\"B1\").Value = 0.13\n    MsgBox \"税率：\" & Range(\"税率\").Value\nEnd Sub",
+        "howToRun": "工作簿里有 Sheet1 时按 F5。",
+        "result": "新建名称「税率」指向 Sheet1!$B$1，弹出「税率：0.13」。"
+      },
+      {
+        "title": "列出所有名称和它指向哪里",
+        "code": "Sub 列出名称()\n    Dim n As Name, s As String\n    For Each n In ThisWorkbook.Names\n        s = s & n.Name & \" → \" & n.RefersTo & vbCrLf\n    Next n\n    MsgBox s\nEnd Sub",
+        "howToRun": "先跑上例建一个名称，再按 F5。",
+        "result": "逐行显示名称与引用地址，如「税率 → =Sheet1!$B$1」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "名称作用域搞错：工作簿级 vs 工作表级",
+        "reason": "同名名称可以同时存在于工作簿和工作表，取到时可能不是你建的那个。",
+        "fix": "建名称时明确 `ThisWorkbook.Names` 或 `Worksheets(\"表\").Names`；重名先删旧的。",
+        "level": "high"
+      },
+      {
+        "title": "名称指向的单元格被删，公式变 #REF!",
+        "reason": "名称保存的是引用文本，目标被删后引用失效。",
+        "fix": "删行/删列前检查 `Name.RefersTo`；用 `Names.Delete` 清理不再用的名称。",
+        "level": "mid",
+        "errorCode": "1004"
+      },
+      {
+        "title": "名称和单元格地址重名（如 \"A1\"）",
+        "reason": "Excel 不允许用单元格地址当名称，Add 会失败。",
+        "fix": "名称用业务词（税率、单价），不要用 A1、R1C1 这类地址样式。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "名称最终就是指向一个 Range。"
+      },
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "名称的默认作用域在工作簿层级。"
+      }
+    ],
+    "oneLiner": "给单元格或区域起个业务名字",
+    "summary": "名称让公式从 `Sheet1!$B$1` 变成「税率」，也让 VBA 不必记地址。要小心作用域（工作簿/工作表同名）和目标被删后的 #REF!。"
+  },
+  {
+    "id": "listobject",
+    "enName": "ListObject / Excel Table",
+    "zhName": "表格 ListObject",
+    "alias": [
+      "ListObject",
+      "表格",
+      "超级表",
+      "结构化引用",
+      "ListRows"
+    ],
+    "keywords": [
+      "Excel 表格怎么用宏操作",
+      "表格加行",
+      "DataBodyRange",
+      "表格名称",
+      "结构化引用"
+    ],
+    "kind": "concept",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dim lo As ListObject\nSet lo = Worksheets(\"Sheet1\").ListObjects(1)\nlo.DataBodyRange / lo.ListRows.Add / lo.ListRows.Count",
+    "examples": [
+      {
+        "title": "读表格名和数据行数",
+        "code": "Sub 表格基本情况()\n    Dim lo As ListObject\n    Set lo = Worksheets(\"Sheet1\").ListObjects(1)\n    MsgBox \"表名：\" & lo.Name & \"，数据行：\" & lo.ListRows.Count\nEnd Sub",
+        "howToRun": "在 Sheet1 选中一块带标题的数据，插入→表格，再按 F5。",
+        "result": "显示表格名（如「表1」）和当前数据行数。"
+      },
+      {
+        "title": "给表格追加一行",
+        "code": "Sub 追加一行()\n    Dim lo As ListObject\n    Set lo = Worksheets(\"Sheet1\").ListObjects(1)\n    With lo.ListRows.Add\n        .Range(1, 1).Value = \"新客户\"\n        .Range(1, 2).Value = 100\n    End With\n    MsgBox \"现有 \" & lo.ListRows.Count & \" 行\"\nEnd Sub",
+        "howToRun": "接上例，表格至少有两列时按 F5。",
+        "result": "表格末尾新增一行，「新客户 / 100」，行数加 1。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 ListObjects(1) 当成「表名」",
+        "reason": "括号里是集合序号，不是 Name；删表/加表后序号会变。",
+        "fix": "长期引用用 `ListObjects(\"表1\")` 按名字取，先遍历打印 Name 核对。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "空表格直接读 DataBodyRange",
+        "reason": "只有标题没有数据行时，DataBodyRange 是 Nothing，取 .Value 报 91/424。",
+        "fix": "先判断 `If Not lo.DataBodyRange Is Nothing`，或用 ListRows.Count 判断。",
+        "level": "mid",
+        "errorCode": "91"
+      },
+      {
+        "title": "表格名与工作表名混为一谈",
+        "reason": "「表1」是 ListObject 名，「Sheet1」是工作表名，两者独立。",
+        "fix": "代码里写清：先定位工作表，再按表名/序号取 ListObject。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "ListObject 挂在具体工作表上，先取表再取表格。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "普通区域与表格区域的边界判断容易混。"
+      }
+    ],
+    "oneLiner": "把一块数据当成「表」来操作",
+    "summary": "Excel 表格（ListObject）自带标题、自动扩展、结构化引用，是比普通区域更稳的数据容器。VBA 里按「工作表 → 表格 → 行/列」三层取，注意序号会变、空表 DataBodyRange 是 Nothing。"
+  }
+]

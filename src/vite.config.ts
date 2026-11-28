@@ -23,8 +23,8 @@ export default defineConfig({
     },
   },
   build: {
-    // v1.0 隔离：单文件模式输出到 v1.0 根的 .tmp/dist（中间产物，不进 src / 不进 delivery / 不进仓库根）
-    // 之后再 cp 到 delivery/index-v1.html 作为交付文件
+    // v2 隔离：单文件模式输出到 v2 根的 .tmp/dist（中间产物，不进 src / 不进 delivery / 不进仓库根）
+    // 之后再 cp 到 delivery/index-v2.html 作为交付文件
     outDir: singleFile ? '../.tmp/dist' : '../.tmp/dist-split',
     // 注意：此处必须保持 false。outDir 在工程根之外，若开启清空会触发沙箱
     // safe-delete 回收站钩子报错（环境限制）。单文件产物每次直接覆盖写入，无需清空。

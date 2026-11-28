@@ -1,0 +1,634 @@
+[
+  {
+    "id": "static",
+    "enName": "Static",
+    "zhName": "静态变量",
+    "alias": [
+      "Static",
+      "静态变量",
+      "过程级保留"
+    ],
+    "keywords": [
+      "过程里记住上次的值",
+      "计数器不重置",
+      "静态变量和模块变量"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Static n As Long      ' 只在当前过程可见，但两次调用之间保留值\nStatic arr(1 To 10) As Long",
+    "examples": [
+      {
+        "title": "连续运行三次，看计数器累加",
+        "code": "Sub 计数()\n    Static n As Long\n    n = n + 1\n    Debug.Print n\nEnd Sub",
+        "howToRun": "连续按三次 F5，看立即窗口。",
+        "result": "依次打印 1、2、3；变量没有在每次调用时清零。"
+      },
+      {
+        "title": "用 Static 累计本次会话的合计",
+        "code": "Sub 累计()\n    Static total As Double\n    total = total + Range(\"B2\").Value\n    MsgBox \"累计：\" & total\nEnd Sub",
+        "howToRun": "B2 改成不同数字，多按几次 F5。",
+        "result": "每次弹窗的累计值都在上一次基础上增加。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为 Static 是全局变量，别的过程也能读",
+        "reason": "Static 只在声明它的过程内可见，跨过程读不到。",
+        "fix": "要跨过程共享用模块级 Private/Public 变量。",
+        "level": "mid"
+      },
+      {
+        "title": "调试时结果越跑越大，以为代码有 bug",
+        "reason": "Static 变量在两次调用之间保值，重跑宏不会自动归零。",
+        "fix": "调试前加一句清零逻辑，或临时改成普通 Dim。",
+        "level": "mid"
+      },
+      {
+        "title": "在类模块/窗体里用 Static 做跨实例缓存",
+        "reason": "Static 的生命周期跟随过程所在模块，不是跟随对象实例。",
+        "fix": "需要跟实例走就用模块级变量，别用 Static。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "confusable",
+        "why": "Dim 每次调用都重置，Static 不重置。"
+      },
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "作用域规则在概念条目里讲透。"
+      }
+    ],
+    "oneLiner": "过程内变量，调用间保值",
+    "summary": "Static 声明的变量只在当前过程可见，但两次调用之间保留值。适合计数器和缓存，不适合当全局变量用。"
+  },
+  {
+    "id": "option-explicit",
+    "enName": "Option Explicit",
+    "zhName": "强制声明变量",
+    "alias": [
+      "Option Explicit",
+      "强制声明",
+      "变量未定义"
+    ],
+    "keywords": [
+      "变量未定义报错",
+      "强制声明变量",
+      "拼写错误检查"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Option Explicit    ' 必须写在模块最顶部，所有 Dim 之前",
+    "examples": [
+      {
+        "title": "开启后忘记 Dim，编译直接报错",
+        "code": "Option Explicit\n\nSub 测试()\n    x = 1\nEnd Sub",
+        "howToRun": "把这段放到新模块，按 F5。",
+        "result": "编译报「变量未定义」，提示 x 没有声明。"
+      },
+      {
+        "title": "按规矩声明后正常运行",
+        "code": "Option Explicit\n\nSub 测试()\n    Dim x As Long\n    x = 1\n    MsgBox x\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹窗显示 1。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Option Explicit 写在 Dim 后面，照样报错",
+        "reason": "它必须是模块里的第一条语句（可在 Option Base 之后）。",
+        "fix": "放到模块最顶端，所有声明之前。",
+        "level": "high"
+      },
+      {
+        "title": "以为开一次就全局生效",
+        "reason": "Option Explicit 是模块级设置，每个模块各管各的。",
+        "fix": "每个标准模块/工作表模块都写一遍，或用「工具→选项→要求变量声明」自动加。",
+        "level": "mid"
+      },
+      {
+        "title": "开了强制声明，循环变量忘了 Dim",
+        "reason": "For i = 1 To 10 里的 i 也必须声明。",
+        "fix": "在过程开头 Dim i As Long。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "强制声明的配套就是 Dim。"
+      },
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "声明位置决定作用域。"
+      }
+    ],
+    "oneLiner": "逼你声明每一个变量",
+    "summary": "Option Explicit 让未声明变量直接编译失败，是防拼写错误最有效的一招。它按模块生效，必须写在模块最顶部。"
+  },
+  {
+    "id": "public-private",
+    "enName": "Public / Private",
+    "zhName": "公有与私有",
+    "alias": [
+      "Public",
+      "Private",
+      "模块级变量"
+    ],
+    "keywords": [
+      "跨模块共享变量",
+      "模块内私有",
+      "变量作用域"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Public gCount As Long     ' 全工程可见\nPrivate mCount As Long    ' 本模块可见",
+    "examples": [
+      {
+        "title": "Public 变量给另一个模块用",
+        "code": "Public gTotal As Double\n\nSub 累加()\n    gTotal = gTotal + 10\nEnd Sub",
+        "howToRun": "在模块1写这段，再在模块2写 Sub 读取(): MsgBox gTotal: End Sub，先跑累加再跑读取。",
+        "result": "模块2 能读到模块1 的 gTotal。"
+      },
+      {
+        "title": "Private 变量只在本模块用",
+        "code": "Private mStep As Long\n\nSub 设置步长()\n    mStep = 5\nEnd Sub\n\nSub 用步长()\n    MsgBox mStep\nEnd Sub",
+        "howToRun": "两个过程都写在同一个模块，按 F5。",
+        "result": "同模块内可读写 mStep。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在类模块/工作表模块里写 Public 变量，以为是全局",
+        "reason": "类模块里的 Public 变量是对象的属性，不是工程级全局变量。",
+        "fix": "要全局变量就放在标准模块（Module）里声明 Public。",
+        "level": "high"
+      },
+      {
+        "title": "Public 和 Public Sub 混为一谈",
+        "reason": "变量声明与过程声明是两回事，Public Sub 是暴露过程。",
+        "fix": "变量写 Public x As Long；过程写 Public Sub 名()。",
+        "level": "mid"
+      },
+      {
+        "title": "所有变量都图省事写 Public，后面改名牵一发动全身",
+        "reason": "全局变量谁都能改，排查困难。",
+        "fix": "默认 Private，确实要跨模块才升 Public。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "Public/Private 是作用域的两档。"
+      },
+      {
+        "id": "option-explicit",
+        "kind": "companion",
+        "why": "声明与强制声明配套使用。"
+      }
+    ],
+    "oneLiner": "控制变量能见范围",
+    "summary": "Public 让变量全工程可见，Private 只在本模块可见。类模块里的 Public 是属性不是全局，真全局要放标准模块。"
+  },
+  {
+    "id": "type-end-type",
+    "enName": "Type ... End Type",
+    "zhName": "自定义类型",
+    "alias": [
+      "Type",
+      "End Type",
+      "自定义类型",
+      "UDT"
+    ],
+    "keywords": [
+      "自定义结构体",
+      "一组字段打包",
+      "Type 怎么用"
+    ],
+    "kind": "statement",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Type 客户\n    名称 As String\n    金额 As Double\nEnd Type\nDim c As 客户",
+    "examples": [
+      {
+        "title": "定义客户结构并赋值",
+        "code": "Type 客户\n    名称 As String\n    金额 As Double\nEnd Type\n\nSub 用类型()\n    Dim c As 客户\n    c.名称 = \"张三\"\n    c.金额 = 100\n    MsgBox c.名称 & \"：\" & c.金额\nEnd Sub",
+        "howToRun": "Type 必须放在模块顶部（Sub 之外），按 F5。",
+        "result": "弹窗显示「张三：100」。"
+      },
+      {
+        "title": "用类型数组装一批记录",
+        "code": "Type 客户\n    名称 As String\n    金额 As Double\nEnd Type\nSub 批量()\n    Dim arr(1 To 3) As 客户, i As Long\n    For i = 1 To 3\n        arr(i).名称 = \"客户\" & i\n        arr(i).金额 = i * 10\n    Next i\n    MsgBox arr(2).名称 & \"：\" & arr(2).金额\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹窗显示「客户2：20」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 Type 写在 Sub 里面，编译报错",
+        "reason": "自定义类型只能在模块的声明区定义，不能写在过程内。",
+        "fix": "把 Type...End Type 移到模块顶部。",
+        "level": "high"
+      },
+      {
+        "title": "把 Type 写进工作表模块/类模块，跨模块引用不到",
+        "reason": "工作表模块里的 Type 默认是本模块私有。",
+        "fix": "放到标准模块，并在前面加 Public Type。",
+        "level": "mid"
+      },
+      {
+        "title": "想给类型变量直接赋整块值",
+        "reason": "UDT 不能整体赋一个字面量，必须逐字段赋值。",
+        "fix": "逐字段赋值，或用数组 + 循环批量填。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "const-and-enum",
+        "kind": "companion",
+        "why": "Type 打包数据，Enum 打包常量。"
+      },
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "类型变量仍然要靠 Dim 声明。"
+      }
+    ],
+    "oneLiner": "把多个字段打包成一个类型",
+    "summary": "Type 定义结构体，必须放在模块顶部，用 Dim 声明变量后逐字段访问。它不能整体赋值，跨模块使用要放标准模块并加 Public。"
+  },
+  {
+    "id": "elseif",
+    "enName": "ElseIf",
+    "zhName": "否则如果",
+    "alias": [
+      "ElseIf",
+      "否则如果",
+      "多条件分支"
+    ],
+    "keywords": [
+      "多个条件判断",
+      "ElseIf 怎么写",
+      "嵌套 If 太深"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "If 条件1 Then\n    ...\nElseIf 条件2 Then\n    ...\nElse\n    ...\nEnd If",
+    "examples": [
+      {
+        "title": "按分数分三档",
+        "code": "Sub 评级()\n    Dim s As Double\n    s = Range(\"B2\").Value\n    If s >= 90 Then\n        Range(\"C2\").Value = \"优\"\n    ElseIf s >= 60 Then\n        Range(\"C2\").Value = \"合格\"\n    Else\n        Range(\"C2\").Value = \"不合格\"\n    End If\nEnd Sub",
+        "howToRun": "B2 填 75，按 F5。",
+        "result": "C2 写入「合格」。"
+      },
+      {
+        "title": "用 ElseIf 替掉三层嵌套",
+        "code": "Sub 判断()\n    Dim v As Variant: v = Range(\"A2\").Value\n    If IsEmpty(v) Then\n        MsgBox \"空\"\n    ElseIf IsNumeric(v) Then\n        MsgBox \"数字\"\n    ElseIf IsDate(v) Then\n        MsgBox \"日期\"\n    Else\n        MsgBox \"文本\"\n    End If\nEnd Sub",
+        "howToRun": "A2 分别填空、100、2026/11/28、abc 再按 F5。",
+        "result": "依次提示空、数字、日期、文本。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "写成 Else If 两个词，End If 数量对不上",
+        "reason": "Else If 会开启一个新的 If 块，需要额外的 End If。",
+        "fix": "同一层分支写 ElseIf（一个词）；确实要嵌套才写 Else + If。",
+        "level": "high"
+      },
+      {
+        "title": "条件顺序写反，宽条件把窄条件吃掉",
+        "reason": "ElseIf 从上往下命中第一个就停。",
+        "fix": "把最严格/最特殊的条件放前面。",
+        "level": "mid"
+      },
+      {
+        "title": "分支超过五六层还在堆 ElseIf",
+        "reason": "可读性差，改一个条件容易漏。",
+        "fix": "改用 Select Case，或拆成独立函数。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "if-then-else",
+        "kind": "companion",
+        "why": "ElseIf 是 If 块的分支扩展。"
+      },
+      {
+        "id": "select-case",
+        "kind": "alternative",
+        "why": "多值分支用 Select Case 更清楚。"
+      }
+    ],
+    "oneLiner": "给 If 加更多分支",
+    "summary": "ElseIf 是同一层 If 的继续判断，命中一个就停。别写成 Else If（会多开一个 If），宽条件要放后面。"
+  },
+  {
+    "id": "do-until-loop",
+    "enName": "Do Until ... Loop",
+    "zhName": "直到型循环",
+    "alias": [
+      "Do Until",
+      "直到循环",
+      "Loop Until"
+    ],
+    "keywords": [
+      "循环到条件成立",
+      "遍历到空单元格",
+      "Do Until 怎么用"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Do Until 条件\n    ...\nLoop",
+    "examples": [
+      {
+        "title": "一直往下读，直到遇到空单元格",
+        "code": "Sub 读到空()\n    Dim i As Long\n    i = 2\n    Do Until Cells(i, 1).Value = \"\"\n        Debug.Print Cells(i, 1).Value\n        i = i + 1\n    Loop\nEnd Sub",
+        "howToRun": "A2 起填几个值，下面留空，按 F5。",
+        "result": "立即窗口打印到第一个空单元格为止。"
+      },
+      {
+        "title": "累加到超过 100 就停",
+        "code": "Sub 累加()\n    Dim n As Long, total As Long\n    Do Until total >= 100\n        n = n + 1\n        total = total + n\n    Loop\n    MsgBox \"加到 \" & n & \"，合计 \" & total\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹窗显示加到 14，合计 105。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "条件一开始就成立，循环体一次都不执行",
+        "reason": "Do Until 是「先判断后执行」。",
+        "fix": "至少要执行一次就改用 Do...Loop Until（条件放末尾）。",
+        "level": "mid"
+      },
+      {
+        "title": "循环里忘了改条件变量，宏卡死",
+        "reason": "条件永远不成立时 Do Until 不会自己退出。",
+        "fix": "循环体内必须让条件趋近成立；再加一个最大次数保护。",
+        "level": "high"
+      },
+      {
+        "title": "把 Do Until 和 Do While 的条件写反",
+        "reason": "Until 是「直到成立才停」，While 是「成立就继续」。",
+        "fix": "记法：Until 条件 = 不满足时继续。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "do-loop",
+        "kind": "companion",
+        "why": "Do...Loop 是同一族循环。"
+      },
+      {
+        "id": "while-wend",
+        "kind": "alternative",
+        "why": "While...Wend 只能先判断，Do Until 更灵活。"
+      }
+    ],
+    "oneLiner": "条件成立前一直循环",
+    "summary": "Do Until 在开头判断，条件不成立就继续。适合「读到空为止」这类场景，但条件变量必须在循环里推进。"
+  },
+  {
+    "id": "while-wend",
+    "enName": "While ... Wend",
+    "zhName": "当型循环",
+    "alias": [
+      "While",
+      "Wend",
+      "当型循环"
+    ],
+    "keywords": [
+      "While Wend 用法",
+      "老式循环",
+      "循环到条件不成立"
+    ],
+    "kind": "statement",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "While 条件\n    ...\nWend",
+    "examples": [
+      {
+        "title": "逐行处理到空为止",
+        "code": "Sub 逐行()\n    Dim i As Long\n    i = 2\n    While Cells(i, 1).Value <> \"\"\n        Debug.Print Cells(i, 1).Value\n        i = i + 1\n    Wend\nEnd Sub",
+        "howToRun": "A2 起填几个值，按 F5。",
+        "result": "打印到第一个空单元格前的所有值。"
+      },
+      {
+        "title": "条件不满足时一次都不跑",
+        "code": "Sub 演示()\n    Dim n As Long\n    n = 10\n    While n < 5\n        Debug.Print n\n        n = n + 1\n    Wend\n    MsgBox \"没进循环\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "直接弹「没进循环」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "想在循环中间提前跳出，发现没有 Exit While",
+        "reason": "While...Wend 不提供退出语句。",
+        "fix": "改用 Do...Loop，用 Exit Do 跳出。",
+        "level": "high"
+      },
+      {
+        "title": "Wend 和 End While 混写",
+        "reason": "VBA 只有 Wend，没有 End While。",
+        "fix": "收尾统一写 Wend。",
+        "level": "mid"
+      },
+      {
+        "title": "条件永远为真，只能强行中断",
+        "reason": "循环内没有推进条件。",
+        "fix": "循环体内更新条件变量，并加最大次数保护。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "do-until-loop",
+        "kind": "alternative",
+        "why": "Do Until 能中途退出，更常用。"
+      },
+      {
+        "id": "for-next",
+        "kind": "alternative",
+        "why": "次数已知优先用 For。"
+      }
+    ],
+    "oneLiner": "条件为真时一直循环",
+    "summary": "While...Wend 是最老的循环写法：开头判断、结尾 Wend。它不能中途 Exit，要提前跳出就换 Do...Loop。"
+  },
+  {
+    "id": "exit-for",
+    "enName": "Exit For",
+    "zhName": "跳出 For",
+    "alias": [
+      "Exit For",
+      "跳出循环",
+      "提前结束循环"
+    ],
+    "keywords": [
+      "找到就停止循环",
+      "跳出 For",
+      "循环提前结束"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Exit For    ' 立即跳出当前 For / For Each",
+    "examples": [
+      {
+        "title": "找到第一个匹配就停",
+        "code": "Sub 找第一处()\n    Dim i As Long\n    For i = 2 To 100\n        If Cells(i, 1).Value = \"目标\" Then\n            MsgBox \"在第 \" & i & \" 行\"\n            Exit For\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "A 列放一个「目标」，按 F5。",
+        "result": "弹出行号后立刻停止，不再往下扫。"
+      },
+      {
+        "title": "嵌套循环只跳出内层",
+        "code": "Sub 嵌套()\n    Dim i As Long, j As Long\n    For i = 1 To 3\n        For j = 1 To 3\n            If Cells(i, j).Value = \"X\" Then\n                Debug.Print \"命中 \" & i & \",\" & j\n                Exit For\n            End If\n        Next j\n    Next i\nEnd Sub",
+        "howToRun": "在 3×3 区域放几个 X，按 F5。",
+        "result": "每行最多打印一个命中，外层仍继续。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "以为 Exit For 能一次跳出两层",
+        "reason": "Exit For 只结束它所在的那一层循环。",
+        "fix": "外层加一个标志变量，或把内层封成函数用 Exit Function。",
+        "level": "high"
+      },
+      {
+        "title": "在 For Each 里写 Exit For 以为无效",
+        "reason": "For Each 同样支持 Exit For。",
+        "fix": "放心用，它只跳出当前 For Each。",
+        "level": "mid"
+      },
+      {
+        "title": "Exit For 写在 If 外，循环第一轮就结束",
+        "reason": "位置不对会无条件跳出。",
+        "fix": "把 Exit For 放进命中条件的 Then 分支里。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "for-next",
+        "kind": "companion",
+        "why": "Exit For 是 For...Next 的出口。"
+      },
+      {
+        "id": "for-each-next",
+        "kind": "companion",
+        "why": "For Each 也用它跳出。"
+      },
+      {
+        "id": "exit-do",
+        "kind": "companion",
+        "why": "Do 循环的对应出口是 Exit Do。"
+      }
+    ],
+    "oneLiner": "提前结束当前 For",
+    "summary": "Exit For 只跳出当前这一层 For/For Each。嵌套要跳两层，得靠标志变量或封成 Function。"
+  },
+  {
+    "id": "exit-do",
+    "enName": "Exit Do",
+    "zhName": "跳出 Do",
+    "alias": [
+      "Exit Do",
+      "跳出 Do 循环",
+      "提前结束 Do"
+    ],
+    "keywords": [
+      "Do 循环提前退出",
+      "死循环怎么跳出",
+      "Exit Do 用法"
+    ],
+    "kind": "statement",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Exit Do    ' 立即跳出当前 Do...Loop",
+    "examples": [
+      {
+        "title": "找到目标就退出 Do 循环",
+        "code": "Sub 查找()\n    Dim i As Long\n    i = 2\n    Do\n        If Cells(i, 1).Value = \"目标\" Then\n            MsgBox \"在第 \" & i & \" 行\"\n            Exit Do\n        End If\n        i = i + 1\n    Loop Until Cells(i, 1).Value = \"\"\nEnd Sub",
+        "howToRun": "A 列放「目标」，按 F5。",
+        "result": "命中即弹窗退出；没命中则读到空单元格自然结束。"
+      },
+      {
+        "title": "给死循环加一个最大次数保险",
+        "code": "Sub 有保险()\n    Dim n As Long\n    Do\n        n = n + 1\n        If n >= 1000 Then Exit Do\n    Loop\n    MsgBox \"跑了 \" & n & \" 次\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "跑满 1000 次后退出，不会卡死。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "在 While...Wend 里写 Exit Do，编译报错",
+        "reason": "Exit Do 只能用于 Do...Loop 结构。",
+        "fix": "把 While...Wend 改成 Do...Loop，或改用 Exit Sub。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Exit Do 能跳出多层 Do",
+        "reason": "它只结束最内层的那一个 Do。",
+        "fix": "多层嵌套用标志变量，或封成 Function 用 Exit Function。",
+        "level": "mid"
+      },
+      {
+        "title": "条件写在 Loop Until 里，又忘了推进变量",
+        "reason": "末尾判断仍可能永远不成立。",
+        "fix": "循环体内更新判断依据，并加最大次数保护。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "do-loop",
+        "kind": "companion",
+        "why": "Exit Do 是 Do...Loop 的出口。"
+      },
+      {
+        "id": "exit-for",
+        "kind": "companion",
+        "why": "For 的出口是 Exit For。"
+      },
+      {
+        "id": "do-until-loop",
+        "kind": "companion",
+        "why": "Until 型循环同样可用 Exit Do。"
+      }
+    ],
+    "oneLiner": "提前结束当前 Do",
+    "summary": "Exit Do 立即跳出当前 Do...Loop，是给死循环加保险的标准手段。它不能用在 While...Wend 里。"
+  }
+]

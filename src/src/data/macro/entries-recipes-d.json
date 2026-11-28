@@ -1,0 +1,723 @@
+[
+  {
+    "id": "batch-print-sheets",
+    "enName": "BatchPrintSheets",
+    "zhName": "批量打印工作表",
+    "alias": [
+      "打印所有表",
+      "批量出纸质",
+      "PrintOut"
+    ],
+    "keywords": [
+      "一次打印多张表",
+      "批量打印",
+      "逐表打印"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "遍历 Worksheets → PageSetup → PrintOut Copies:=1",
+    "examples": [
+      {
+        "title": "按顺序打印所有普通工作表",
+        "code": "Sub 全打印()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        ws.PrintOut Copies:=1, Collate:=True\n    Next ws\nEnd Sub",
+        "howToRun": "打印机就绪时按 F5。",
+        "result": "每张表各打印一份，按表顺序输出。"
+      },
+      {
+        "title": "先统一横向再打印",
+        "code": "Sub 横向打印()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        With ws.PageSetup\n            .Orientation = xlLandscape\n            .Zoom = False\n            .FitToPagesWide = 1\n            .FitToPagesTall = False\n        End With\n        ws.PrintOut\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "每张表横向、压到一页宽后打印。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把图表表也 PrintOut，报错",
+        "reason": "Worksheets 不含图表表，但如果用 Sheets 就会遇到 Chart。",
+        "fix": "用 Worksheets 遍历，或先判断 TypeName。",
+        "level": "high"
+      },
+      {
+        "title": "打印区没设，空白页一堆",
+        "reason": "UsedRange 含大量空格式单元格。",
+        "fix": "打印前统一设 PrintArea 到实际数据区。",
+        "level": "mid"
+      },
+      {
+        "title": "循环里不提示，用户以为卡死",
+        "reason": "PrintOut 是同步阻塞的。",
+        "fix": "打印前状态栏提示，或用 PrintOut 的 Preview 先确认。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "print-area",
+        "kind": "companion",
+        "why": "先限定打印范围。"
+      },
+      {
+        "id": "page-setup",
+        "kind": "companion",
+        "why": "方向与缩放。"
+      },
+      {
+        "id": "batch-export-pdf",
+        "kind": "companion",
+        "why": "不打印时导出 PDF。"
+      }
+    ],
+    "oneLiner": "一次把多张表送进打印机",
+    "summary": "循环 PrintOut 就能逐表打印。先用 Worksheets 避开图表表，打印前设打印区，否则容易出一堆空白页。"
+  },
+  {
+    "id": "add-sequence-numbers",
+    "enName": "AddSequenceNumbers",
+    "zhName": "批量加序号",
+    "alias": [
+      "自动编号",
+      "加行号",
+      "序列号填充"
+    ],
+    "keywords": [
+      "每行加序号",
+      "自动编号",
+      "筛选后编号"
+    ],
+    "kind": "recipe",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Cells(i, 1).Value = i - 1   ' 从第 2 行开始编 1",
+    "examples": [
+      {
+        "title": "A 列从 1 编到末行",
+        "code": "Sub 加序号()\n    Dim i As Long, n As Long\n    n = Cells(Rows.Count, 2).End(xlUp).Row\n    For i = 2 To n\n        Cells(i, 1).Value = i - 1\n    Next i\nEnd Sub",
+        "howToRun": "B 列有数据，按 F5。",
+        "result": "A2:A末行 依次是 1、2、3…"
+      },
+      {
+        "title": "只给可见行编号（筛选后）",
+        "code": "Sub 可见行编号()\n    Dim r As Range, i As Long\n    i = 0\n    For Each r In Range(\"B2:B100\").SpecialCells(xlCellTypeVisible)\n        i = i + 1\n        r.Offset(0, -1).Value = i\n    Next r\nEnd Sub",
+        "howToRun": "先筛选 B 列，再按 F5。",
+        "result": "A 列只给当前可见行连续编号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "筛选状态下普通循环，编号跳到隐藏行",
+        "reason": "For i 遍历所有行，不认可见性。",
+        "fix": "要对可见行编号就用 SpecialCells(xlCellTypeVisible)。",
+        "level": "high"
+      },
+      {
+        "title": "末行按 A 列算，A 列本来是空的",
+        "reason": "End(xlUp) 找不到数据。",
+        "fix": "改用真正有数据的列（如 B 列）算末行。",
+        "level": "mid"
+      },
+      {
+        "title": "插入行后序号断档",
+        "reason": "静态数字不会自动调整。",
+        "fix": "需要自动维护就改用公式 =ROW()-1 或表格序号列。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "special-cells",
+        "kind": "companion",
+        "why": "可见行编号。"
+      },
+      {
+        "id": "rows",
+        "kind": "companion",
+        "why": "行数与末行定位。"
+      }
+    ],
+    "oneLiner": "给数据行补连续编号",
+    "summary": "普通编号直接循环赋值；筛选后编号必须只遍历可见单元格。静态序号不会随插入行自动调整，需要动态就上公式。"
+  },
+  {
+    "id": "batch-hyperlinks",
+    "enName": "BatchAddHyperlinks",
+    "zhName": "批量生成超链接",
+    "alias": [
+      "一列文件变链接",
+      "批量加链接",
+      "目录超链接"
+    ],
+    "keywords": [
+      "文件名批量变链接",
+      "点击打开文件",
+      "批量超链接"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Hyperlinks.Add Anchor:=单元格, Address:=全路径, TextToDisplay:=显示名",
+    "examples": [
+      {
+        "title": "把 B 列文件名变成可点击链接",
+        "code": "Sub 批量链接()\n    Dim i As Long, p As String\n    For i = 2 To Cells(Rows.Count, 2).End(xlUp).Row\n        p = ThisWorkbook.Path & \"\\文件\\\" & Cells(i, 2).Value\n        If Dir(p) <> \"\" Then\n            Cells(i, 3).Hyperlinks.Delete\n            Cells(i, 3).Hyperlinks.Add Anchor:=Cells(i, 3), _\n                Address:=p, TextToDisplay:=Cells(i, 2).Value\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "B 列是文件名，同目录有「文件」文件夹，按 F5。",
+        "result": "C 列生成可点击链接，文字显示文件名。"
+      },
+      {
+        "title": "链接到各工作表目录",
+        "code": "Sub 表目录()\n    Dim ws As Worksheet, i As Long\n    i = 1\n    For Each ws In ThisWorkbook.Worksheets\n        i = i + 1\n        Cells(i, 1).Hyperlinks.Delete\n        Cells(i, 1).Hyperlinks.Add Anchor:=Cells(i, 1), _\n            Address:=\"\", SubAddress:=Chr(39) & ws.Name & Chr(39) & \"!A1\", TextToDisplay:=ws.Name\n    Next ws\nEnd Sub",
+        "howToRun": "在空白表上按 F5。",
+        "result": "A 列生成指向每张表的目录链接。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "重复运行，链接叠一层又一层",
+        "reason": "Hyperlinks.Add 不会自动替换。",
+        "fix": "加之前先 Hyperlinks.Delete。",
+        "level": "high"
+      },
+      {
+        "title": "表名带空格没加单引号，SubAddress 失效",
+        "reason": "带空格的工作表名在引用里必须用单引号包住。",
+        "fix": "用 Chr(39) 拼单引号：SubAddress:=Chr(39) & ws.Name & Chr(39) & \"!A1\"。",
+        "level": "high"
+      },
+      {
+        "title": "路径含中文/空格，部分环境打不开",
+        "reason": "超链接对特殊字符敏感。",
+        "fix": "尽量用短英文路径，或测试后再批量生成。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "hyperlink-add",
+        "kind": "companion",
+        "why": "单个链接的细节。"
+      },
+      {
+        "id": "hyperlink-follow",
+        "kind": "companion",
+        "why": "验证链接是否可点。"
+      },
+      {
+        "id": "sheet-directory",
+        "kind": "companion",
+        "why": "目录配方。"
+      }
+    ],
+    "oneLiner": "把一列文件名变成可点链接",
+    "summary": "批量生成链接要先删旧链接，表内跳转用 SubAddress 并给带空格表名加单引号。路径特殊字符是常见的打不开原因。"
+  },
+  {
+    "id": "workbook-properties",
+    "enName": "SetWorkbookProperties",
+    "zhName": "批量改文档属性",
+    "alias": [
+      "文档属性",
+      "BuiltinDocumentProperties",
+      "作者标题"
+    ],
+    "keywords": [
+      "批量改作者",
+      "统一标题属性",
+      "文档信息"
+    ],
+    "kind": "recipe",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ThisWorkbook.BuiltinDocumentProperties(\"Title\").Value = \"标题\"",
+    "examples": [
+      {
+        "title": "统一写标题、作者、备注",
+        "code": "Sub 改属性()\n    With ThisWorkbook\n        .BuiltinDocumentProperties(\"Title\").Value = \"2026 年销售报表\"\n        .BuiltinDocumentProperties(\"Author\").Value = \"财务部\"\n        .BuiltinDocumentProperties(\"Comments\").Value = \"自动生成\"\n    End With\nEnd Sub",
+        "howToRun": "按 F5，再到「文件 → 信息」查看。",
+        "result": "文档标题、作者、备注被改写。"
+      },
+      {
+        "title": "读出所有内置属性",
+        "code": "Sub 读属性()\n    Dim p As DocumentProperty\n    For Each p In ThisWorkbook.BuiltinDocumentProperties\n        Debug.Print p.Name, p.Value\n    Next p\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "立即窗口列出全部内置属性名和值。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "属性名写中文，报「类型不匹配」",
+        "reason": "BuiltinDocumentProperties 的索引是英文标准名。",
+        "fix": "用 Title / Author / Comments / Subject 这些英文名。",
+        "level": "high"
+      },
+      {
+        "title": "把只读属性当可写，赋值报错",
+        "reason": "部分内置属性（如 Created）只读。",
+        "fix": "先读 p.Name 列表，只改可写项。",
+        "level": "mid"
+      },
+      {
+        "title": "改完不保存，属性没落盘",
+        "reason": "属性修改也在内存里。",
+        "fix": "最后 ThisWorkbook.Save。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook",
+        "kind": "companion",
+        "why": "属性挂在 Workbook 上。"
+      },
+      {
+        "id": "workbook-save",
+        "kind": "companion",
+        "why": "改完要保存。"
+      }
+    ],
+    "oneLiner": "统一工作簿的标题作者信息",
+    "summary": "内置属性用英文标准名读写，Created 这类只读项不能赋值。改完记得 Save，否则文件信息里看不到。"
+  },
+  {
+    "id": "batch-export-pdf",
+    "enName": "BatchExportPdf",
+    "zhName": "批量导出 PDF",
+    "alias": [
+      "多表导出PDF",
+      "ExportAsFixedFormat",
+      "批量PDF"
+    ],
+    "keywords": [
+      "每张表一个PDF",
+      "整个工作簿导PDF",
+      "批量导出"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.ExportAsFixedFormat Type:=xlTypePDF, Filename:=路径",
+    "examples": [
+      {
+        "title": "每张表导成一个 PDF",
+        "code": "Sub 逐表导PDF()\n    Dim ws As Worksheet, p As String\n    For Each ws In ThisWorkbook.Worksheets\n        p = ThisWorkbook.Path & \"\\PDF\\\" & ws.Name & \".pdf\"\n        ws.ExportAsFixedFormat Type:=xlTypePDF, Filename:=p, _\n            Quality:=xlQualityStandard, OpenAfterPublish:=False\n    Next ws\nEnd Sub",
+        "howToRun": "先建「PDF」文件夹，按 F5。",
+        "result": "每张表生成一个同名 PDF。"
+      },
+      {
+        "title": "整个工作簿导成一个 PDF",
+        "code": "Sub 整簿导PDF()\n    ThisWorkbook.ExportAsFixedFormat _\n        Type:=xlTypePDF, _\n        Filename:=ThisWorkbook.Path & \"\\整簿.pdf\", _\n        OpenAfterPublish:=False\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "同目录生成「整簿.pdf」，包含所有可见表。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "输出目录不存在，报错 1004",
+        "reason": "ExportAsFixedFormat 不自动建目录。",
+        "fix": "先 Dir 检查并 MkDir。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "表名带 / 等字符，PDF 文件名非法",
+        "reason": "直接拿表名当文件名。",
+        "fix": "清洗非法字符，或改用序号命名。",
+        "level": "high"
+      },
+      {
+        "title": "打印区/缩放没设，PDF 分页很碎",
+        "reason": "按默认页面设置导出。",
+        "fix": "导出前统一 PrintArea、Orientation、FitToPagesWide。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "export-pdf",
+        "kind": "companion",
+        "why": "单表导 PDF 的配方。"
+      },
+      {
+        "id": "print-area",
+        "kind": "companion",
+        "why": "导出前限定范围。"
+      },
+      {
+        "id": "page-setup",
+        "kind": "companion",
+        "why": "分页与缩放。"
+      }
+    ],
+    "oneLiner": "把多张表批量导成 PDF",
+    "summary": "ExportAsFixedFormat 可逐表或整簿导出。目录要先建、表名要清洗，打印区和缩放不设会导出一堆碎页。"
+  },
+  {
+    "id": "archive-by-month",
+    "enName": "ArchiveFilesByMonth",
+    "zhName": "按月归档文件",
+    "alias": [
+      "文件按月分类",
+      "按日期归档",
+      "自动归档"
+    ],
+    "keywords": [
+      "按月份建文件夹",
+      "文件自动归档",
+      "按日期移动"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "按名单日期 yyyy-mm 建目录 → FileCopy 到目标目录",
+    "examples": [
+      {
+        "title": "按 B 列日期把文件复制到月份目录",
+        "code": "Sub 按月归档()\n    Dim i As Long, m As String, src As String, dstDir As String\n    For i = 2 To Cells(Rows.Count, 1).End(xlUp).Row\n        m = Format(Cells(i, 2).Value, \"yyyy-mm\")\n        dstDir = ThisWorkbook.Path & \"\\归档\\\" & m\n        If Dir(dstDir, vbDirectory) = \"\" Then MkDir dstDir\n        src = ThisWorkbook.Path & \"\\待归档\\\" & Cells(i, 1).Value\n        If Dir(src) <> \"\" Then FileCopy src, dstDir & \"\\\" & Cells(i, 1).Value\n    Next i\nEnd Sub",
+        "howToRun": "A 文件名、B 日期，先建「待归档」文件夹，按 F5。",
+        "result": "文件被复制到「归档\\2026-01」这类月份目录。"
+      },
+      {
+        "title": "归档后列出结果",
+        "code": "Sub 看结果()\n    Dim f As String\n    f = Dir(ThisWorkbook.Path & \"\\归档\\*\", vbDirectory)\n    Do While f <> \"\"\n        Debug.Print f\n        f = Dir\n    Loop\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "立即窗口打印已建的月份目录。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "日期是文本，Format 出来是原字符串",
+        "reason": "Format 对文本日期无效。",
+        "fix": "先 CDate 转换，或确保 B 列是真正的日期值。",
+        "level": "high"
+      },
+      {
+        "title": "多级目录一次 MkDir，父目录不存在报错",
+        "reason": "MkDir 不能一次建多层。",
+        "fix": "先建「归档」，再建月份子目录。",
+        "level": "high"
+      },
+      {
+        "title": "FileCopy 遇同名文件直接覆盖",
+        "reason": "目标已存在时覆盖且无提示。",
+        "fix": "复制前 Dir(dst) 判重，或加序号。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook-path",
+        "kind": "companion",
+        "why": "拼归档路径。"
+      },
+      {
+        "id": "batch-rename-files",
+        "kind": "companion",
+        "why": "同类文件批处理。"
+      }
+    ],
+    "oneLiner": "按月份把文件分目录存放",
+    "summary": "核心是 Format 日期成 yyyy-mm、逐级建目录、FileCopy。文本日期要先转换，MkDir 不能一次建多层。"
+  },
+  {
+    "id": "batch-copy-sheet",
+    "enName": "BatchCopySheetToWorkbooks",
+    "zhName": "批量复制工作表到多个文件",
+    "alias": [
+      "给每个文件加一张表",
+      "批量插模板表",
+      "Copy Sheet"
+    ],
+    "keywords": [
+      "每个工作簿加汇总表",
+      "批量复制工作表",
+      "统一模板页"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "wb.Worksheets(1).Copy After:=目标表 → 重命名 → Close True",
+    "examples": [
+      {
+        "title": "给目录下每个 xlsx 加一张「说明」表",
+        "code": "Sub 批量加表()\n    Dim f As String, wb As Workbook\n    f = Dir(ThisWorkbook.Path & \"\\目标\\*.xlsx\")\n    Do While f <> \"\"\n        Set wb = Workbooks.Open(ThisWorkbook.Path & \"\\目标\\\" & f)\n        ThisWorkbook.Worksheets(\"说明\").Copy After:=wb.Worksheets(wb.Worksheets.Count)\n        wb.Close True\n        f = Dir\n    Loop\n End Sub",
+        "howToRun": "当前簿有「说明」表，同目录有「目标」文件夹，按 F5。",
+        "result": "每个目标文件末尾都多一张「说明」表。"
+      },
+      {
+        "title": "复制前先删同名旧表",
+        "code": "Sub 先删旧表()\n    Dim wb As Workbook\n    Set wb = Workbooks.Open(ThisWorkbook.Path & \"\\目标\\示例.xlsx\")\n    On Error Resume Next\n    wb.Worksheets(\"说明\").Delete\n    On Error GoTo 0\n    ThisWorkbook.Worksheets(\"说明\").Copy After:=wb.Worksheets(wb.Worksheets.Count)\n    wb.Close True\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "旧「说明」表被替换，不会重名报错。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "目标文件已有同名表，Copy 报错",
+        "reason": "同一工作簿表名必须唯一。",
+        "fix": "先删旧表，或复制后立刻改成唯一名。",
+        "level": "high"
+      },
+      {
+        "title": "Copy 不指定 After，表插到最前面",
+        "reason": "默认插在活动表之前。",
+        "fix": "明确 After:=最后一个表。",
+        "level": "mid"
+      },
+      {
+        "title": "批量打开不关，最后几十个文件都开着",
+        "reason": "循环里 Open 没 Close。",
+        "fix": "每个循环 Close True/False，异常分支也要关。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheets-collection",
+        "kind": "companion",
+        "why": "表集合与位置。"
+      },
+      {
+        "id": "workbook-open",
+        "kind": "companion",
+        "why": "逐个打开目标文件。"
+      },
+      {
+        "id": "merge-workbooks",
+        "kind": "companion",
+        "why": "跨簿批量处理。"
+      }
+    ],
+    "oneLiner": "把一张模板表塞进一批文件",
+    "summary": "Copy After 指定插入位置，目标已有同名表要先删。循环打开文件必须逐个关闭，否则会残留一堆窗口。"
+  },
+  {
+    "id": "batch-find-replace",
+    "enName": "BatchFindReplace",
+    "zhName": "批量查找替换",
+    "alias": [
+      "全表替换",
+      "Cells.Replace",
+      "批量改文字"
+    ],
+    "keywords": [
+      "所有表替换文字",
+      "批量改错别字",
+      "查找替换"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Cells.Replace What:=旧, Replacement:=新, LookAt:=xlPart",
+    "examples": [
+      {
+        "title": "把所有表的「有限公司」改成「集团」",
+        "code": "Sub 批量替换()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        ws.Cells.Replace What:=\"有限公司\", Replacement:=\"集团\", _\n            LookAt:=xlPart, SearchOrder:=xlByRows\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有工作表里「有限公司」被替换成「集团」。"
+      },
+      {
+        "title": "只替换 A 列",
+        "code": "Sub 只改A列()\n    ActiveSheet.Range(\"A:A\").Replace _\n        What:=\"待定\", Replacement:=\"已确认\", LookAt:=xlWhole\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "A 列中整格等于「待定」的改成「已确认」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "LookAt 用 xlPart 误伤长词",
+        "reason": "“有限公司”会命中“有限公司北京”等更长文本的一部分。",
+        "fix": "需要整格匹配就用 xlWhole。",
+        "level": "high"
+      },
+      {
+        "title": "替换不区分大小写，英文被误改",
+        "reason": "Replace 默认不区分大小写。",
+        "fix": "必要时先 MatchCase:=True，或缩小到具体区域。",
+        "level": "mid"
+      },
+      {
+        "title": "替换前没备份，改错无法撤销",
+        "reason": "VBA 批量替换不进撤销栈。",
+        "fix": "先另存副本，或先在少量区域试跑。",
+        "level": "high"
+      }
+    ],
+    "related": [
+      {
+        "id": "range-replace",
+        "kind": "companion",
+        "why": "Range.Replace 的参数细节。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "限定替换范围。"
+      }
+    ],
+    "oneLiner": "跨表批量改文字",
+    "summary": "Cells.Replace 是批量替换的核心，LookAt 决定整格还是包含匹配。VBA 替换不能撤销，动手前先备份。"
+  },
+  {
+    "id": "batch-unify-format",
+    "enName": "BatchUnifyFormat",
+    "zhName": "批量统一表格格式",
+    "alias": [
+      "统一字体行高",
+      "所有表同格式",
+      "批量排版"
+    ],
+    "keywords": [
+      "统一表头样式",
+      "批量调列宽",
+      "所有表一个样"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "遍历工作表 → 统一字体、表头底色、行高列宽",
+    "examples": [
+      {
+        "title": "所有表统一表头样式",
+        "code": "Sub 统一表头()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        With ws.Range(\"A1:Z1\")\n            .Font.Bold = True\n            .Font.Size = 11\n            .Interior.Color = RGB(217, 217, 217)\n            .HorizontalAlignment = xlHAlignCenter\n        End With\n        ws.Rows(1).RowHeight = 24\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有表第 1 行加粗、灰底、居中、行高 24。"
+      },
+      {
+        "title": "统一数据区字体和列宽",
+        "code": "Sub 统一正文()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        ws.UsedRange.Font.Name = \"微软雅黑\"\n        ws.UsedRange.Font.Size = 10\n        ws.Columns(\"A:Z\").ColumnWidth = 12\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有表正文变微软雅黑 10 号，A:Z 列宽 12。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对空表也设格式，UsedRange 被撑大",
+        "reason": "格式操作会扩展 UsedRange。",
+        "fix": "先判断有数据再设，避免整表格式化。",
+        "level": "mid"
+      },
+      {
+        "title": "表头行不是第 1 行，样式套错",
+        "reason": "配方默认 A1:Z1。",
+        "fix": "按实际表头行修改范围。",
+        "level": "mid"
+      },
+      {
+        "title": "统一列宽把手工调好的列压坏",
+        "reason": "ColumnWidth 是硬覆盖。",
+        "fix": "先备份，或只对指定列设宽。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "font",
+        "kind": "companion",
+        "why": "字体属性。"
+      },
+      {
+        "id": "interior",
+        "kind": "companion",
+        "why": "底色属性。"
+      },
+      {
+        "id": "row-height-column-width",
+        "kind": "companion",
+        "why": "行列尺寸。"
+      }
+    ],
+    "oneLiner": "把多张表排成同一个样式",
+    "summary": "遍历工作表统一字体、表头底色、行高列宽。格式会撑大 UsedRange，空表别乱设；列宽是硬覆盖，改前先备份。"
+  },
+  {
+    "id": "batch-set-print-area",
+    "enName": "BatchSetPrintArea",
+    "zhName": "批量设置打印区域",
+    "alias": [
+      "每表设打印区",
+      "统一打印范围",
+      "PrintArea 批量"
+    ],
+    "keywords": [
+      "所有表设打印区",
+      "批量页面设置",
+      "一页宽打印"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ws.PageSetup.PrintArea = ws.UsedRange.Address\nws.PageSetup.FitToPagesWide = 1",
+    "examples": [
+      {
+        "title": "每张表按实际数据区设打印范围",
+        "code": "Sub 批量打印区()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        With ws.PageSetup\n            .PrintArea = ws.UsedRange.Address\n            .Orientation = xlLandscape\n            .Zoom = False\n            .FitToPagesWide = 1\n            .FitToPagesTall = False\n        End With\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5，逐表看打印预览。",
+        "result": "每张表打印区贴合数据，横向一页宽。"
+      },
+      {
+        "title": "清除所有打印区域",
+        "code": "Sub 清打印区()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        ws.PageSetup.PrintArea = \"\"\n    Next ws\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有表恢复默认打印范围。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "UsedRange 含大量空格式列，打印区过宽",
+        "reason": "历史格式会把 UsedRange 撑大。",
+        "fix": "先清理空列空行，或手工指定到实际最后一列。",
+        "level": "high"
+      },
+      {
+        "title": "PrintArea 地址不是绝对引用，部分版本不认",
+        "reason": "需要 $A$1:$H$30 形式。",
+        "fix": "用 UsedRange.Address 生成，别手拼相对地址。",
+        "level": "mid"
+      },
+      {
+        "title": "只设 Wide 不设 Tall，页面被压成一页高",
+        "reason": "FitToPagesTall 沿用旧值。",
+        "fix": "明确 FitToPagesTall = False。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "print-area",
+        "kind": "companion",
+        "why": "打印区域属性。"
+      },
+      {
+        "id": "page-setup",
+        "kind": "companion",
+        "why": "缩放与方向。"
+      },
+      {
+        "id": "batch-export-pdf",
+        "kind": "companion",
+        "why": "导出前先设打印区。"
+      }
+    ],
+    "oneLiner": "给每张表统一打印范围",
+    "summary": "用 UsedRange.Address 批量设打印区，再配横向和一页宽。UsedRange 被空格式撑大时，打印区会过宽，先清空列。"
+  }
+]

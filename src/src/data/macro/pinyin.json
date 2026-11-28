@@ -1,0 +1,1086 @@
+{
+  "active-selection": {
+    "pinyin": "dangqianxuanqu",
+    "abbr": "dqxq"
+  },
+  "activesheet": {
+    "pinyin": "huodonggongzuobiao",
+    "abbr": "hdgzb"
+  },
+  "activeworkbook": {
+    "pinyin": "huodonggongzuobo",
+    "abbr": "hdgzb"
+  },
+  "add-in": {
+    "pinyin": "jiazaixiang",
+    "abbr": "jzx"
+  },
+  "add-sequence-numbers": {
+    "pinyin": "piliangjiaxuhao",
+    "abbr": "pljxh"
+  },
+  "advanced-filter": {
+    "pinyin": "gaojishaixuan",
+    "abbr": "gjsx"
+  },
+  "application-run": {
+    "pinyin": "diaoyonghong",
+    "abbr": "dyh"
+  },
+  "application-wait": {
+    "pinyin": "dengdai",
+    "abbr": "dd"
+  },
+  "archive-by-month": {
+    "pinyin": "anyueguidangwenjian",
+    "abbr": "aygdwj"
+  },
+  "area-count": {
+    "pinyin": "quyujishu",
+    "abbr": "qyjs"
+  },
+  "areas": {
+    "pinyin": "duogexuanqu",
+    "abbr": "dgxq"
+  },
+  "arrays-vs-ranges": {
+    "pinyin": "shuzuyuquyu",
+    "abbr": "szyqy"
+  },
+  "autofilter": {
+    "pinyin": "zidongshaixuan",
+    "abbr": "zdsx"
+  },
+  "automation": {
+    "pinyin": "kuayingyongzidonghua",
+    "abbr": "kyyzdh"
+  },
+  "batch-convert-workbooks": {
+    "pinyin": "piliangzhuanhuanwenjiangeshi",
+    "abbr": "plzhwjgs"
+  },
+  "batch-copy-sheet": {
+    "pinyin": "piliangfuzhigongzuobiaodaoduogewenjian",
+    "abbr": "plfzgzbddgwj"
+  },
+  "batch-export-pdf": {
+    "pinyin": "piliangdaochu pdf",
+    "abbr": "pldc pdf"
+  },
+  "batch-fill-formula": {
+    "pinyin": "piliangtianchonggongshi",
+    "abbr": "pltcgs"
+  },
+  "batch-find-replace": {
+    "pinyin": "piliangchazhaotihuan",
+    "abbr": "plczth"
+  },
+  "batch-hyperlinks": {
+    "pinyin": "piliangshengchengchaolianjie",
+    "abbr": "plscclj"
+  },
+  "batch-insert-pictures": {
+    "pinyin": "piliangcharutupian",
+    "abbr": "plcrtp"
+  },
+  "batch-print-sheets": {
+    "pinyin": "piliangdayingongzuobiao",
+    "abbr": "pldygzb"
+  },
+  "batch-protect-sheets": {
+    "pinyin": "piliangbaohugongzuobiao",
+    "abbr": "plbhgzb"
+  },
+  "batch-rename-files": {
+    "pinyin": "piliangzhongmingmingwenjian",
+    "abbr": "plzmmwj"
+  },
+  "batch-set-print-area": {
+    "pinyin": "piliangshezhidayinquyu",
+    "abbr": "plszdyqy"
+  },
+  "batch-unify-format": {
+    "pinyin": "piliangtongyibiaogegeshi",
+    "abbr": "pltybggs"
+  },
+  "borders": {
+    "pinyin": "biankuang",
+    "abbr": "bk"
+  },
+  "byref-vs-byval": {
+    "pinyin": "chuanzhiyuchuanzhi",
+    "abbr": "czycz"
+  },
+  "calculation": {
+    "pinyin": "zhongsuanmoshi",
+    "abbr": "zsms"
+  },
+  "call": {
+    "pinyin": "diaoyonglingyigeguocheng",
+    "abbr": "dylyggc"
+  },
+  "cell-style": {
+    "pinyin": "danyuangeyangshi",
+    "abbr": "dygys"
+  },
+  "cells": {
+    "pinyin": "anhangliequdanyuange",
+    "abbr": "ahlqdyg"
+  },
+  "cf-add-rule": {
+    "pinyin": "xinzengtiaojiangeshi",
+    "abbr": "xztjgs"
+  },
+  "cf-clear": {
+    "pinyin": "qingchutiaojiangeshi",
+    "abbr": "qctjgs"
+  },
+  "cf-formula-rule": {
+    "pinyin": "gongshitiaojiangeshi",
+    "abbr": "gstjgs"
+  },
+  "chart-add": {
+    "pinyin": "xinjiantubiao",
+    "abbr": "xjtb"
+  },
+  "chart-object": {
+    "pinyin": "tubiaoduixiang",
+    "abbr": "tbdx"
+  },
+  "chart-set-source": {
+    "pinyin": "tubiaoshujuyuan",
+    "abbr": "tbsjy"
+  },
+  "chart-type": {
+    "pinyin": "tubiaoleixing",
+    "abbr": "tblx"
+  },
+  "class-module": {
+    "pinyin": "leimokuai",
+    "abbr": "lmk"
+  },
+  "clear-cell-formats": {
+    "pinyin": "qingchugeshi",
+    "abbr": "qcgs"
+  },
+  "clear-formats": {
+    "pinyin": "yijianqingchugeshi",
+    "abbr": "yjqcgs"
+  },
+  "collection-index": {
+    "pinyin": "jiheyusuoyin",
+    "abbr": "jhysy"
+  },
+  "collection-object": {
+    "pinyin": "collection jiheduixiang",
+    "abbr": "collection jhdx"
+  },
+  "columns": {
+    "pinyin": "zhenglie",
+    "abbr": "zl"
+  },
+  "comment-add": {
+    "pinyin": "tianjiapizhu",
+    "abbr": "tjpz"
+  },
+  "comment-delete": {
+    "pinyin": "shanchupizhu",
+    "abbr": "scpz"
+  },
+  "comment-object": {
+    "pinyin": "pizhuduixiang",
+    "abbr": "pzdx"
+  },
+  "conditional-color": {
+    "pinyin": "anshuzhizidongbianse",
+    "abbr": "aszzdbs"
+  },
+  "conditional-summary": {
+    "pinyin": "antiaojianhuizongdaoxinbiao",
+    "abbr": "atjhzdxb"
+  },
+  "const": {
+    "pinyin": "shengmingchangliang",
+    "abbr": "smcl"
+  },
+  "const-and-enum": {
+    "pinyin": "changliangyumeiju",
+    "abbr": "clymj"
+  },
+  "current-region": {
+    "pinyin": "dangqianshujukuai",
+    "abbr": "dqsjk"
+  },
+  "cutcopymode": {
+    "pinyin": "fuzhizhuangtai",
+    "abbr": "fzzt"
+  },
+  "date-precision": {
+    "pinyin": "riqiyushuzhijingdu",
+    "abbr": "rqyszjd"
+  },
+  "declare-api": {
+    "pinyin": "shengmingwaibu api",
+    "abbr": "smwb api"
+  },
+  "dedupe": {
+    "pinyin": "anliequzhong",
+    "abbr": "alqz"
+  },
+  "delete-empty-rows": {
+    "pinyin": "shanchusuoyoukongxing",
+    "abbr": "scsykx"
+  },
+  "dictionary": {
+    "pinyin": "zidian dictionary",
+    "abbr": "zd dictionary"
+  },
+  "dim": {
+    "pinyin": "shengmingbianliang",
+    "abbr": "smbl"
+  },
+  "displayalerts": {
+    "pinyin": "jinggaotishikaiguan",
+    "abbr": "jgtskg"
+  },
+  "do-loop": {
+    "pinyin": "tiaojianxunhuan",
+    "abbr": "tjxh"
+  },
+  "do-until-loop": {
+    "pinyin": "zhidaoxingxunhuan",
+    "abbr": "zdxxh"
+  },
+  "elseif": {
+    "pinyin": "fouzeruguo",
+    "abbr": "fzrg"
+  },
+  "enableevents": {
+    "pinyin": "shijiankaiguan",
+    "abbr": "sjkg"
+  },
+  "end-statement": {
+    "pinyin": "qiangzhijieshuchengxu",
+    "abbr": "qzjscx"
+  },
+  "end-xldown": {
+    "pinyin": "anfangxiangzhaobianjie",
+    "abbr": "afxzbj"
+  },
+  "entire-row-column": {
+    "pinyin": "zhengxingzhenglie",
+    "abbr": "zxzl"
+  },
+  "erase": {
+    "pinyin": "qingkongshuzu",
+    "abbr": "qksz"
+  },
+  "err-object": {
+    "pinyin": "cuowuduixiang",
+    "abbr": "cwdx"
+  },
+  "error-handling-model": {
+    "pinyin": "cuowuchulimoxing",
+    "abbr": "cwclmx"
+  },
+  "evaluate": {
+    "pinyin": "jisuanbiaodashi",
+    "abbr": "jsbds"
+  },
+  "event-order": {
+    "pinyin": "shijianchufashunxu",
+    "abbr": "sjcfsx"
+  },
+  "events": {
+    "pinyin": "shijianshishenme",
+    "abbr": "sjssm"
+  },
+  "exit-do": {
+    "pinyin": "tiaochu do",
+    "abbr": "tc do"
+  },
+  "exit-for": {
+    "pinyin": "tiaochu for",
+    "abbr": "tc for"
+  },
+  "exit-function": {
+    "pinyin": "tuichuhanshu",
+    "abbr": "tchs"
+  },
+  "exit-sub": {
+    "pinyin": "tiqiantuichuguocheng",
+    "abbr": "tqtcgc"
+  },
+  "explicit-let": {
+    "pinyin": "let fuzhiyuju",
+    "abbr": "let fzyj"
+  },
+  "export-charts-as-images": {
+    "pinyin": "daochutubiaoweitupian",
+    "abbr": "dctbwtp"
+  },
+  "export-csv": {
+    "pinyin": "daochuwei csv",
+    "abbr": "dcw csv"
+  },
+  "export-pdf": {
+    "pinyin": "daochu pdf",
+    "abbr": "dc pdf"
+  },
+  "filter-to-new-sheet": {
+    "pinyin": "shaixuandaoxinbiao",
+    "abbr": "sxdxb"
+  },
+  "find": {
+    "pinyin": "chazhaodanyuange",
+    "abbr": "czdyg"
+  },
+  "find-next": {
+    "pinyin": "jixuchazhao",
+    "abbr": "jxcz"
+  },
+  "font": {
+    "pinyin": "zitigeshi",
+    "abbr": "ztgs"
+  },
+  "for-each-next": {
+    "pinyin": "bianlijihe",
+    "abbr": "bljh"
+  },
+  "for-next": {
+    "pinyin": "jishuxunhuan",
+    "abbr": "jsxh"
+  },
+  "format-column": {
+    "pinyin": "zhenglietaogeshi",
+    "abbr": "zltgs"
+  },
+  "format-conditions": {
+    "pinyin": "tiaojiangeshijihe",
+    "abbr": "tjgsjh"
+  },
+  "formula": {
+    "pinyin": "xierugongshi",
+    "abbr": "xrgs"
+  },
+  "formula-r1c1": {
+    "pinyin": "r1c1 gongshi",
+    "abbr": "r1c1 gs"
+  },
+  "freeze-panes": {
+    "pinyin": "dongjiechuangge",
+    "abbr": "djcg"
+  },
+  "goto-statement": {
+    "pinyin": "tiaozhuanyuju",
+    "abbr": "tzyj"
+  },
+  "horizontal-alignment": {
+    "pinyin": "shuipingduiqi",
+    "abbr": "spdq"
+  },
+  "hyperlink-add": {
+    "pinyin": "tianjiachaolianjie",
+    "abbr": "tjclj"
+  },
+  "hyperlink-follow": {
+    "pinyin": "dakaichaolianjie",
+    "abbr": "dkclj"
+  },
+  "if-then-else": {
+    "pinyin": "tiaojianpanduan",
+    "abbr": "tjpd"
+  },
+  "implements": {
+    "pinyin": "shixianjiekou",
+    "abbr": "sxjk"
+  },
+  "input-form": {
+    "pinyin": "shurukuangluru",
+    "abbr": "srklr"
+  },
+  "inputbox": {
+    "pinyin": "rangyonghushuru",
+    "abbr": "ryhsr"
+  },
+  "interior": {
+    "pinyin": "danyuangedise",
+    "abbr": "dygds"
+  },
+  "jsa-application": {
+    "pinyin": "jsa application duixiang",
+    "abbr": "jsa application dx"
+  },
+  "jsa-application-run": {
+    "pinyin": "jsa diaoyonghong",
+    "abbr": "jsa dyh"
+  },
+  "jsa-array-methods": {
+    "pinyin": "shuzubianliyuzhuanhuan",
+    "abbr": "szblyzh"
+  },
+  "jsa-autofilter": {
+    "pinyin": "jsa zidongshaixuan",
+    "abbr": "jsa zdsx"
+  },
+  "jsa-autofit": {
+    "pinyin": "jsa zidongliekuan",
+    "abbr": "jsa zdlk"
+  },
+  "jsa-borders": {
+    "pinyin": "jsa danyuangebiankuang",
+    "abbr": "jsa dygbk"
+  },
+  "jsa-chart": {
+    "pinyin": "jsa jiantubiao",
+    "abbr": "jsa jtb"
+  },
+  "jsa-console-log": {
+    "pinyin": "kongzhitaishuchu",
+    "abbr": "kztsc"
+  },
+  "jsa-copy-paste": {
+    "pinyin": "jsa fuzhiniantie",
+    "abbr": "jsa fznt"
+  },
+  "jsa-currentregion": {
+    "pinyin": "jsa dangqianquyu",
+    "abbr": "jsa dqqy"
+  },
+  "jsa-end": {
+    "pinyin": "jsa tiaodaobianjie",
+    "abbr": "jsa tdbj"
+  },
+  "jsa-find": {
+    "pinyin": "jsa chazhao",
+    "abbr": "jsa cz"
+  },
+  "jsa-first-macro": {
+    "pinyin": "diyige js hong",
+    "abbr": "dyg js h"
+  },
+  "jsa-function": {
+    "pinyin": "js hanshuxiefa",
+    "abbr": "js hsxf"
+  },
+  "jsa-inputbox": {
+    "pinyin": "jsa shurukuang",
+    "abbr": "jsa srk"
+  },
+  "jsa-interior": {
+    "pinyin": "jsa tianchongdise",
+    "abbr": "jsa tcds"
+  },
+  "jsa-intro": {
+    "pinyin": "jsa shishenme",
+    "abbr": "jsa ssm"
+  },
+  "jsa-let-const": {
+    "pinyin": "let yu const",
+    "abbr": "let y const"
+  },
+  "jsa-msgbox": {
+    "pinyin": "jsa xiaoxikuang",
+    "abbr": "jsa xxk"
+  },
+  "jsa-numberformat": {
+    "pinyin": "jsa shuzigeshi",
+    "abbr": "jsa szgs"
+  },
+  "jsa-object-json": {
+    "pinyin": "duixiangyu json",
+    "abbr": "dxy json"
+  },
+  "jsa-offset-resize": {
+    "pinyin": "pianyiyukuosuoquyu",
+    "abbr": "pyyksqy"
+  },
+  "jsa-pivot-refresh": {
+    "pinyin": "jsa toushibiaoshuaxin",
+    "abbr": "jsa tsbsx"
+  },
+  "jsa-range-read-write": {
+    "pinyin": "duxiedanyuange",
+    "abbr": "dxdyg"
+  },
+  "jsa-sort": {
+    "pinyin": "jsa quyupaixu",
+    "abbr": "jsa qypx"
+  },
+  "jsa-template-literal": {
+    "pinyin": "mubanzifuchuan",
+    "abbr": "mbzfc"
+  },
+  "jsa-try-catch": {
+    "pinyin": "yichangchuli",
+    "abbr": "yccl"
+  },
+  "jsa-usedrange": {
+    "pinyin": "jsa yiyongquyu",
+    "abbr": "jsa yyqy"
+  },
+  "jsa-workbook": {
+    "pinyin": "jsa gongzuobo",
+    "abbr": "jsa gzb"
+  },
+  "jsa-worksheets": {
+    "pinyin": "jsa gongzuobiaojihe",
+    "abbr": "jsa gzbjh"
+  },
+  "late-binding": {
+    "pinyin": "houqibangding",
+    "abbr": "hqbd"
+  },
+  "listobject": {
+    "pinyin": "biaoge listobject",
+    "abbr": "bg listobject"
+  },
+  "listobject-rows": {
+    "pinyin": "biaogexing",
+    "abbr": "bgx"
+  },
+  "macro-security": {
+    "pinyin": "honganquanyuqiyong",
+    "abbr": "haqyqy"
+  },
+  "merge-all-sheets": {
+    "pinyin": "duobiaohebingdaoyizhang",
+    "abbr": "dbhbdyz"
+  },
+  "merge-cells": {
+    "pinyin": "hebingdanyuange",
+    "abbr": "hbdyg"
+  },
+  "merge-two-sheets": {
+    "pinyin": "liangbiaoanbianhaohebing",
+    "abbr": "lbabhhb"
+  },
+  "merge-workbooks": {
+    "pinyin": "duogongzuobohuizong",
+    "abbr": "dgzbhz"
+  },
+  "module-and-procedure": {
+    "pinyin": "mokuaiyuguocheng",
+    "abbr": "mkygc"
+  },
+  "msgbox": {
+    "pinyin": "tanchuangtishi",
+    "abbr": "tcts"
+  },
+  "multi-column-sort": {
+    "pinyin": "duoliepaixu",
+    "abbr": "dlpx"
+  },
+  "named-range": {
+    "pinyin": "mingchengyumingmingquyu",
+    "abbr": "mcymmqy"
+  },
+  "nothing-empty-null": {
+    "pinyin": "kongzhisanxiongdi",
+    "abbr": "kzsxd"
+  },
+  "number-to-text": {
+    "pinyin": "shuzizhuanwenben",
+    "abbr": "szzwb"
+  },
+  "numberformat": {
+    "pinyin": "shezhishuzigeshi",
+    "abbr": "szszgs"
+  },
+  "object-model-hierarchy": {
+    "pinyin": "duixiangmoxingcengji",
+    "abbr": "dxmxcj"
+  },
+  "object-property-method": {
+    "pinyin": "duixiang·shuxing·fangfa",
+    "abbr": "dx·sx·ff"
+  },
+  "offset": {
+    "pinyin": "xiangduipianyi",
+    "abbr": "xdpy"
+  },
+  "on-error-goto": {
+    "pinyin": "tiaodaocuowuchuli",
+    "abbr": "tdcwcl"
+  },
+  "on-error-goto-0": {
+    "pinyin": "guanbicuowuchuli",
+    "abbr": "gbcwcl"
+  },
+  "on-error-resume-next": {
+    "pinyin": "tiaoguocuowujixu",
+    "abbr": "tgcwjx"
+  },
+  "option-base": {
+    "pinyin": "shuzuxiabiaoqidian",
+    "abbr": "szxbqd"
+  },
+  "option-compare": {
+    "pinyin": "zifuchuanbijiaomoshi",
+    "abbr": "zfcbjms"
+  },
+  "option-explicit": {
+    "pinyin": "qiangzhishengmingbianliang",
+    "abbr": "qzsmbl"
+  },
+  "optional-args": {
+    "pinyin": "kexuancanshuyumorenzhi",
+    "abbr": "kxcsymrz"
+  },
+  "page-setup": {
+    "pinyin": "yemianshezhi",
+    "abbr": "ymsz"
+  },
+  "paramarray": {
+    "pinyin": "canshuoshuozu",
+    "abbr": "cssz"
+  },
+  "paste-special": {
+    "pinyin": "xuanzexingniantie",
+    "abbr": "xzxnt"
+  },
+  "performance-trio": {
+    "pinyin": "xingnengsanjiantao",
+    "abbr": "xnsjt"
+  },
+  "pivot-add-fields": {
+    "pinyin": "toushibiaoziduan",
+    "abbr": "tsbzd"
+  },
+  "pivot-create": {
+    "pinyin": "xinjiantoushibiao",
+    "abbr": "xjtsb"
+  },
+  "pivot-filter": {
+    "pinyin": "toushibiaoshaixuan",
+    "abbr": "tsbsx"
+  },
+  "pivot-refresh": {
+    "pinyin": "shuaxintoushibiao",
+    "abbr": "sxtsb"
+  },
+  "pivot-table-object": {
+    "pinyin": "toushibiaoduixiang",
+    "abbr": "tsbdx"
+  },
+  "print-area": {
+    "pinyin": "dayinquyu",
+    "abbr": "dyqy"
+  },
+  "property-get-let": {
+    "pinyin": "property yuju",
+    "abbr": "property yj"
+  },
+  "property-procedure": {
+    "pinyin": "shuxingguocheng",
+    "abbr": "sxgc"
+  },
+  "public-private": {
+    "pinyin": "gongyouyusiyou",
+    "abbr": "gyysy"
+  },
+  "raiseevent": {
+    "pinyin": "chufazidingyishijian",
+    "abbr": "cfzdysj"
+  },
+  "range": {
+    "pinyin": "danyuangequyu",
+    "abbr": "dygqy"
+  },
+  "range-address": {
+    "pinyin": "danyuangedizhi",
+    "abbr": "dygdz"
+  },
+  "range-intersect": {
+    "pinyin": "quyujiaoji",
+    "abbr": "qyjj"
+  },
+  "range-replace": {
+    "pinyin": "piliangtihuan",
+    "abbr": "plth"
+  },
+  "range-union": {
+    "pinyin": "hebingquyu",
+    "abbr": "hbqy"
+  },
+  "range-vs-cells": {
+    "pinyin": "range yu cells",
+    "abbr": "range y cells"
+  },
+  "reconcile-two-sheets": {
+    "pinyin": "liangzhangbiaoheduichayi",
+    "abbr": "lzbhdcy"
+  },
+  "recorded-macro": {
+    "pinyin": "luzhihongzenmedu",
+    "abbr": "lzhzmd"
+  },
+  "redim": {
+    "pinyin": "dongtaishuzu",
+    "abbr": "dtsz"
+  },
+  "redim-preserve": {
+    "pinyin": "baoliuzhongdingyishuzu",
+    "abbr": "blzdysz"
+  },
+  "relative-absolute-reference": {
+    "pinyin": "xiangduiyinyongyujueduiyinyong",
+    "abbr": "xdyyyjdyy"
+  },
+  "rename-sheets": {
+    "pinyin": "piliangzhongmingminggongzuobiao",
+    "abbr": "plzmmgzb"
+  },
+  "resize": {
+    "pinyin": "tiaozhengquyudaxiao",
+    "abbr": "tzqydx"
+  },
+  "resume": {
+    "pinyin": "chongshichucuoxing",
+    "abbr": "csccx"
+  },
+  "resume-next": {
+    "pinyin": "tiaoguochucuoxing",
+    "abbr": "tgccx"
+  },
+  "row-height-column-width": {
+    "pinyin": "hanggaoliekuan",
+    "abbr": "hglk"
+  },
+  "rows": {
+    "pinyin": "zhengxing",
+    "abbr": "zx"
+  },
+  "runtime-1004": {
+    "pinyin": "yunxingshicuowu 1004：yingyongchengxudingyicuowu",
+    "abbr": "yxscw 1004：yycxdycw"
+  },
+  "runtime-11": {
+    "pinyin": "yunxingshicuowu 11：chuling",
+    "abbr": "yxscw 11：cl"
+  },
+  "runtime-13": {
+    "pinyin": "yunxingshicuowu 13：leixingbupipei",
+    "abbr": "yxscw 13：lxbpp"
+  },
+  "runtime-2147024891": {
+    "pinyin": "quanxiancuowu -2147024891（0x80070005）",
+    "abbr": "qxcw -2147024891（0x80070005）"
+  },
+  "runtime-28": {
+    "pinyin": "yunxingshicuowu 28：zhankongjianbuzu",
+    "abbr": "yxscw 28：zkjbz"
+  },
+  "runtime-32809": {
+    "pinyin": "yunxingshicuowu 32809：jiantieban/duixiangzhuangtaiyichang",
+    "abbr": "yxscw 32809：jtb/dxztyc"
+  },
+  "runtime-35": {
+    "pinyin": "bianyicuowu：sub huo function weidingyi",
+    "abbr": "bycw：sub h function wdy"
+  },
+  "runtime-424": {
+    "pinyin": "yunxingshicuowu 424：xuyaoduixiang",
+    "abbr": "yxscw 424：xydx"
+  },
+  "runtime-429": {
+    "pinyin": "yunxingshicuowu 429：bunengchuangjianduixiang",
+    "abbr": "yxscw 429：bncjdx"
+  },
+  "runtime-438": {
+    "pinyin": "yunxingshicuowu 438：fangfahuoshuxingbucunzai",
+    "abbr": "yxscw 438：ffhsxbcz"
+  },
+  "runtime-440": {
+    "pinyin": "yunxingshicuowu 440：zidonghuacuowu",
+    "abbr": "yxscw 440：zdhcw"
+  },
+  "runtime-449": {
+    "pinyin": "yunxingshicuowu 449：canshubukexuan",
+    "abbr": "yxscw 449：csbkx"
+  },
+  "runtime-450": {
+    "pinyin": "yunxingshicuowu 450：canshugeshubudui",
+    "abbr": "yxscw 450：csgsbd"
+  },
+  "runtime-457": {
+    "pinyin": "yunxingshicuowu 457：jianchongfu",
+    "abbr": "yxscw 457：jcf"
+  },
+  "runtime-458": {
+    "pinyin": "bianyicuowu：bianliangweidingyi",
+    "abbr": "bycw：blwdy"
+  },
+  "runtime-48": {
+    "pinyin": "yunxingshicuowu 48：jiazai dll cuowu",
+    "abbr": "yxscw 48：jz dll cw"
+  },
+  "runtime-5": {
+    "pinyin": "yunxingshicuowu 5：wuxiaodeguochengdiaoyong",
+    "abbr": "yxscw 5：wxdgcdy"
+  },
+  "runtime-50289": {
+    "pinyin": "yunxingshicuowu 50289：gongchengbeibaohu",
+    "abbr": "yxscw 50289：gcbbh"
+  },
+  "runtime-52": {
+    "pinyin": "yunxingshicuowu 52：wenjianminghuobianhaocuowu",
+    "abbr": "yxscw 52：wjmhbhcw"
+  },
+  "runtime-53": {
+    "pinyin": "yunxingshicuowu 53：wenjianweizhaodao",
+    "abbr": "yxscw 53：wjwzd"
+  },
+  "runtime-58": {
+    "pinyin": "yunxingshicuowu 58：wenjianyicunzai",
+    "abbr": "yxscw 58：wjycz"
+  },
+  "runtime-6": {
+    "pinyin": "yunxingshicuowu 6：yichu",
+    "abbr": "yxscw 6：yc"
+  },
+  "runtime-62": {
+    "pinyin": "yunxingshicuowu 62：shuruchaochuwenjianwei",
+    "abbr": "yxscw 62：srccwjw"
+  },
+  "runtime-7": {
+    "pinyin": "yunxingshicuowu 7：neicunbuzu",
+    "abbr": "yxscw 7：ncbz"
+  },
+  "runtime-70": {
+    "pinyin": "yunxingshicuowu 70：quanxianbeijujue",
+    "abbr": "yxscw 70：qxbjj"
+  },
+  "runtime-75": {
+    "pinyin": "yunxingshicuowu 75：lujing/wenjianfangwencuowu",
+    "abbr": "yxscw 75：lj/wjfwcw"
+  },
+  "runtime-76": {
+    "pinyin": "yunxingshicuowu 76：lujingweizhaodao",
+    "abbr": "yxscw 76：ljwzd"
+  },
+  "runtime-9": {
+    "pinyin": "yunxingshicuowu 9：xiabiaoyuejie",
+    "abbr": "yxscw 9：xbyj"
+  },
+  "runtime-91": {
+    "pinyin": "yunxingshicuowu 91：duixiangbianliangweishezhi",
+    "abbr": "yxscw 91：dxblwsz"
+  },
+  "runtime-94": {
+    "pinyin": "yunxingshicuowu 94：wuxiaoshiyong null",
+    "abbr": "yxscw 94：wxsy null"
+  },
+  "save-as": {
+    "pinyin": "lingcunwei",
+    "abbr": "lcw"
+  },
+  "screenupdating": {
+    "pinyin": "pingmushuaxinkaiguan",
+    "abbr": "pmsxkg"
+  },
+  "select-case": {
+    "pinyin": "duofenzhixuanze",
+    "abbr": "dfzxz"
+  },
+  "selection-clipboard": {
+    "pinyin": "xuanzhongquyuyujiantieban",
+    "abbr": "xzqyyjtb"
+  },
+  "set": {
+    "pinyin": "yinyongduixiang",
+    "abbr": "yydx"
+  },
+  "shape-add": {
+    "pinyin": "xinjianxingzhuang",
+    "abbr": "xjxz"
+  },
+  "shape-object": {
+    "pinyin": "xingzhuangduixiang",
+    "abbr": "xzdx"
+  },
+  "shape-position": {
+    "pinyin": "xingzhuangweizhidaxiao",
+    "abbr": "xzwzdx"
+  },
+  "shape-text": {
+    "pinyin": "xingzhuangwenzi",
+    "abbr": "xzwz"
+  },
+  "sheet-directory": {
+    "pinyin": "shengchengmuluye",
+    "abbr": "scmly"
+  },
+  "sort": {
+    "pinyin": "paixu",
+    "abbr": "px"
+  },
+  "special-cells": {
+    "pinyin": "dingweiteshudanyuange",
+    "abbr": "dwtsdyg"
+  },
+  "split-by-column": {
+    "pinyin": "an a liechaichengduozhangbiao",
+    "abbr": "a a lccdzb"
+  },
+  "split-column-to-workbooks": {
+    "pinyin": "anliechaichengduogegongzuobo",
+    "abbr": "alccdggzb"
+  },
+  "split-sheet-by-rows": {
+    "pinyin": "anxingshuchaifengongzuobiao",
+    "abbr": "axscfgzb"
+  },
+  "static": {
+    "pinyin": "jingtaibianliang",
+    "abbr": "jtbl"
+  },
+  "static-vs-dynamic-array": {
+    "pinyin": "jingtaishuzuyudongtaishuzu",
+    "abbr": "jtszydtsz"
+  },
+  "statusbar": {
+    "pinyin": "zhuangtailanwenzi",
+    "abbr": "ztlwz"
+  },
+  "stop": {
+    "pinyin": "zanting",
+    "abbr": "zt"
+  },
+  "string-encoding": {
+    "pinyin": "zifuchuanyubianma",
+    "abbr": "zfcybm"
+  },
+  "sub-vs-function": {
+    "pinyin": "sub yu function",
+    "abbr": "sub y function"
+  },
+  "template-workbook": {
+    "pinyin": "anmubanpiliangshengchenggongzuobo",
+    "abbr": "ambplscgzb"
+  },
+  "text-to-columns": {
+    "pinyin": "fenlie",
+    "abbr": "fl"
+  },
+  "text-value": {
+    "pinyin": "xianshichulaidewenzi",
+    "abbr": "xscldwz"
+  },
+  "type-end-type": {
+    "pinyin": "zidingyileixing",
+    "abbr": "zdylx"
+  },
+  "unified-date-format": {
+    "pinyin": "tongyiriqigeshi",
+    "abbr": "tyrqgs"
+  },
+  "usedrange": {
+    "pinyin": "yiyongquyu",
+    "abbr": "yyqy"
+  },
+  "userform-basics": {
+    "pinyin": "yonghuchuangtijichu",
+    "abbr": "yhctjc"
+  },
+  "validation-add": {
+    "pinyin": "tianjiashujuyanzheng",
+    "abbr": "tjsjyz"
+  },
+  "validation-input-message": {
+    "pinyin": "yanzhengtishiyu",
+    "abbr": "yztsy"
+  },
+  "validation-object": {
+    "pinyin": "shujuyanzhengduixiang",
+    "abbr": "sjyzdx"
+  },
+  "value": {
+    "pinyin": "duxiedanyuangedezhi",
+    "abbr": "dxdygdz"
+  },
+  "value2": {
+    "pinyin": "zhi（wugeshi）",
+    "abbr": "z（wgs）"
+  },
+  "variable-scope": {
+    "pinyin": "bianliangzuoyongyu",
+    "abbr": "blzyy"
+  },
+  "variant-type": {
+    "pinyin": "variant leixing",
+    "abbr": "variant lx"
+  },
+  "vba-project-model": {
+    "pinyin": "vba gongchengjiegou",
+    "abbr": "vba gcjg"
+  },
+  "what-is-macro": {
+    "pinyin": "shenmeshihong",
+    "abbr": "smsh"
+  },
+  "while-wend": {
+    "pinyin": "dangxingxunhuan",
+    "abbr": "dxxh"
+  },
+  "window-freeze": {
+    "pinyin": "dongjiechuangge",
+    "abbr": "djcg"
+  },
+  "with-end-with": {
+    "pinyin": "with yujukuai",
+    "abbr": "with yjk"
+  },
+  "workbook": {
+    "pinyin": "gongzuoboduixiang",
+    "abbr": "gzbdx"
+  },
+  "workbook-close": {
+    "pinyin": "guanbigongzuobo",
+    "abbr": "gbgzb"
+  },
+  "workbook-names": {
+    "pinyin": "mingchengjihe",
+    "abbr": "mcjh"
+  },
+  "workbook-open": {
+    "pinyin": "dakaigongzuobo",
+    "abbr": "dkgzb"
+  },
+  "workbook-path": {
+    "pinyin": "wenjianlujing",
+    "abbr": "wjlj"
+  },
+  "workbook-properties": {
+    "pinyin": "pilianggaiwendangshuxing",
+    "abbr": "plgwdsx"
+  },
+  "workbook-save": {
+    "pinyin": "baocungongzuobo",
+    "abbr": "bcgzb"
+  },
+  "worksheet": {
+    "pinyin": "gongzuobiaoduixiang",
+    "abbr": "gzbdx"
+  },
+  "worksheet-protect": {
+    "pinyin": "baohugongzuobiao",
+    "abbr": "bhgzb"
+  },
+  "worksheet-visible": {
+    "pinyin": "gongzuobiaokejianxing",
+    "abbr": "gzbkjx"
+  },
+  "worksheetfunction": {
+    "pinyin": "diaoyonggongzuobiaohanshu",
+    "abbr": "dygzbhs"
+  },
+  "worksheets-collection": {
+    "pinyin": "gongzuobiaojihe",
+    "abbr": "gzbjh"
+  },
+  "wrap-text": {
+    "pinyin": "zidonghuanhang",
+    "abbr": "zdhh"
+  }
+}

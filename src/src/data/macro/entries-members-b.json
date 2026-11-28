@@ -1,0 +1,663 @@
+[
+  {
+    "id": "advanced-filter",
+    "enName": "Range.AdvancedFilter",
+    "zhName": "高级筛选",
+    "alias": [
+      "AdvancedFilter",
+      "高级筛选",
+      "条件筛选"
+    ],
+    "keywords": [
+      "按条件复制到别处",
+      "提取不重复",
+      "多条件筛选"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "数据区.AdvancedFilter Action, CriteriaRange, CopyToRange, Unique",
+    "examples": [
+      {
+        "title": "提取 A 列不重复值到 C 列",
+        "code": "Sub 提取不重复()\n    Range(\"A1:A100\").AdvancedFilter _\n        Action:=xlFilterCopy, CopyToRange:=Range(\"C1\"), Unique:=True\nEnd Sub",
+        "howToRun": "A1 是标题、A2:A100 有重复值，C 列留空，按 F5。",
+        "result": "C 列得到一列不重复值，含标题。"
+      },
+      {
+        "title": "按条件把整行复制到 H 列",
+        "code": "Sub 按条件筛()\n    Range(\"A1:D100\").AdvancedFilter _\n        Action:=xlFilterCopy, CriteriaRange:=Range(\"F1:F2\"), CopyToRange:=Range(\"H1\")\nEnd Sub",
+        "howToRun": "F1 写与 A1 完全相同的标题，F2 写条件（如 \">100\"），H 列留空，按 F5。",
+        "result": "满足条件的整行被复制到 H 列起，含标题。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "条件区标题和数据标题差一个字，筛出空结果",
+        "reason": "高级筛选按标题名逐字匹配，空格、全半角差异都算不同。",
+        "fix": "条件区标题直接复制数据区标题，别手打。",
+        "level": "high"
+      },
+      {
+        "title": "CopyToRange 写了一整块，报 1004",
+        "reason": "结果区只写左上角一个单元格，由 Excel 自行扩展。",
+        "fix": "CopyToRange:=Range(\"H1\")，不要写 Range(\"H1:K100\")。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "以为多行条件是一组「且」",
+        "reason": "同一行是「且」，不同行是「或」。",
+        "fix": "要同时满足写在同一行；要满足任一写在多行。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "autofilter",
+        "kind": "confusable",
+        "why": "AutoFilter 在原地筛，AdvancedFilter 可复制到别处。"
+      },
+      {
+        "id": "special-cells",
+        "kind": "companion",
+        "why": "筛完常要取可见格做后续处理。"
+      }
+    ],
+    "oneLiner": "按条件复制筛选结果",
+    "summary": "AdvancedFilter 能原地筛也能复制到别处，还能提不重复。三个硬条件：标题完全一致、结果区只写左上角、多行条件是「或」。"
+  },
+  {
+    "id": "horizontal-alignment",
+    "enName": "Range.HorizontalAlignment",
+    "zhName": "水平对齐",
+    "alias": [
+      "HorizontalAlignment",
+      "水平对齐",
+      "居中"
+    ],
+    "keywords": [
+      "文字右对齐",
+      "标题居中",
+      "对齐方式"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.HorizontalAlignment = xlLeft | xlCenter | xlRight | xlGeneral | xlJustify",
+    "examples": [
+      {
+        "title": "让金额列一律右对齐",
+        "code": "Sub 数字右对齐()\n    Range(\"B2:B20\").HorizontalAlignment = xlRight\nEnd Sub",
+        "howToRun": "B2:B20 放金额，按 F5。",
+        "result": "金额统一靠右，小数点上下对齐更易读。"
+      },
+      {
+        "title": "合并标题并居中",
+        "code": "Sub 标题居中()\n    With Range(\"A1:D1\")\n        .Merge\n        .HorizontalAlignment = xlCenter\n    End With\nEnd Sub",
+        "howToRun": "A1:D1 留空，按 F5。",
+        "result": "A1:D1 合并成一个格子，文字居中。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对合并区域设对齐，只有左上角那格变了",
+        "reason": "合并单元格的格式只认左上角单元格。",
+        "fix": "先 Merge，再对合并后的左上角（或整个 MergeArea）设置。",
+        "level": "mid"
+      },
+      {
+        "title": "xlGeneral 不是「恢复默认外观」",
+        "reason": "xlGeneral 是「常规」对齐：文本靠左、数字靠右、逻辑值居中。",
+        "fix": "要统一左对齐就写 xlLeft，别用 xlGeneral。",
+        "level": "mid"
+      },
+      {
+        "title": "对整列设对齐，文件变卡",
+        "reason": "整列 1048576 行都写格式。",
+        "fix": "只对数据范围设置，如 Range(\"B2:B\" & lastRow)。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "wrap-text",
+        "kind": "companion",
+        "why": "对齐和换行一起决定单元格观感。"
+      },
+      {
+        "id": "merge-cells",
+        "kind": "companion",
+        "why": "合并标题的标准配套。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "数字对齐常和格式一起调。"
+      }
+    ],
+    "oneLiner": "设置左右居中",
+    "summary": "HorizontalAlignment 控制水平对齐。合并单元格只认左上角，xlGeneral 不是恢复默认，整列设置会拖慢文件。"
+  },
+  {
+    "id": "wrap-text",
+    "enName": "Range.WrapText",
+    "zhName": "自动换行",
+    "alias": [
+      "WrapText",
+      "自动换行",
+      "换行"
+    ],
+    "keywords": [
+      "长文字自动换行",
+      "单元格内容折行",
+      "关掉自动换行"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.WrapText = True | False",
+    "examples": [
+      {
+        "title": "开启换行并让行高跟着内容",
+        "code": "Sub 换行并调高()\n    With Range(\"A2:A10\")\n        .WrapText = True\n        .EntireRow.AutoFit\n    End With\nEnd Sub",
+        "howToRun": "A2:A10 放较长的说明文字，按 F5。",
+        "result": "文字在格内折行，行高自动加大到能看全。"
+      },
+      {
+        "title": "批量关掉换行",
+        "code": "Sub 关换行()\n    Range(\"A2:A10\").WrapText = False\nEnd Sub",
+        "howToRun": "先开启过换行，再按 F5。",
+        "result": "文字回到单行显示，超宽部分被右侧格子遮住。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只设了 WrapText，行高没变、内容仍被遮",
+        "reason": "WrapText 只允许折行，不会自动调行高。",
+        "fix": "再补 .EntireRow.AutoFit，或手动设 RowHeight。",
+        "level": "high"
+      },
+      {
+        "title": "行高被手动固定，换行后只看到一行半",
+        "reason": "固定 RowHeight 优先于内容高度。",
+        "fix": "先 Rows.AutoFit，再决定是否固定。",
+        "level": "mid"
+      },
+      {
+        "title": "合并单元格开启换行后 AutoFit 无效",
+        "reason": "Excel 不会为合并单元格自动算行高。",
+        "fix": "取消合并，或按字数手动估一个 RowHeight。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "horizontal-alignment",
+        "kind": "companion",
+        "why": "换行后常配合对齐调整。"
+      },
+      {
+        "id": "row-height-column-width",
+        "kind": "companion",
+        "why": "行高列宽是换行能否显示的前提。"
+      },
+      {
+        "id": "merge-cells",
+        "kind": "confusable",
+        "why": "合并和换行一起用最容易出问题。"
+      }
+    ],
+    "oneLiner": "让长文字在格内折行",
+    "summary": "WrapText 只是允许折行，不会自动加高。要真正看全内容，必须配合 AutoFit；合并单元格则 AutoFit 无效。"
+  },
+  {
+    "id": "row-height-column-width",
+    "enName": "Range.RowHeight / ColumnWidth",
+    "zhName": "行高列宽",
+    "alias": [
+      "RowHeight",
+      "ColumnWidth",
+      "行高",
+      "列宽"
+    ],
+    "keywords": [
+      "列宽自适应",
+      "设置行高",
+      "列宽单位"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.RowHeight = 22          ' 单位：磅\nr.ColumnWidth = 12.5      ' 单位：字符数\nColumns(\"A:F\").AutoFit   ' 按内容自适应",
+    "examples": [
+      {
+        "title": "A 到 F 列按内容自适应",
+        "code": "Sub 列宽自适应()\n    Columns(\"A:F\").AutoFit\nEnd Sub",
+        "howToRun": "各列有长短不一的内容，按 F5。",
+        "result": "每列宽度刚好容纳最长内容。"
+      },
+      {
+        "title": "固定行高和列宽",
+        "code": "Sub 固定尺寸()\n    Rows(\"2:10\").RowHeight = 22\n    Columns(\"B\").ColumnWidth = 12.5\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "第 2 到 10 行行高 22 磅，B 列宽 12.5 个字符。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 ColumnWidth 当像素用，列宽全不对",
+        "reason": "ColumnWidth 单位是「字符数」，不是像素。",
+        "fix": "要精确像素用 .Width（磅），或按 1 字符约 7 像素估算后再微调。",
+        "level": "high"
+      },
+      {
+        "title": "合并单元格 AutoFit 没反应",
+        "reason": "Excel 不为合并单元格计算自适应宽度。",
+        "fix": "取消合并后 AutoFit，再合并；或手动设 ColumnWidth。",
+        "level": "mid"
+      },
+      {
+        "title": "先设了固定行高，后面 AutoFit 又把它改回去",
+        "reason": "AutoFit 会按内容重算，覆盖手动值。",
+        "fix": "先 AutoFit，再设固定值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "rows",
+        "kind": "companion",
+        "why": "Rows 管整行，RowHeight 是它的高度属性。"
+      },
+      {
+        "id": "columns",
+        "kind": "companion",
+        "why": "Columns 管整列，ColumnWidth 是它的宽度属性。"
+      },
+      {
+        "id": "wrap-text",
+        "kind": "companion",
+        "why": "换行内容的显示依赖行高。"
+      }
+    ],
+    "oneLiner": "调行高和列宽",
+    "summary": "RowHeight 用磅，ColumnWidth 用字符数。AutoFit 对合并单元格无效，手动固定值要放在 AutoFit 之后。"
+  },
+  {
+    "id": "merge-cells",
+    "enName": "Range.Merge",
+    "zhName": "合并单元格",
+    "alias": [
+      "Merge",
+      "UnMerge",
+      "MergeArea",
+      "合并"
+    ],
+    "keywords": [
+      "合并标题",
+      "取消合并",
+      "合并单元格取值"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Merge          ' 合并\nr.UnMerge        ' 取消合并\nr.MergeArea      ' 取合并后的整块",
+    "examples": [
+      {
+        "title": "合并标题并写入文字",
+        "code": "Sub 合并标题()\n    With Range(\"A1:D1\")\n        .Merge\n        .Value = \"2026 年销售汇总\"\n    End With\nEnd Sub",
+        "howToRun": "A1:D1 留空，按 F5。",
+        "result": "A1:D1 变成一个格子，显示标题。"
+      },
+      {
+        "title": "拆开合并并把内容填回每一格",
+        "code": "Sub 拆开填满()\n    Dim c As Range\n    With Range(\"A1:D1\")\n        .UnMerge\n        For Each c In .Cells\n            c.Value = \"2026 年销售汇总\"\n        Next c\n    End With\nEnd Sub",
+        "howToRun": "先跑上一个例子，再跑这个。",
+        "result": "四个格子各自都有标题文字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "合并后只剩左上角的值，其余全丢",
+        "reason": "Merge 默认只保留左上角单元格内容。",
+        "fix": "先把值拼好写到左上角，或用 Application.DisplayAlerts = False 明确接受丢值。",
+        "level": "high"
+      },
+      {
+        "title": "合并区域参与排序/筛选，直接报错或结果乱",
+        "reason": "Excel 的排序、筛选、透视都要求规整的单格数据。",
+        "fix": "数据区绝不合并；合并只用于标题、说明区。",
+        "level": "high"
+      },
+      {
+        "title": "对单个格子取 MergeArea，以为能判断是否合并",
+        "reason": "单格没有合并时 MergeArea 返回它自己，不是 Nothing。",
+        "fix": "判断用 r.MergeCells = True/False，或比较 r.MergeArea.Count > 1。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "horizontal-alignment",
+        "kind": "companion",
+        "why": "合并标题后一般要居中。"
+      },
+      {
+        "id": "wrap-text",
+        "kind": "confusable",
+        "why": "合并单元格的换行和行高都特殊。"
+      },
+      {
+        "id": "merge-two-sheets",
+        "kind": "companion",
+        "why": "多表合并配方与单元格合并是两回事，别搜错。"
+      }
+    ],
+    "oneLiner": "合并或拆开单元格",
+    "summary": "Merge 只保留左上角值，合并区不能排序筛选。判断是否合并看 MergeCells 或 MergeArea.Count，别拿单格 MergeArea 当判断。"
+  },
+  {
+    "id": "clear-cell-formats",
+    "enName": "Range.ClearFormats",
+    "zhName": "清除格式",
+    "alias": [
+      "ClearFormats",
+      "清格式",
+      "清除内容"
+    ],
+    "keywords": [
+      "只清格式保留内容",
+      "清空单元格",
+      "日期变数字"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.ClearFormats      ' 只清格式，保留值和公式\nr.ClearContents     ' 只清内容，保留格式\nr.Clear             ' 内容 + 格式 + 批注全清",
+    "examples": [
+      {
+        "title": "只清格式，保留数字",
+        "code": "Sub 只清格式()\n    Range(\"A2:D20\").ClearFormats\nEnd Sub",
+        "howToRun": "区域里有带颜色的单元格，按 F5。",
+        "result": "颜色、边框、数字格式都没了，值还在。"
+      },
+      {
+        "title": "清空内容但保留格式",
+        "code": "Sub 清内容()\n    Range(\"A2:D20\").ClearContents\nEnd Sub",
+        "howToRun": "区域里有值和格式，按 F5。",
+        "result": "值和公式被清掉，底色、边框、数字格式保留。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "想清内容却用了 Clear，格式也一起没了",
+        "reason": "Clear 等于 ClearContents + ClearFormats + ClearComments。",
+        "fix": "只清值用 ClearContents，只清格式用 ClearFormats。",
+        "level": "high"
+      },
+      {
+        "title": "清格式后日期变成 46000 这类数字",
+        "reason": "日期显示靠 NumberFormat，格式清掉就露出序列号。",
+        "fix": "清完重新设 NumberFormat，或改用 ClearContents。",
+        "level": "mid"
+      },
+      {
+        "title": "对 UsedRange 清格式，整表样式全毁",
+        "reason": "UsedRange 可能比你以为的大得多，包含表头、说明区。",
+        "fix": "明确写数据范围，别用 UsedRange.ClearFormats。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "cell-style",
+        "kind": "companion",
+        "why": "清格式和套样式是一对反向操作。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "数字格式也在被清除的范围内。"
+      }
+    ],
+    "oneLiner": "分层清除内容或格式",
+    "summary": "Clear 全清，ClearContents 只清值，ClearFormats 只清格式。日期一旦被清格式就会露出序列号，范围要写死别用 UsedRange。"
+  },
+  {
+    "id": "cell-style",
+    "enName": "Range.Style",
+    "zhName": "单元格样式",
+    "alias": [
+      "Style",
+      "样式",
+      "套用样式"
+    ],
+    "keywords": [
+      "套用内置样式",
+      "恢复常规样式",
+      "样式名"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Style = \"Normal\"        ' 套用现有样式名\nr.Style = ActiveWorkbook.Styles(1).Name",
+    "examples": [
+      {
+        "title": "列出当前工作簿所有样式名",
+        "code": "Sub 列样式()\n    Dim s As Style\n    For Each s In ActiveWorkbook.Styles\n        Debug.Print s.Name\n    Next s\nEnd Sub",
+        "howToRun": "按 F5，看立即窗口。",
+        "result": "打印出「常规」「货币」「百分比」等样式名（随界面语言变化）。"
+      },
+      {
+        "title": "按列表里的名字套用样式",
+        "code": "Sub 套样式()\n    Dim nm As String\n    nm = ActiveWorkbook.Styles(2).Name\n    Range(\"B2:B10\").Style = nm\nEnd Sub",
+        "howToRun": "先跑上一个例子确认样式名，再按 F5。",
+        "result": "B2:B10 套上第 2 个样式，数字格式和对齐一起变。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "写死 \"Currency\" 在中文版 Excel 报错",
+        "reason": "内置样式名随界面语言本地化，中文版可能叫「货币」。",
+        "fix": "先遍历 ActiveWorkbook.Styles 取 Name，别写死英文名。",
+        "level": "high"
+      },
+      {
+        "title": "修改样式定义，全簿同款样式一起变",
+        "reason": "Style 是工作簿级共享对象，改一次影响所有使用者。",
+        "fix": "要局部特殊外观就直接设 NumberFormat / Font / Interior，别改样式本身。",
+        "level": "high"
+      },
+      {
+        "title": "套样式把原有格式全覆盖了",
+        "reason": "Style 是一整套格式，赋值会重置字体、对齐、边框等。",
+        "fix": "只调需要的单个属性；或先记录原格式再恢复。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "clear-cell-formats",
+        "kind": "companion",
+        "why": "套样式与清格式互为反向。"
+      },
+      {
+        "id": "font",
+        "kind": "companion",
+        "why": "字体是样式的一部分。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "数字格式也是样式的一部分。"
+      }
+    ],
+    "oneLiner": "套用一整组格式",
+    "summary": "Style 是工作簿级的整套格式。样式名随语言变，别写死英文；改样式定义会影响全簿，局部需求直接调单个属性更安全。"
+  },
+  {
+    "id": "paste-special",
+    "enName": "Range.PasteSpecial",
+    "zhName": "选择性粘贴",
+    "alias": [
+      "PasteSpecial",
+      "选择性粘贴",
+      "只粘贴数值"
+    ],
+    "keywords": [
+      "只粘数值不粘公式",
+      "粘贴格式",
+      "粘贴列宽"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "目标.PasteSpecial Paste:=xlPasteValues | xlPasteFormats | xlPasteColumnWidths, Operation:=xlNone",
+    "examples": [
+      {
+        "title": "把公式结果只粘成数值",
+        "code": "Sub 只粘数值()\n    Range(\"B2:B10\").Copy\n    Range(\"C2\").PasteSpecial xlPasteValues\n    Application.CutCopyMode = False\nEnd Sub",
+        "howToRun": "B2:B10 是公式，C 列留空，按 F5。",
+        "result": "C2:C10 是纯数值，不含公式。"
+      },
+      {
+        "title": "只粘格式和列宽",
+        "code": "Sub 粘格式列宽()\n    Columns(\"B\").Copy\n    Columns(\"D\").PasteSpecial xlPasteFormats\n    Columns(\"D\").PasteSpecial xlPasteColumnWidths\n    Application.CutCopyMode = False\nEnd Sub",
+        "howToRun": "B 列有底色和自定义列宽，按 F5。",
+        "result": "D 列的底色、字体、列宽与 B 列一致，值不变。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没 Copy 就直接 PasteSpecial，报 1004",
+        "reason": "剪贴板为空时选择性粘贴没有源。",
+        "fix": "先 Copy，再 PasteSpecial；完事把 CutCopyMode 设回 False。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "粘完不关 CutCopyMode，虚线框一直闪",
+        "reason": "复制状态没退出，后续操作可能误粘。",
+        "fix": "结尾加 Application.CutCopyMode = False。",
+        "level": "mid"
+      },
+      {
+        "title": "xlPasteAll 连公式一起粘，引用全错位",
+        "reason": "默认全粘会带上公式和相对引用。",
+        "fix": "只要结果用 xlPasteValues；只要外观用 xlPasteFormats。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "只粘数值后拿到的是 Value 口径。"
+      },
+      {
+        "id": "clear-cell-formats",
+        "kind": "companion",
+        "why": "粘贴格式和清格式常成对出现。"
+      },
+      {
+        "id": "export-csv",
+        "kind": "companion",
+        "why": "导出前常先把公式粘成数值。"
+      }
+    ],
+    "oneLiner": "只粘值、格式或列宽",
+    "summary": "PasteSpecial 的关键是显式指定 Paste 类型。必须先 Copy，粘完关掉 CutCopyMode；只要结果就 xlPasteValues。"
+  },
+  {
+    "id": "listobject-rows",
+    "enName": "ListObject.ListRows",
+    "zhName": "表格行",
+    "alias": [
+      "ListRows",
+      "ListColumns",
+      "表格行"
+    ],
+    "keywords": [
+      "表格加一行",
+      "表格删行",
+      "结构化引用"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "lo.ListRows.Count       ' 数据行数（不含标题和汇总行）\nlo.ListRows.Add          ' 末尾加一行\nlo.ListRows(i).Delete    ' 删第 i 行",
+    "examples": [
+      {
+        "title": "给表格末尾加一行并填值",
+        "code": "Sub 表格加行()\n    Dim lo As ListObject\n    Set lo = Sheet1.ListObjects(\"表1\")\n    lo.ListRows.Add\n    lo.ListRows(lo.ListRows.Count).Range(1, 1).Value = \"新数据\"\nEnd Sub",
+        "howToRun": "Sheet1 上有名为「表1」的表格，按 F5。",
+        "result": "表格末尾多一行，「新数据」写进第一列，格式自动延续。"
+      },
+      {
+        "title": "倒序删掉表格里第一列为空的行",
+        "code": "Sub 表格删空行()\n    Dim lo As ListObject, i As Long\n    Set lo = Sheet1.ListObjects(1)\n    For i = lo.ListRows.Count To 1 Step -1\n        If lo.ListRows(i).Range(1, 1).Value = \"\" Then lo.ListRows(i).Delete\n    Next i\nEnd Sub",
+        "howToRun": "表格第一列留几个空行，按 F5。",
+        "result": "空行被删除，表格范围自动收缩。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把表格名当工作表名，报 9 或 1004",
+        "reason": "ListObjects(\"表1\") 里的「表1」是表格名，不是 Sheet 名。",
+        "fix": "点表格看「表格设计」里的表名；不确定就用 ListObjects(1)。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "ListRows.Count 和表格总行数对不上",
+        "reason": "ListRows 不含标题行，也不含启用中的汇总行。",
+        "fix": "要总范围用 lo.Range.Rows.Count；要数据行才用 ListRows.Count。",
+        "level": "mid"
+      },
+      {
+        "title": "用 Rows(i).Delete 删表行，表格结构被搞乱",
+        "reason": "直接删工作表行会破坏表格边界。",
+        "fix": "统一用 lo.ListRows(i).Delete。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "listobject",
+        "kind": "companion",
+        "why": "ListObject 是表格对象，ListRows 是它的行集合。"
+      },
+      {
+        "id": "autofilter",
+        "kind": "companion",
+        "why": "表格自带筛选，常一起用。"
+      },
+      {
+        "id": "current-region",
+        "kind": "alternative",
+        "why": "普通区域靠 CurrentRegion，表格靠 ListObject。"
+      }
+    ],
+    "oneLiner": "按表格结构增删行",
+    "summary": "ListRows 是表格的数据行集合，不含标题和汇总行。增删都走 ListRows，别直接删工作表行，否则表格边界会乱。"
+  }
+]

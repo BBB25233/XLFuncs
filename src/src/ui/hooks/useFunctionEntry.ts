@@ -45,18 +45,24 @@ export function useFunctionEntry(id: string | undefined): UseFunctionEntryResult
         }
         if (loaded === null) {
           setEntry(null);
-          setError('没找到这个函数');
+          // 这一支是「清单里没有这个 id」，属于正常 404，不该显示成加载失败
+          setError(null);
         } else {
           setEntry(loaded);
           pushRecent(id);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (cancelled) {
           return;
         }
         setEntry(null);
-        setError('这个函数的内容没能加载出来，请刷新页面重试');
+        // 内容包加载器抛的是带文件名/分类的中文说明，优先透出；其它异常用兜底文案
+        const message =
+          err instanceof Error && err.message !== ''
+            ? err.message
+            : '这个函数的内容没能加载出来，请刷新页面重试';
+        setError(message);
       })
       .finally(() => {
         if (!cancelled) {

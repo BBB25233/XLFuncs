@@ -1,0 +1,722 @@
+[
+  {
+    "id": "template-workbook",
+    "enName": "BatchGenerateFromTemplate",
+    "zhName": "按模板批量生成工作簿",
+    "alias": [
+      "模板批量生成",
+      "批量套模板",
+      "生成多个文件"
+    ],
+    "keywords": [
+      "一个模板生成多份",
+      "批量新建工作簿",
+      "按名单生成"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "FileCopy 模板, 新路径\nWorkbooks.Open 新路径\n写入内容后 SaveAs / Close",
+    "examples": [
+      {
+        "title": "按 A 列名单各生成一份",
+        "code": "Sub 按名单生成()\n    Dim i As Long, nm As String, src As String, dst As String\n    src = ThisWorkbook.Path & \"\\模板.xlsx\"\n    For i = 2 To Cells(Rows.Count, 1).End(xlUp).Row\n        nm = Cells(i, 1).Value\n        dst = ThisWorkbook.Path & \"\\输出\\\" & nm & \".xlsx\"\n        FileCopy src, dst\n        With Workbooks.Open(dst)\n            .Worksheets(1).Range(\"B2\").Value = nm\n            .Close SaveChanges:=True\n        End With\n    Next i\n    MsgBox \"完成\"\nEnd Sub",
+        "howToRun": "同目录放「模板.xlsx」，A2:A10 放名单，先建「输出」文件夹，按 F5。",
+        "result": "输出文件夹里每个名字一个工作簿，B2 已填名字。"
+      },
+      {
+        "title": "生成前先建输出目录",
+        "code": "Sub 建目录再生成()\n    Dim p As String\n    p = ThisWorkbook.Path & \"\\输出\"\n    If Dir(p, vbDirectory) = \"\" Then MkDir p\n    MsgBox \"目录就绪：\" & p\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "同目录出现「输出」文件夹；已存在则只提示。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "模板路径写相对路径，找不到文件",
+        "reason": "FileCopy 按当前目录解析，不是工作簿所在目录。",
+        "fix": "用 ThisWorkbook.Path 拼全路径。",
+        "level": "high"
+      },
+      {
+        "title": "名单里有重名/非法字符，文件覆盖或报错",
+        "reason": "文件名不能含 / \\ : * ? \" < > |，重名会直接覆盖。",
+        "fix": "生成前清洗文件名，并检查 Dir(dst) 是否已存在。",
+        "level": "high"
+      },
+      {
+        "title": "模板本身正被打开，FileCopy 失败",
+        "reason": "文件被占用时不能复制。",
+        "fix": "先关闭模板，或复制一份只读副本再改。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook-open",
+        "kind": "companion",
+        "why": "复制后要打开写入。"
+      },
+      {
+        "id": "save-as",
+        "kind": "companion",
+        "why": "需要换格式时用 SaveAs。"
+      },
+      {
+        "id": "batch-rename-files",
+        "kind": "companion",
+        "why": "同类批量文件操作。"
+      }
+    ],
+    "oneLiner": "一个模板批量套出多份文件",
+    "summary": "核心是 FileCopy 模板到目标名，再 Open 写入、Save 关闭。路径必须全，文件名要清洗，模板不能被占用。"
+  },
+  {
+    "id": "split-column-to-workbooks",
+    "enName": "SplitByColumnToWorkbooks",
+    "zhName": "按列拆成多个工作簿",
+    "alias": [
+      "按部门拆文件",
+      "一列拆多簿",
+      "SplitToWorkbooks"
+    ],
+    "keywords": [
+      "每个部门一个文件",
+      "按字段拆工作簿",
+      "批量拆表"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "对每个唯一值 AutoFilter → 复制可见区 → 粘贴到新工作簿 → SaveAs",
+    "examples": [
+      {
+        "title": "按 B 列部门拆成独立文件",
+        "code": "Sub 按部门拆()\n    Dim d As Object, k As Variant, rng As Range, wb As Workbook\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    Dim i As Long\n    For i = 2 To Cells(Rows.Count, 2).End(xlUp).Row\n        d(CStr(Cells(i, 2).Value)) = 1\n    Next i\n    For Each k In d.Keys\n        Range(\"A1\").AutoFilter Field:=2, Criteria1:=k\n        Set rng = Range(\"A1\").CurrentRegion.SpecialCells(xlCellTypeVisible)\n        Set wb = Workbooks.Add\n        rng.Copy wb.Worksheets(1).Range(\"A1\")\n        wb.SaveAs ThisWorkbook.Path & \"\\拆分\\\" & k & \".xlsx\", xlOpenXMLWorkbook\n        wb.Close False\n    Next k\n    Range(\"A1\").AutoFilter\n End Sub",
+        "howToRun": "B 列是部门，先建「拆分」文件夹，按 F5。",
+        "result": "每个部门生成一个 xlsx，内容只含该部门行。"
+      },
+      {
+        "title": "拆完恢复筛选状态",
+        "code": "Sub 收尾()\n    If ActiveSheet.AutoFilterMode Then ActiveSheet.AutoFilterMode = False\nEnd Sub",
+        "howToRun": "拆分结束后按 F5。",
+        "result": "表头筛选箭头和筛选状态被清除。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接复制整表，拆出来还是全量",
+        "reason": "没有只取可见单元格。",
+        "fix": "先 AutoFilter，再 CurrentRegion.SpecialCells(xlCellTypeVisible)。",
+        "level": "high"
+      },
+      {
+        "title": "部门名带 / 或空格，SaveAs 报错",
+        "reason": "文件名非法或路径被截断。",
+        "fix": "生成前替换非法字符，必要时加序号。",
+        "level": "high"
+      },
+      {
+        "title": "循环里没关新工作簿，内存里堆一堆文件",
+        "reason": "Workbooks.Add 每次新建一个。",
+        "fix": "每个循环 SaveAs 后立刻 Close False。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "autofilter",
+        "kind": "companion",
+        "why": "按列拆的核心。"
+      },
+      {
+        "id": "special-cells",
+        "kind": "companion",
+        "why": "取可见单元格。"
+      },
+      {
+        "id": "split-by-column",
+        "kind": "companion",
+        "why": "拆到当前簿的多张表版本。"
+      }
+    ],
+    "oneLiner": "每个类别拆成一个文件",
+    "summary": "先收集唯一值，再逐个筛选、复制可见区到新工作簿、另存关闭。文件名清洗和关闭释放是两个必做项。"
+  },
+  {
+    "id": "split-sheet-by-rows",
+    "enName": "SplitSheetByRows",
+    "zhName": "按行数拆分工作表",
+    "alias": [
+      "每100行拆一份",
+      "按行拆文件",
+      "分卷导出"
+    ],
+    "keywords": [
+      "大表按行拆分",
+      "每N行一个文件",
+      "分页导出"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "每 N 行复制一次 → 新工作簿 → SaveAs 带序号",
+    "examples": [
+      {
+        "title": "每 500 行拆一个文件",
+        "code": "Sub 按行拆()\n    Dim src As Worksheet, wb As Workbook, i As Long, n As Long, part As Long\n    Const STEP_ROWS As Long = 500\n    Set src = ActiveSheet\n    n = src.Cells(src.Rows.Count, 1).End(xlUp).Row\n    For i = 2 To n Step STEP_ROWS\n        part = part + 1\n        Set wb = Workbooks.Add\n        src.Rows(1).Copy wb.Worksheets(1).Rows(1)\n        src.Range(src.Cells(i, 1), src.Cells(Application.Min(i + STEP_ROWS - 1, n), 20)).Copy _\n            wb.Worksheets(1).Range(\"A2\")\n        wb.SaveAs ThisWorkbook.Path & \"\\分卷_\" & Format(part, \"00\") & \".xlsx\", xlOpenXMLWorkbook\n        wb.Close False\n    Next i\nEnd Sub",
+        "howToRun": "数据从第 2 行开始、最多 20 列，按 F5。",
+        "result": "同目录生成「分卷_01」「分卷_02」…每个 500 行数据加表头。"
+      },
+      {
+        "title": "先算要拆几份",
+        "code": "Sub 算份数()\n    Dim n As Long\n    n = Cells(Rows.Count, 1).End(xlUp).Row - 1\n    MsgBox \"共 \" & n & \" 行，需要 \" & Application.RoundUp(n / 500, 0) & \" 份\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出总行数和预计份数。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "最后一份越界，复制到不存在的行",
+        "reason": "i + 499 可能超过总行数。",
+        "fix": "用 Application.Min(i + STEP_ROWS - 1, n) 收口。",
+        "level": "high"
+      },
+      {
+        "title": "表头没复制，每份都要手动补",
+        "reason": "只复制了数据区。",
+        "fix": "每份先复制第 1 行，再粘数据。",
+        "level": "mid"
+      },
+      {
+        "title": "只按 A 列算行数，尾部空 A 的数据被截断",
+        "reason": "End(xlUp) 依赖 A 列连续。",
+        "fix": "改用 UsedRange 或找真正的主键列。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "split-column-to-workbooks",
+        "kind": "companion",
+        "why": "按列拆的兄弟配方。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "统计实际数据范围。"
+      }
+    ],
+    "oneLiner": "大表按固定行数分卷",
+    "summary": "每 N 行复制表头加数据到新工作簿，序号命名。最后一份要用 Min 收口，否则会越界复制空行。"
+  },
+  {
+    "id": "merge-all-sheets",
+    "enName": "MergeAllSheets",
+    "zhName": "多表合并到一张",
+    "alias": [
+      "所有工作表合并",
+      "汇总所有表",
+      "MergeAll"
+    ],
+    "keywords": [
+      "多张表拼一起",
+      "合并整个工作簿",
+      "汇总各月表"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "遍历 Worksheets → 从第 2 行复制到汇总表末尾 → 记录来源表名",
+    "examples": [
+      {
+        "title": "把除汇总外的表全部追加到汇总",
+        "code": "Sub 合并全部()\n    Dim ws As Worksheet, dst As Worksheet, last As Long\n    Set dst = Worksheets(\"汇总\")\n    dst.Range(\"A2:Z100000\").Clear\n    For Each ws In ThisWorkbook.Worksheets\n        If ws.Name <> dst.Name Then\n            last = dst.Cells(dst.Rows.Count, 1).End(xlUp).Row + 1\n            ws.Range(\"A2\").CurrentRegion.Offset(1, 0).Copy dst.Cells(last, 1)\n            dst.Cells(last, 26).Value = ws.Name\n        End If\n    Next ws\nEnd Sub",
+        "howToRun": "有「汇总」表且其余表结构一致，按 F5。",
+        "result": "所有表数据追加到「汇总」，Z 列记录来源表名。"
+      },
+      {
+        "title": "合并前统一表头",
+        "code": "Sub 写表头()\n    With Worksheets(\"汇总\")\n        .Range(\"A1\").Value = \"日期\"\n        .Range(\"B1\").Value = \"金额\"\n        .Range(\"Z1\").Value = \"来源表\"\n    End With\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "汇总表有统一表头，来源列在 Z1。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "各表列顺序不一样，合并后数据错列",
+        "reason": "直接按位置复制，不认表头。",
+        "fix": "先统一模板列顺序，或按表头名映射列。",
+        "level": "high"
+      },
+      {
+        "title": "把汇总表自己也复制进去，越合并越多",
+        "reason": "循环包含目标表。",
+        "fix": "循环里跳过 dst.Name。",
+        "level": "high"
+      },
+      {
+        "title": "每次都从 A2 复制，表头重复",
+        "reason": "CurrentRegion 含表头。",
+        "fix": "用 Offset(1, 0) 跳过表头。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "merge-two-sheets",
+        "kind": "companion",
+        "why": "两张表的合并版本。"
+      },
+      {
+        "id": "merge-workbooks",
+        "kind": "companion",
+        "why": "跨工作簿合并。"
+      },
+      {
+        "id": "current-region",
+        "kind": "companion",
+        "why": "取每张表的数据区。"
+      }
+    ],
+    "oneLiner": "把工作簿里所有表拼成一张",
+    "summary": "遍历工作表、跳过汇总表、从第 2 行起追加，并记录来源。列顺序不一致和把汇总表算进去，是两个最常见的坑。"
+  },
+  {
+    "id": "reconcile-two-sheets",
+    "enName": "ReconcileTwoSheets",
+    "zhName": "两张表核对差异",
+    "alias": [
+      "跨表核对",
+      "对账",
+      "找差异"
+    ],
+    "keywords": [
+      "两张表比对",
+      "核对金额",
+      "标记不一致"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "按主键用 Match 找行 → 比对金额 → 在结果列写「一致 / 差异 / 仅左表 / 仅右表」",
+    "examples": [
+      {
+        "title": "按订单号核对金额",
+        "code": "Sub 核对()\n    Dim a As Worksheet, b As Worksheet, i As Long, n As Long, p As Variant\n    Set a = Worksheets(\"系统\")\n    Set b = Worksheets(\"台账\")\n    n = a.Cells(a.Rows.Count, 1).End(xlUp).Row\n    For i = 2 To n\n        p = Application.Match(a.Cells(i, 1).Value, b.Columns(1), 0)\n        If IsError(p) Then\n            a.Cells(i, 4).Value = \"仅左表\"\n        ElseIf Abs(a.Cells(i, 2).Value - b.Cells(p, 2).Value) < 0.01 Then\n            a.Cells(i, 4).Value = \"一致\"\n        Else\n            a.Cells(i, 4).Value = \"差异：\" & b.Cells(p, 2).Value\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "左表「系统」A 订单号/B 金额，右表「台账」同结构，按 F5。",
+        "result": "「系统」D 列标出一致、差异金额或仅左表。"
+      },
+      {
+        "title": "把差异行标红",
+        "code": "Sub 标红差异()\n    Dim r As Range\n    For Each r In Worksheets(\"系统\").Range(\"D2:D\" & Worksheets(\"系统\").Cells(Rows.Count, 4).End(xlUp).Row)\n        If Left(r.Value, 2) = \"差异\" Then r.Interior.Color = vbRed\n    Next r\nEnd Sub",
+        "howToRun": "先跑核对，再按 F5。",
+        "result": "差异行 D 列红底。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "订单号是文本/数字混用，Match 找不到",
+        "reason": "“001” 与 1 不相等。",
+        "fix": "两边统一转 CStr 或统一数值化后再比。",
+        "level": "high"
+      },
+      {
+        "title": "金额直接用 = 比较，浮点误差判成差异",
+        "reason": "小数计算有精度误差。",
+        "fix": "用 Abs(差) < 0.01 这类容差判断。",
+        "level": "high"
+      },
+      {
+        "title": "只在左表循环，右表多出来的单子查不到",
+        "reason": "单向核对只覆盖左表主键。",
+        "fix": "再反向跑一次，或补「仅右表」清单。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "find",
+        "kind": "companion",
+        "why": "也可以用 Find 定位。"
+      },
+      {
+        "id": "match",
+        "kind": "companion",
+        "why": "Match 是核心查找函数。"
+      },
+      {
+        "id": "value2",
+        "kind": "companion",
+        "why": "金额比较取值。"
+      }
+    ],
+    "oneLiner": "按主键找出两张表的差异",
+    "summary": "用 Match 按主键定位，金额用容差比较，结果写「一致/差异/仅左表」。文本数字混用和浮点精度是最容易翻车的地方。"
+  },
+  {
+    "id": "batch-insert-pictures",
+    "enName": "BatchInsertPictures",
+    "zhName": "批量插入图片",
+    "alias": [
+      "按文件名插图",
+      "批量加图片",
+      "InsertPictures"
+    ],
+    "keywords": [
+      "一列文件名批量插图",
+      "产品图批量插入",
+      "图片对齐单元格"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "遍历文件名 → Shapes.AddPicture 放到对应行 → 统一尺寸",
+    "examples": [
+      {
+        "title": "按 B 列文件名插入到 C 列",
+        "code": "Sub 批量插图()\n    Dim i As Long, p As String, sh As Shape\n    For i = 2 To Cells(Rows.Count, 2).End(xlUp).Row\n        p = ThisWorkbook.Path & \"\\图片\\\" & Cells(i, 2).Value\n        If Dir(p) <> \"\" Then\n            Set sh = ActiveSheet.Shapes.AddPicture(p, msoFalse, msoTrue, _\n                Cells(i, 3).Left, Cells(i, 3).Top, 80, 80)\n            sh.Placement = xlMoveAndSize\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "B2:B20 是图片文件名，同目录有「图片」文件夹，按 F5。",
+        "result": "C 列每行出现对应图片，大小 80×80。"
+      },
+      {
+        "title": "先检查缺图清单",
+        "code": "Sub 查缺图()\n    Dim i As Long, p As String\n    For i = 2 To Cells(Rows.Count, 2).End(xlUp).Row\n        p = ThisWorkbook.Path & \"\\图片\\\" & Cells(i, 2).Value\n        If Dir(p) = \"\" Then Cells(i, 4).Value = \"缺图\"\n    Next i\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "D 列标出找不到文件的那些行。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "文件名不带扩展名，AddPicture 找不到",
+        "reason": "路径必须含 .jpg/.png 等后缀。",
+        "fix": "B 列直接存完整文件名，或代码里补后缀。",
+        "level": "high"
+      },
+      {
+        "title": "图片尺寸按磅写，和单元格像素对不上",
+        "reason": "AddPicture 的宽高单位是磅。",
+        "fix": "按单元格宽高换算，或插入后统一 Resize。",
+        "level": "mid"
+      },
+      {
+        "title": "几百张图全插进去，文件暴涨",
+        "reason": "原图未压缩，且嵌入工作簿。",
+        "fix": "先压到目标尺寸再插入，或只存链接（AddPicture 的 LinkToFile）。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "shape-add",
+        "kind": "companion",
+        "why": "AddPicture 也是 Shape。"
+      },
+      {
+        "id": "shape-position",
+        "kind": "companion",
+        "why": "对齐单元格靠 Left/Top。"
+      },
+      {
+        "id": "export-charts-as-images",
+        "kind": "companion",
+        "why": "图片导出的反向操作。"
+      }
+    ],
+    "oneLiner": "按名单把图片贴到单元格旁",
+    "summary": "路径要带扩展名，AddPicture 的宽高按磅算。批量插图前先查缺图，数量大要先压图，否则文件会非常大。"
+  },
+  {
+    "id": "export-charts-as-images",
+    "enName": "ExportChartsAsImages",
+    "zhName": "导出图表为图片",
+    "alias": [
+      "图表导出PNG",
+      "Chart.Export",
+      "批量导图"
+    ],
+    "keywords": [
+      "图表存成图片",
+      "导出PNG",
+      "批量图表截图"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "co.Chart.Export 文件路径, \"PNG\"",
+    "examples": [
+      {
+        "title": "把当前表图表导成 PNG",
+        "code": "Sub 导图表()\n    Dim co As ChartObject, i As Long\n    For Each co In ActiveSheet.ChartObjects\n        i = i + 1\n        co.Chart.Export ThisWorkbook.Path & \"\\图表_\" & i & \".png\", \"PNG\"\n    Next co\n    MsgBox \"导出 \" & i & \" 张\"\nEnd Sub",
+        "howToRun": "表里有图表时按 F5。",
+        "result": "同目录生成「图表_1.png」等文件。"
+      },
+      {
+        "title": "导出前统一图表大小",
+        "code": "Sub 统一大小再导()\n    Dim co As ChartObject\n    For Each co In ActiveSheet.ChartObjects\n        co.Width = 640\n        co.Height = 360\n    Next co\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "所有图表变成 640×360，再导出更整齐。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "导出路径目录不存在，Export 报错",
+        "reason": "Chart.Export 不会自动建目录。",
+        "fix": "先 Dir 检查并 MkDir。",
+        "level": "high"
+      },
+      {
+        "title": "文件名重复，后面的覆盖前面的",
+        "reason": "循环里没用唯一序号。",
+        "fix": "用 i 或图表名拼文件名。",
+        "level": "mid"
+      },
+      {
+        "title": "图表被遮挡/未激活，导出内容不完整",
+        "reason": "导出按图表对象自身渲染，通常不受遮挡，但隐藏图表会失败。",
+        "fix": "确保图表 Visible，必要时先激活所在表。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "chart-object",
+        "kind": "companion",
+        "why": "遍历图表对象。"
+      },
+      {
+        "id": "chart-add",
+        "kind": "companion",
+        "why": "没有图表先创建。"
+      }
+    ],
+    "oneLiner": "把图表批量存成图片",
+    "summary": "Chart.Export 直接输出 PNG，路径目录必须先存在，文件名要带序号。导出前统一图表尺寸，成品更整齐。"
+  },
+  {
+    "id": "batch-rename-files",
+    "enName": "BatchRenameFiles",
+    "zhName": "批量重命名文件",
+    "alias": [
+      "批量改名",
+      "文件重命名",
+      "Name As"
+    ],
+    "keywords": [
+      "按表格名单改名",
+      "批量改文件名",
+      "文件编号重排"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Name 旧全路径 As 新全路径",
+    "examples": [
+      {
+        "title": "按 A 列旧名、B 列新名改名",
+        "code": "Sub 批量改名()\n    Dim i As Long, oldP As String, newP As String\n    For i = 2 To Cells(Rows.Count, 1).End(xlUp).Row\n        oldP = ThisWorkbook.Path & \"\\\" & Cells(i, 1).Value\n        newP = ThisWorkbook.Path & \"\\\" & Cells(i, 2).Value\n        If Dir(oldP) <> \"\" And Dir(newP) = \"\" Then\n            Name oldP As newP\n            Cells(i, 3).Value = \"成功\"\n        Else\n            Cells(i, 3).Value = \"跳过\"\n        End If\n    Next i\nEnd Sub",
+        "howToRun": "A 旧文件名、B 新文件名都在同目录，按 F5。",
+        "result": "C 列标记成功/跳过，文件被改名。"
+      },
+      {
+        "title": "统一加前缀",
+        "code": "Sub 加前缀()\n    Dim f As String, i As Long\n    i = 1\n    f = Dir(ThisWorkbook.Path & \"\\*.xlsx\")\n    Do While f <> \"\"\n        If f <> ThisWorkbook.Name Then Name ThisWorkbook.Path & \"\\\" & f As ThisWorkbook.Path & \"\\备份_\" & f\n        i = i + 1\n        f = Dir\n    Loop\nEnd Sub",
+        "howToRun": "同目录有多个 xlsx 时按 F5。",
+        "result": "除当前文件外，其余 xlsx 都加上「备份_」前缀。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "目标名已存在，Name 直接覆盖或报错",
+        "reason": "Windows 下同名文件会被替换（视权限）。",
+        "fix": "改名前先 Dir(newP) 判断，存在就跳过。",
+        "level": "high"
+      },
+      {
+        "title": "只写文件名不写路径，按当前目录找",
+        "reason": "Name 需要完整路径。",
+        "fix": "统一用 ThisWorkbook.Path 拼。",
+        "level": "high"
+      },
+      {
+        "title": "新旧名交叉，改到一半互相覆盖",
+        "reason": "A→B、B→A 这类顺序会冲突。",
+        "fix": "先全部改成临时名，再改成目标名。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "workbook-path",
+        "kind": "companion",
+        "why": "拼路径。"
+      },
+      {
+        "id": "template-workbook",
+        "kind": "companion",
+        "why": "同类批量文件操作。"
+      }
+    ],
+    "oneLiner": "按清单成批改文件名",
+    "summary": "Name 旧全路径 As 新全路径 就能改名。目标存在要跳过，交叉改名要先过渡到临时名。"
+  },
+  {
+    "id": "batch-convert-workbooks",
+    "enName": "BatchConvertWorkbooks",
+    "zhName": "批量转换文件格式",
+    "alias": [
+      "xls转xlsx",
+      "批量转格式",
+      "SaveAs 转换"
+    ],
+    "keywords": [
+      "老文件转新格式",
+      "批量另存xlsx",
+      "格式升级"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Workbooks.Open 旧文件 → SaveAs 新扩展名 + FileFormat → Close",
+    "examples": [
+      {
+        "title": "把目录下 xls 全部转 xlsx",
+        "code": "Sub 批量转()\n    Dim f As String, wb As Workbook, i As Long\n    f = Dir(ThisWorkbook.Path & \"\\*.xls\")\n    Do While f <> \"\"\n        Set wb = Workbooks.Open(ThisWorkbook.Path & \"\\\" & f, ReadOnly:=False)\n        wb.SaveAs ThisWorkbook.Path & \"\\\" & Left(f, Len(f) - 4) & \".xlsx\", xlOpenXMLWorkbook\n        wb.Close False\n        i = i + 1\n        f = Dir\n    Loop\n    MsgBox \"转换 \" & i & \" 个\"\nEnd Sub",
+        "howToRun": "同目录放 .xls 文件，按 F5。",
+        "result": "每个 .xls 旁边生成同名 .xlsx。"
+      },
+      {
+        "title": "转换前先确认格式常量",
+        "code": "Sub 看常量()\n    MsgBox \"xlsx = \" & xlOpenXMLWorkbook & vbCrLf & \"xlsm = \" & xlOpenXMLWorkbookMacroEnabled\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "弹出两种格式的常量值，便于核对。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把带宏的 xls 转成 xlsx，宏全丢",
+        "reason": "xlsx 不保存 VBA 工程。",
+        "fix": "带宏文件用 xlOpenXMLWorkbookMacroEnabled 存成 xlsm。",
+        "level": "high"
+      },
+      {
+        "title": "Dir 循环里 Open 文件，Dir 状态被打断",
+        "reason": "同一进程里 Open 可能影响 Dir 枚举。",
+        "fix": "先把文件名收集到数组/字典，再逐个处理。",
+        "level": "mid"
+      },
+      {
+        "title": "同名 xlsx 已存在，SaveAs 弹确认",
+        "reason": "目标文件存在。",
+        "fix": "转换前检查 Dir，或临时关 DisplayAlerts 并明确覆盖策略。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "save-as",
+        "kind": "companion",
+        "why": "格式转换靠 SaveAs。"
+      },
+      {
+        "id": "workbook-open",
+        "kind": "companion",
+        "why": "逐个打开旧文件。"
+      },
+      {
+        "id": "batch-rename-files",
+        "kind": "companion",
+        "why": "同类批量文件处理。"
+      }
+    ],
+    "oneLiner": "把一批老格式文件转成新格式",
+    "summary": "Open 旧文件、SaveAs 新格式、Close。带宏必须存 xlsm，Dir 枚举中途打开文件容易乱，先收集名单更稳。"
+  },
+  {
+    "id": "batch-protect-sheets",
+    "enName": "BatchProtectSheets",
+    "zhName": "批量保护工作表",
+    "alias": [
+      "所有表加保护",
+      "批量加密工作表",
+      "ProtectAll"
+    ],
+    "keywords": [
+      "一次保护多张表",
+      "统一加密码",
+      "锁定所有表"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "遍历 Worksheets → Protect 密码 + UserInterfaceOnly",
+    "examples": [
+      {
+        "title": "给除汇总外的表统一加保护",
+        "code": "Sub 批量保护()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        If ws.Name <> \"汇总\" Then\n            ws.Protect Password:=\"1234\", UserInterfaceOnly:=True, _\n                AllowFiltering:=True, AllowSorting:=True\n        End If\n    Next ws\n    MsgBox \"已保护\"\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "除「汇总」外表全部保护，仍可筛选排序。"
+      },
+      {
+        "title": "批量解除保护",
+        "code": "Sub 批量解除()\n    Dim ws As Worksheet\n    For Each ws In ThisWorkbook.Worksheets\n        On Error Resume Next\n        ws.Unprotect Password:=\"1234\"\n        On Error GoTo 0\n    Next ws\nEnd Sub",
+        "howToRun": "密码一致时按 F5。",
+        "result": "所有表保护被解除；密码不对的表保持原状。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "保护后宏也写不进去",
+        "reason": "默认保护对 VBA 同样生效。",
+        "fix": "Protect 时加 UserInterfaceOnly:=True，且每次打开工作簿重设。",
+        "level": "high"
+      },
+      {
+        "title": "密码写死在代码里，谁都能看到",
+        "reason": "VBA 工程本身可被查看。",
+        "fix": "敏感场景不要用弱密码，或改用只读建议 + 结构保护组合。",
+        "level": "mid"
+      },
+      {
+        "title": "对已保护的表重复 Protect，报错",
+        "reason": "重复保护会失败。",
+        "fix": "先 On Error Resume Next 或判断 ProtectContents。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet-protect",
+        "kind": "companion",
+        "why": "单表保护的属性细节。"
+      },
+      {
+        "id": "worksheet-visible",
+        "kind": "companion",
+        "why": "保护与隐藏常一起。"
+      }
+    ],
+    "oneLiner": "一次给多张表加保护",
+    "summary": "循环 Protect 可批量锁表，但要开 UserInterfaceOnly 否则宏也写不进去。重复保护和密码管理是两个现实坑。"
+  }
+]

@@ -1,0 +1,801 @@
+[
+  {
+    "id": "value2",
+    "enName": "Range.Value2",
+    "zhName": "值（无格式）",
+    "alias": [
+      "Value2",
+      "取数值",
+      "日期序列号"
+    ],
+    "keywords": [
+      "取日期真实数值",
+      "金额不带格式",
+      "Value 和 Value2 区别"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Value2        ' 原始值：日期=序列号，金额=纯数字\nr.Value         ' 带类型的值：日期=Date\nr.Text          ' 显示出来的字符串",
+    "examples": [
+      {
+        "title": "看清 Value、Value2、Text 的差别",
+        "code": "Sub 三种取值()\n    Dim r As Range\n    For Each r In Range(\"A2:A5\")\n        Debug.Print r.Text, r.Value, r.Value2\n    Next r\nEnd Sub",
+        "howToRun": "A2:A5 放几个日期（如 2026/11/28），按 F5 看立即窗口。",
+        "result": "Text 是格式化字符串；Value 是 Date；Value2 是 46000 左右的序列号。"
+      },
+      {
+        "title": "用 Value2 算税额，避开日期类型报错",
+        "code": "Sub 算税额()\n    Dim r As Range\n    For Each r In Range(\"B2:B5\")\n        r.Offset(0, 1).Value2 = r.Value2 * 0.06\n    Next r\nEnd Sub",
+        "howToRun": "B2:B5 放金额，C 列留空，按 F5。",
+        "result": "C2:C5 写入税额；即使 B 列是货币格式，读到的也是纯数字。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "拿 Value 直接做算术，日期列报「类型不匹配」13",
+        "reason": "日期格式单元格的 Value 返回 Date 类型，和数字相乘会报 13。",
+        "fix": "改用 Value2（日期变序列号），或先 CDbl(r.Value)。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "以为 Value2 会带上单元格格式",
+        "reason": "Value2 只取值，不带货币符号、千分位、日期显示格式。",
+        "fix": "要显示成什么样，另外设 NumberFormat；要字符串用 r.Text。",
+        "level": "mid"
+      },
+      {
+        "title": "对整块区域直接写 Value2 做判断",
+        "reason": "多单元格的 Value2 返回二维数组，不能直接和单个值比较。",
+        "fix": "逐格遍历，或把数组接进 Variant 再处理。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "value",
+        "kind": "companion",
+        "why": "Value 与 Value2 是同一属性的两种口径。"
+      },
+      {
+        "id": "formula",
+        "kind": "companion",
+        "why": "取值和取公式是两条线，别混。"
+      },
+      {
+        "id": "date-precision",
+        "kind": "companion",
+        "why": "日期本质是序列号，精度问题在概念条目里讲透。"
+      }
+    ],
+    "oneLiner": "取不带格式的原始值",
+    "summary": "Value2 是最稳的取值方式：日期给序列号、金额给纯数字。要做计算优先 Value2，要显示格式才用 Text。"
+  },
+  {
+    "id": "formula-r1c1",
+    "enName": "Range.FormulaR1C1",
+    "zhName": "R1C1 公式",
+    "alias": [
+      "FormulaR1C1",
+      "R1C1",
+      "相对公式"
+    ],
+    "keywords": [
+      "循环里写公式",
+      "整列填公式",
+      "相对引用公式"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.FormulaR1C1 = \"=RC[-1]*2\"    ' RC 是本行本列，方括号是相对偏移",
+    "examples": [
+      {
+        "title": "一次给整列填相对公式",
+        "code": "Sub 整列填公式()\n    Dim lastRow As Long\n    lastRow = Cells(Rows.Count, 2).End(xlUp).Row\n    Range(\"D2:D\" & lastRow).FormulaR1C1 = \"=RC[-2]*RC[-1]\"\nEnd Sub",
+        "howToRun": "B、C 列有数字，D 列空，按 F5。",
+        "result": "D2 起每行都是「同行 B 列 × 同行 C 列」，不用逐行改公式。"
+      },
+      {
+        "title": "循环里用 R1C1 写求和",
+        "code": "Sub 逐行写公式()\n    Dim i As Long\n    For i = 2 To 10\n        Cells(i, 5).FormulaR1C1 = \"=SUM(RC[-3]:RC[-1])\"\n    Next i\nEnd Sub",
+        "howToRun": "B:D 列有数字，按 F5。",
+        "result": "E2:E10 每行都是本行 B 到 D 的求和。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 A1 写法塞进 FormulaR1C1，报 1004",
+        "reason": "FormulaR1C1 只认 R1C1 语法，写成 \"=B2*C2\" 会被判非法。",
+        "fix": "要么改用 .Formula 写 A1 引用，要么把引用换成 RC[-2] 这种相对写法。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "R1C1 写成 R[0]C[-1] 就报错",
+        "reason": "同一行同一列直接写 RC；只有偏移才用方括号。",
+        "fix": "同行左侧一列写 RC[-1]，上一行同列写 R[-1]C。",
+        "level": "mid"
+      },
+      {
+        "title": "单元格是「文本」格式，写完公式只显示字符串",
+        "reason": "文本格式下写入的公式不会参与计算。",
+        "fix": "先把 NumberFormat 设为 \"General\"，再写公式。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "formula",
+        "kind": "companion",
+        "why": "Formula 写 A1，FormulaR1C1 写相对引用。"
+      },
+      {
+        "id": "relative-absolute-reference",
+        "kind": "companion",
+        "why": "R1C1 是相对引用的另一种写法。"
+      }
+    ],
+    "oneLiner": "用相对坐标批量写公式",
+    "summary": "FormulaR1C1 用「本行本列 + 偏移」描述引用，最适合整列填公式和循环写公式，不用拼接行号。"
+  },
+  {
+    "id": "range-address",
+    "enName": "Range.Address",
+    "zhName": "单元格地址",
+    "alias": [
+      "Address",
+      "地址",
+      "绝对引用地址"
+    ],
+    "keywords": [
+      "取单元格地址",
+      "去掉美元符号",
+      "外部引用地址"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Address([RowAbsolute], [ColumnAbsolute], [ReferenceStyle], [External])",
+    "examples": [
+      {
+        "title": "取绝对地址、相对地址和行列号",
+        "code": "Sub 打印地址()\n    Dim r As Range\n    Set r = Range(\"B5\")\n    Debug.Print r.Address          ' $B$5\n    Debug.Print r.Address(0, 0)    ' B5\n    Debug.Print r.Row, r.Column\nEnd Sub",
+        "howToRun": "按 F5，看立即窗口。",
+        "result": "第一行 $B$5；第二行 B5；第三行 5 和 2。"
+      },
+      {
+        "title": "取带工作簿名的外部地址",
+        "code": "Sub 取外部地址()\n    Dim r As Range\n    Set r = ThisWorkbook.Worksheets(\"数据\").Range(\"A1\")\n    Debug.Print r.Address(External:=True)\nEnd Sub",
+        "howToRun": "先建名为「数据」的工作表，按 F5。",
+        "result": "输出类似 [工作簿.xlsm]数据!$A$1，可直接粘到别的公式里。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "拿 Address 当纯地址做字符串比较，永远对不上",
+        "reason": "默认带 $，Range(\"A1\").Address 是 \"$A$1\"。",
+        "fix": "比较前统一用 r.Address(0, 0)，或直接用 r.Row / r.Column。",
+        "level": "mid"
+      },
+      {
+        "title": "用 Address 拼 Range 时把 $ 也带进去",
+        "reason": "拼多区域字符串时，带 $ 的地址容易拼出非法引用。",
+        "fix": "拼区域用 r.Address(0, 0)，或 Range(Cells(1, 1), Cells(2, 2))。",
+        "level": "mid"
+      },
+      {
+        "title": "外部地址在未保存的新工作簿里名字很怪",
+        "reason": "未保存时工作簿名是「工作簿1」，External 地址会带上这个临时名。",
+        "fix": "先保存再取；同簿内直接 Set 对象引用，不必绕地址字符串。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Address 是 Range 的门牌号，配套使用。"
+      },
+      {
+        "id": "address",
+        "kind": "companion",
+        "why": "同族的 ADDRESS 函数是拼地址的另一条路。"
+      }
+    ],
+    "oneLiner": "取单元格的门牌号",
+    "summary": "Address 输出 \"$B$5\" 这类地址字符串。默认带 $，要无 $ 的地址用 Address(0, 0)，要跨簿引用加 External:=True。"
+  },
+  {
+    "id": "area-count",
+    "enName": "Range.Count",
+    "zhName": "区域计数",
+    "alias": [
+      "Count",
+      "CountA",
+      "非空计数"
+    ],
+    "keywords": [
+      "选区有多少格",
+      "数非空单元格",
+      "区域行数"
+    ],
+    "kind": "member",
+    "level": 1,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Count              ' 区域里的单元格个数（含空白）\nr.Rows.Count         ' 区域行数\nApplication.CountA(r) ' 非空单元格个数",
+    "examples": [
+      {
+        "title": "数选区有多少格、多少行",
+        "code": "Sub 数选区()\n    Dim r As Range\n    Set r = Selection\n    MsgBox \"格子数：\" & r.Count & Chr(10) & \"行数：\" & r.Rows.Count\nEnd Sub",
+        "howToRun": "先选一块区域（如 B2:D10），按 F5。",
+        "result": "格子数 27，行数 9。"
+      },
+      {
+        "title": "数一列里有多少非空",
+        "code": "Sub 数非空()\n    Dim r As Range\n    Set r = Range(\"A2:A100\")\n    MsgBox \"非空：\" & Application.CountA(r)\nEnd Sub",
+        "howToRun": "A2:A100 填一些值、留一些空，按 F5。",
+        "result": "只数有内容的格子，空白不计。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "把 Count 当数据行数，得到 1048576",
+        "reason": "Range(\"A:A\").Count 是整列格子数，不是已用行数。",
+        "fix": "数据末行用 Cells(Rows.Count, 1).End(xlUp).Row。",
+        "level": "high"
+      },
+      {
+        "title": "Count 把空白格也算进去",
+        "reason": "Count 数的是区域大小，不是有内容的格子。",
+        "fix": "要数非空用 Application.CountA(r)；要数数字用 Count。",
+        "level": "mid"
+      },
+      {
+        "title": "CountA 把空文本 \"\" 也当非空",
+        "reason": "CountA 只判断「非空」，=\"\" 返回的空文本也算一个。",
+        "fix": "严格判空用 Len(r.Value) > 0，并排除错误值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "Count 是区域大小，UsedRange 是已用范围。"
+      },
+      {
+        "id": "cells",
+        "kind": "companion",
+        "why": "Cells(Rows.Count, 1).End(xlUp) 是常用的末行写法。"
+      }
+    ],
+    "oneLiner": "数区域有多大、有多少非空",
+    "summary": "Count 数格子数（含空白），CountA 数非空。最容易错的是把 Count 当数据行数，整列一取就是 1048576。"
+  },
+  {
+    "id": "current-region",
+    "enName": "Range.CurrentRegion",
+    "zhName": "当前数据块",
+    "alias": [
+      "CurrentRegion",
+      "当前区域",
+      "数据块"
+    ],
+    "keywords": [
+      "选中整块数据",
+      "自动识别数据范围",
+      "复制整个表"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.CurrentRegion    ' 从 r 向外扩展到空行空列为止的一块",
+    "examples": [
+      {
+        "title": "复制整块数据到备份表",
+        "code": "Sub 整块复制()\n    Dim r As Range\n    Set r = Range(\"A1\").CurrentRegion\n    r.Copy Destination:=Worksheets(\"备份\").Range(\"A1\")\nEnd Sub",
+        "howToRun": "A1 开始有一块连续数据，且存在「备份」表，按 F5。",
+        "result": "整块（含标题）被复制到备份表 A1。"
+      },
+      {
+        "title": "遍历整块的某一列做标红",
+        "code": "Sub 遍历整块()\n    Dim r As Range, c As Range\n    Set r = Range(\"A1\").CurrentRegion\n    For Each c In r.Columns(3).Cells\n        If IsNumeric(c.Value) And c.Value < 0 Then c.Interior.Color = vbRed\n    Next c\nEnd Sub",
+        "howToRun": "A1 起有连续数据，第 3 列有负数，按 F5。",
+        "result": "第 3 列的负数单元格变红。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "数据中间有空行或空列，只圈到一半",
+        "reason": "CurrentRegion 遇到整行/整列空白就停。",
+        "fix": "先删空行空列，或改用 UsedRange / 自己算末行末列。",
+        "level": "high"
+      },
+      {
+        "title": "给整表加了边框，CurrentRegion 把空白也圈进来",
+        "reason": "边框会让空白格被视为「有内容」，区域被撑大。",
+        "fix": "别对整表加边框；或明确用 Resize 修正范围。",
+        "level": "mid"
+      },
+      {
+        "title": "把标题行一起复制进汇总，多出一行",
+        "reason": "CurrentRegion 含表头。",
+        "fix": "复制数据体用 r.Offset(1, 0).Resize(r.Rows.Count - 1, r.Columns.Count)。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "CurrentRegion 是连续块，UsedRange 是全表已用范围。"
+      },
+      {
+        "id": "end-xldown",
+        "kind": "companion",
+        "why": "判断末行常配合 End(xlUp)。"
+      },
+      {
+        "id": "listobject",
+        "kind": "alternative",
+        "why": "数据做成表格后，直接用 ListObject.Range 更稳。"
+      }
+    ],
+    "oneLiner": "一圈圈扩出连续数据块",
+    "summary": "CurrentRegion 从起点向四周扩到空行空列为止，是整块复制/遍历最省事的写法，但空白和边框会骗它。"
+  },
+  {
+    "id": "areas",
+    "enName": "Range.Areas",
+    "zhName": "多个选区",
+    "alias": [
+      "Areas",
+      "多区域",
+      "不连续选区"
+    ],
+    "keywords": [
+      "多个选区分别处理",
+      "不连续区域求和",
+      "按住 Ctrl 选的区域"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Areas.Count       ' 有几个不连续块\nFor Each a In r.Areas ...",
+    "examples": [
+      {
+        "title": "多个不连续选区分别求和",
+        "code": "Sub 多个选区求和()\n    Dim a As Range, total As Double\n    For Each a In Selection.Areas\n        total = total + Application.Sum(a)\n    Next a\n    MsgBox total\nEnd Sub",
+        "howToRun": "按住 Ctrl 选两三块区域（可以不相邻），按 F5。",
+        "result": "弹出一块的合计。"
+      },
+      {
+        "title": "只给每个选区里的可见单元格上色",
+        "code": "Sub 给可见格上色()\n    Dim a As Range\n    For Each a In Selection.Areas\n        a.SpecialCells(xlCellTypeVisible).Interior.Color = vbYellow\n    Next a\nEnd Sub",
+        "howToRun": "筛选后有隐藏行，选中区域再按 F5。",
+        "result": "只有看得见的格子变黄，隐藏行不动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对 Selection 直接 .Value 赋值，多选区只写第一块",
+        "reason": "不连续选区不能一次性整体赋值，只有第一块生效。",
+        "fix": "For Each a In Selection.Areas 逐块处理。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Areas 会自动跳过隐藏行",
+        "reason": "Areas 只按不连续块切分，隐藏行仍算在块里。",
+        "fix": "要跳过隐藏行用 a.SpecialCells(xlCellTypeVisible)。",
+        "level": "mid"
+      },
+      {
+        "title": "依赖 Areas 的顺序做对应写入",
+        "reason": "Areas 的返回顺序不保证和选择顺序一致。",
+        "fix": "别按序号对应，改为按地址或按内容判断。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "range",
+        "kind": "companion",
+        "why": "Areas 是 Range 的多块视图。"
+      },
+      {
+        "id": "special-cells",
+        "kind": "companion",
+        "why": "可见单元格要靠 SpecialCells 取。"
+      },
+      {
+        "id": "selection-clipboard",
+        "kind": "companion",
+        "why": "Selection 多选区场景在概念条目里有补充。"
+      }
+    ],
+    "oneLiner": "拆开不连续的选区",
+    "summary": "Areas 把一个 Range 拆成若干个连续块。多选区赋值、分别求和、只处理可见格，都必须先 For Each Areas。"
+  },
+  {
+    "id": "entire-row-column",
+    "enName": "Range.EntireRow / EntireColumn",
+    "zhName": "整行整列",
+    "alias": [
+      "EntireRow",
+      "EntireColumn",
+      "整行整列"
+    ],
+    "keywords": [
+      "整列设置格式",
+      "整行删除",
+      "扩展成整行"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.EntireRow        ' 把 r 扩成它所在的整行\nr.EntireColumn     ' 把 r 扩成它所在的整列",
+    "examples": [
+      {
+        "title": "整列设两位小数并自适应列宽",
+        "code": "Sub 整列设格式()\n    Columns(\"C\").NumberFormat = \"0.00\"\n    Columns(\"D\").EntireColumn.AutoFit\nEnd Sub",
+        "howToRun": "C、D 列有数字，按 F5。",
+        "result": "C 列显示两位小数，D 列按内容调宽。"
+      },
+      {
+        "title": "倒序删除整行为空的行",
+        "code": "Sub 删空行()\n    Dim i As Long\n    For i = 20 To 2 Step -1\n        If Cells(i, 1).Value = \"\" Then Rows(i).EntireRow.Delete\n    Next i\nEnd Sub",
+        "howToRun": "A2:A20 里留几个空行，按 F5。",
+        "result": "A 列为空的行被删掉，其余行上移。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对整列设置格式，文件突然变卡变大",
+        "reason": "EntireColumn 作用于 1048576 行，格式会被写到整列。",
+        "fix": "只格式化实际数据范围，如 Range(\"C2:C\" & lastRow)。",
+        "level": "high"
+      },
+      {
+        "title": "正序删行，后面的行被跳过",
+        "reason": "删掉第 i 行后，原来的第 i+1 行补上来，循环却已到 i+1。",
+        "fix": "删除类操作一律 For i = last To 1 Step -1。",
+        "level": "high"
+      },
+      {
+        "title": "区域里有合并单元格，整行删除报 1004",
+        "reason": "合并单元格跨行时无法整行删除。",
+        "fix": "先 UnMerge 再删，或改成清除内容。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "rows",
+        "kind": "companion",
+        "why": "Rows 直接按行号取整行。"
+      },
+      {
+        "id": "columns",
+        "kind": "companion",
+        "why": "Columns 直接按列号取整列。"
+      },
+      {
+        "id": "delete-empty-rows",
+        "kind": "companion",
+        "why": "删空行配方就是倒序 + EntireRow.Delete。"
+      }
+    ],
+    "oneLiner": "把单元格扩成整行整列",
+    "summary": "EntireRow / EntireColumn 把任意区域扩展成整行整列。设置格式只对数据范围做，删除务必倒序，否则会漏行。"
+  },
+  {
+    "id": "find-next",
+    "enName": "Range.FindNext",
+    "zhName": "继续查找",
+    "alias": [
+      "FindNext",
+      "找下一个",
+      "循环查找"
+    ],
+    "keywords": [
+      "找出所有匹配",
+      "连续查找",
+      "查找下一处"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Set r = rng.FindNext(r)   ' 从 r 之后继续按上次条件找",
+    "examples": [
+      {
+        "title": "找出 A 列全部「完成」并打印地址",
+        "code": "Sub 找全部()\n    Dim r As Range, first As String\n    Set r = Range(\"A:A\").Find(\"完成\")\n    If r Is Nothing Then Exit Sub\n    first = r.Address\n    Do\n        Debug.Print r.Address\n        Set r = Range(\"A:A\").FindNext(r)\n    Loop While r.Address <> first\nEnd Sub",
+        "howToRun": "A 列放几个「完成」，按 F5。",
+        "result": "立即窗口逐行打印所有命中的地址，然后停止。"
+      },
+      {
+        "title": "从指定单元格之后开始找",
+        "code": "Sub 从中间找()\n    Dim r As Range\n    Set r = Range(\"A1\").Find(\"张\", After:=Range(\"A10\"))\n    If Not r Is Nothing Then MsgBox r.Address\nEnd Sub",
+        "howToRun": "A 列放几个姓张的，按 F5。",
+        "result": "弹出 A10 之后第一处「张」的地址。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "FindNext 不判 first，死循环卡死 Excel",
+        "reason": "FindNext 会绕回起点继续找，没有终止条件就永远循环。",
+        "fix": "先记 first = r.Address，循环条件写 While r.Address <> first。",
+        "level": "high"
+      },
+      {
+        "title": "找不到时直接 r.Address，报 91",
+        "reason": "Find 没命中返回 Nothing。",
+        "fix": "先 If r Is Nothing Then Exit Sub。",
+        "level": "high",
+        "errorCode": "91"
+      },
+      {
+        "title": "换了查找条件，FindNext 还在用上一次的",
+        "reason": "Find 的参数会被记住，FindNext 不带参数，沿用上次设置。",
+        "fix": "每次重新查找都完整写一遍 Find 参数，或先 Application.FindFormat.Clear。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "find",
+        "kind": "companion",
+        "why": "Find 找第一处，FindNext 找下一处。"
+      },
+      {
+        "id": "range-replace",
+        "kind": "companion",
+        "why": "批量替换和批量查找常一起用。"
+      }
+    ],
+    "oneLiner": "接着上一处继续找",
+    "summary": "FindNext 靠「记住上次条件」继续找，所以必须自己保存第一处地址做终止判断，否则一定死循环。"
+  },
+  {
+    "id": "special-cells",
+    "enName": "Range.SpecialCells",
+    "zhName": "定位特殊单元格",
+    "alias": [
+      "SpecialCells",
+      "定位",
+      "空单元格"
+    ],
+    "keywords": [
+      "一次选中所有空单元格",
+      "选中所有公式",
+      "定位可见单元格"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.SpecialCells(xlCellTypeBlanks | xlCellTypeFormulas | xlCellTypeVisible | xlCellTypeLastCell)",
+    "examples": [
+      {
+        "title": "把所有空白格一次填 0",
+        "code": "Sub 空填零()\n    Dim r As Range\n    On Error Resume Next\n    Set r = Range(\"A2:D20\").SpecialCells(xlCellTypeBlanks)\n    On Error GoTo 0\n    If r Is Nothing Then Exit Sub\n    r.Value = 0\nEnd Sub",
+        "howToRun": "A2:D20 留一些空格，按 F5。",
+        "result": "所有空白格被写成 0，有内容的格子不动。"
+      },
+      {
+        "title": "数一块区域里有多少个公式",
+        "code": "Sub 数公式()\n    Dim r As Range\n    On Error Resume Next\n    Set r = Range(\"A1:D20\").SpecialCells(xlCellTypeFormulas)\n    On Error GoTo 0\n    MsgBox \"公式数：\" & IIf(r Is Nothing, 0, r.Count)\nEnd Sub",
+        "howToRun": "区域里放几个公式，按 F5。",
+        "result": "弹出公式单元格数量；没有公式时显示 0。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没有匹配单元格时直接报 1004",
+        "reason": "SpecialCells 找不到目标会抛错，不是返回 Nothing。",
+        "fix": "On Error Resume Next 包住，On Error GoTo 0 复位，再判 Is Nothing。",
+        "level": "high",
+        "errorCode": "1004"
+      },
+      {
+        "title": "xlCellTypeConstants 漏掉公式单元格",
+        "reason": "Constants 只包含常量，公式属于 Formulas。",
+        "fix": "两类分别取，或两次结果 Union 起来。",
+        "level": "mid"
+      },
+      {
+        "title": "拿 xlCellTypeLastCell 当真实末行",
+        "reason": "LastCell 记录的是曾经用过的最大范围，删数据后不会自动缩回。",
+        "fix": "先 ActiveSheet.UsedRange 重算，或用 End(xlUp) 求末行。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "areas",
+        "kind": "companion",
+        "why": "多选区里取可见格也要 SpecialCells。"
+      },
+      {
+        "id": "current-region",
+        "kind": "companion",
+        "why": "先圈数据块再定位特殊格是常见组合。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "confusable",
+        "why": "UsedRange 是范围，SpecialCells 是筛选特殊格。"
+      }
+    ],
+    "oneLiner": "一次选中空/公式/可见格",
+    "summary": "SpecialCells 是批量处理的加速器：空格填值、公式统计、可见格上色都靠它。唯一铁律是先兜住 1004。"
+  },
+  {
+    "id": "range-replace",
+    "enName": "Range.Replace",
+    "zhName": "批量替换",
+    "alias": [
+      "Replace",
+      "替换",
+      "查找替换"
+    ],
+    "keywords": [
+      "批量替换文字",
+      "去掉空格",
+      "整词替换"
+    ],
+    "kind": "member",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Replace(What, Replacement, [LookAt], [SearchOrder], [MatchCase])   ' 返回 Boolean",
+    "examples": [
+      {
+        "title": "去掉 A 列所有半角空格",
+        "code": "Sub 去空格()\n    Dim ok As Boolean\n    ok = Range(\"A2:A100\").Replace(\" \", \"\", xlPart)\n    MsgBox \"执行结果：\" & ok\nEnd Sub",
+        "howToRun": "A2:A100 里有带空格的内容，按 F5。",
+        "result": "空格被删掉；ok 为 True 只表示执行过，不代表改了几处。"
+      },
+      {
+        "title": "只替换完整单词「苹果」",
+        "code": "Sub 整词替换()\n    Range(\"A2:A100\").Replace What:=\"苹果\", Replacement:=\"Apple\", LookAt:=xlWhole\nEnd Sub",
+        "howToRun": "A 列同时有「苹果」和「苹果汁」，按 F5。",
+        "result": "只有内容正好是「苹果」的格子变成 Apple，「苹果汁」不动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "拿 Replace 的返回值当替换次数",
+        "reason": "Replace 返回 Boolean（有没有执行），不是改了几处。",
+        "fix": "要计数就自己遍历比较前后值，或用 Substitute 逐格替换并统计。",
+        "level": "high"
+      },
+      {
+        "title": "想替换星号 * 却把整列都改了",
+        "reason": "* 和 ? 是通配符，会匹配任意内容。",
+        "fix": "用 ~* 转义星号，~? 转义问号。",
+        "level": "high"
+      },
+      {
+        "title": "替换把公式里的文本也改掉了",
+        "reason": "默认在公式里查找，公式字符串也会被替换。",
+        "fix": "只改显示值时加 LookIn:=xlValues。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "find",
+        "kind": "companion",
+        "why": "查找和替换是同一套参数。"
+      },
+      {
+        "id": "find-next",
+        "kind": "companion",
+        "why": "需要逐处确认时用 Find/FindNext 而不是 Replace。"
+      },
+      {
+        "id": "text-to-columns",
+        "kind": "companion",
+        "why": "结构规整的拆分交给分列更稳。"
+      }
+    ],
+    "oneLiner": "按规则批量换文字",
+    "summary": "Replace 是批量替换最快的入口，但返回值只是 Boolean。通配符要转义，改公式还是改显示值要明确。"
+  },
+  {
+    "id": "text-to-columns",
+    "enName": "Range.TextToColumns",
+    "zhName": "分列",
+    "alias": [
+      "TextToColumns",
+      "分列",
+      "拆列"
+    ],
+    "keywords": [
+      "一列拆成多列",
+      "按符号拆分",
+      "固定宽度拆分"
+    ],
+    "kind": "member",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.TextToColumns Destination, DataType, [TextQualifier], [Other], [OtherChar], [FieldInfo]",
+    "examples": [
+      {
+        "title": "按横杠把 A 列拆成多列",
+        "code": "Sub 按横杠分列()\n    Dim r As Range\n    Set r = Range(\"A2:A100\")\n    r.TextToColumns Destination:=r, DataType:=xlDelimited, _\n        Other:=True, OtherChar:=\"-\"\nEnd Sub",
+        "howToRun": "A2:A100 放「省-市-区」形式的内容，B 列以后留空，按 F5。",
+        "result": "A 列保留第一段，B、C 列写入后两段。"
+      },
+      {
+        "title": "按固定宽度切前 6 位和后段",
+        "code": "Sub 按固定宽度分列()\n    Range(\"A2:A100\").TextToColumns Destination:=Range(\"A2\"), _\n        DataType:=xlFixedWidth, FieldInfo:=Array(Array(0, 1), Array(6, 1))\nEnd Sub",
+        "howToRun": "A 列是「6 位编号 + 名称」，按 F5。",
+        "result": "A 列 6 位编号，B 列名称。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "分列把右侧原有数据直接覆盖，且后悔不回来",
+        "reason": "Destination 右侧会被结果占用，不检查就丢数据。",
+        "fix": "先把右侧插空列，或 Destination 指到空白区域。",
+        "level": "high"
+      },
+      {
+        "title": "一次选了好几列，分列只处理第一列",
+        "reason": "TextToColumns 只对单列区域有效。",
+        "fix": "逐列循环调用，或先把多列转成一列。",
+        "level": "mid"
+      },
+      {
+        "title": "日期被分列后变成 5 位数字",
+        "reason": "FieldInfo 没指定日期格式时按常规解析。",
+        "fix": "在 FieldInfo 里指定日期类型，或分列后补 NumberFormat。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "split-by-column",
+        "kind": "companion",
+        "why": "按分隔符拆成多表的配方用的就是分列思路。"
+      },
+      {
+        "id": "range-replace",
+        "kind": "companion",
+        "why": "先替换掉脏字符再分列更稳。"
+      },
+      {
+        "id": "text-value",
+        "kind": "companion",
+        "why": "分列后常要统一文本/数值类型。"
+      }
+    ],
+    "oneLiner": "按符号或宽度拆列",
+    "summary": "TextToColumns 是 Excel 分列的程序版。注意它只吃单列、会覆盖右侧、日期格式要显式指定。"
+  }
+]

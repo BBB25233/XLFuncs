@@ -1,0 +1,432 @@
+[
+  {
+    "id": "const-and-enum",
+    "enName": "Const / Enum",
+    "zhName": "常量与枚举",
+    "alias": [
+      "常量",
+      "Const",
+      "枚举",
+      "Enum",
+      "固定值"
+    ],
+    "keywords": [
+      "定义常量",
+      "枚举类型",
+      "Const 怎么用",
+      "避免魔法数字",
+      "状态值命名"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Const 税率 As Double = 0.13\nEnum 订单状态\n    待处理 = 1\n    已完成 = 2\nEnd Enum",
+    "examples": [
+      {
+        "title": "Const：把到处出现的数字起个名字",
+        "code": "Sub 用常量算税()\n    Const 税率 As Double = 0.13\n    Dim 金额 As Double\n    金额 = 1000\n    MsgBox \"税额：\" & 金额 * 税率\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「税额：130」。以后改税率只改 Const 一行。"
+      },
+      {
+        "title": "Enum：给状态码一组可读的名字",
+        "code": "Enum 订单状态\n    待处理 = 1\n    已完成 = 2\nEnd Enum\nSub 看状态()\n    Dim s As 订单状态\n    s = 已完成\n    Select Case s\n        Case 待处理: MsgBox \"待处理\"\n        Case 已完成: MsgBox \"已完成\"\n    End Select\nEnd Sub",
+        "howToRun": "把 Enum 放在模块顶部，Sub 放同一模块，按 F5。",
+        "result": "显示「已完成」；把 s 改成 待处理 则显示「待处理」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "想运行中改 Const，编译不过",
+        "reason": "Const 是编译期常量，必须在声明那一行给值，之后不能重新赋值。",
+        "fix": "需要运行中变化就用普通变量（Dim），或把常量放在只读属性/配置表里。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Enum 只能取枚举里列的值",
+        "reason": "VBA 的 Enum 底层就是 Long，`s = 99` 完全合法，编译器不拦。",
+        "fix": "入口处自己校验取值范围（Select Case/If），别指望 Enum 做合法性检查。",
+        "level": "mid"
+      },
+      {
+        "title": "Const 写在过程里，别的过程用不到",
+        "reason": "过程级 Const 只在该过程内可见，复制到别处会「变量未定义」。",
+        "fix": "跨过程共用就提到模块顶部 `Private Const`，或公开给其他模块用 `Public Const`。",
+        "level": "mid",
+        "errorCode": "458"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "Const 与 Dim 都是声明，区别是一个不可改、一个可改。"
+      },
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "常量放过程里还是模块顶部，决定谁能看见。"
+      }
+    ],
+    "oneLiner": "给固定值起名字，别写魔法数字",
+    "summary": "Const 解决「同一个 0.13 抄了二十处，改税率漏一处」；Enum 解决「1 代表待处理还是已完成全靠猜」。两者都不占运行内存里的可变空间，读代码的人最受益。"
+  },
+  {
+    "id": "static-vs-dynamic-array",
+    "enName": "Static array / Dynamic array (ReDim)",
+    "zhName": "静态数组与动态数组",
+    "alias": [
+      "数组",
+      "静态数组",
+      "动态数组",
+      "ReDim",
+      "ReDim Preserve"
+    ],
+    "keywords": [
+      "数组怎么定义",
+      "数组大小不定",
+      "ReDim 用法",
+      "保留数组数据",
+      "数组下标"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dim a(1 To 5) As Long    ' 静态：大小写死\nDim b() As Long          ' 动态：先空着\nReDim b(1 To n)          ' 运行时再定大小",
+    "examples": [
+      {
+        "title": "静态数组：一开始就知道几个",
+        "code": "Sub 静态数组()\n    Dim a(1 To 5) As Long, i As Long\n    For i = 1 To 5\n        a(i) = i * 10\n    Next i\n    MsgBox \"第 5 个：\" & a(5)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「第 5 个：50」。"
+      },
+      {
+        "title": "动态数组：先 ReDim，扩容时 Preserve",
+        "code": "Sub 动态数组()\n    Dim b() As Long, i As Long\n    ReDim b(1 To 3)\n    For i = 1 To 3\n        b(i) = i\n    Next i\n    ReDim Preserve b(1 To 4)\n    b(4) = 100\n    MsgBox \"个数：\" & (UBound(b) - LBound(b) + 1)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「个数：4」，前三个值仍是 1、2、3（Preserve 保住了）。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "ReDim 之后原来的数据全没了",
+        "reason": "不带 Preserve 的 ReDim 会重新分配并清空数组。",
+        "fix": "要保留已有元素就 `ReDim Preserve`；不需要保留才用普通 ReDim。",
+        "level": "high"
+      },
+      {
+        "title": "ReDim Preserve 想改第一维，直接报错",
+        "reason": "Preserve 只允许改最后一维的大小，多维数组改前面维度会编译/运行失败。",
+        "fix": "把要扩容的维度放到最后；或者干脆用 Collection/Dictionary 存不定长数据。",
+        "level": "high"
+      },
+      {
+        "title": "默认下标从 0 开始，和表格行号错一位",
+        "reason": "`Dim a(3)` 是 a(0..3) 共 4 个元素；按行号 1..n 取值容易越界。",
+        "fix": "显式写 `Dim a(1 To n)`；或模块顶部 `Option Base 1`（不推荐，容易影响别人）。",
+        "level": "mid",
+        "errorCode": "9"
+      }
+    ],
+    "related": [
+      {
+        "id": "dim",
+        "kind": "companion",
+        "why": "数组也是变量，先 Dim 再决定静态还是动态。"
+      },
+      {
+        "id": "redim",
+        "kind": "companion",
+        "why": "ReDim 的语法与 Preserve 的限制都在这里。"
+      }
+    ],
+    "oneLiner": "数组大小是写死还是运行时再定",
+    "summary": "元素个数固定用静态数组；要按数据行数决定长度就用动态数组。动态数组的两个硬规则：ReDim 会清空、Preserve 只能改最后一维。"
+  },
+  {
+    "id": "dictionary",
+    "enName": "Scripting.Dictionary",
+    "zhName": "字典 Dictionary",
+    "alias": [
+      "字典",
+      "Dictionary",
+      "键值对",
+      "去重统计",
+      "Exists"
+    ],
+    "keywords": [
+      "字典怎么用",
+      "按键取值",
+      "统计不重复",
+      "键是否存在",
+      "Dictionary 遍历"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dim d As Object\nSet d = CreateObject(\"Scripting.Dictionary\")\nd.Exists(key)  /  d(key)  /  d.Keys",
+    "examples": [
+      {
+        "title": "统计 A 列有多少个不重复值",
+        "code": "Sub 统计不重复()\n    Dim d As Object, i As Long\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    For i = 2 To Cells(Rows.Count, 1).End(xlUp).Row\n        d(CStr(Cells(i, 1).Value)) = 1\n    Next i\n    MsgBox \"不重复个数：\" & d.Count\nEnd Sub",
+        "howToRun": "A 列从 A2 开始放一些重复/不重复的值，按 F5。",
+        "result": "弹出不重复值的个数，例如 10 行里 6 个不同值就显示 6。"
+      },
+      {
+        "title": "遍历键和值",
+        "code": "Sub 列出键值()\n    Dim d As Object, k As Variant\n    Set d = CreateObject(\"Scripting.Dictionary\")\n    d(\"甲\") = 10\n    d(\"乙\") = 20\n    For Each k In d.Keys\n        Debug.Print k, d(k)\n    Next k\n    MsgBox \"共 \" & d.Count & \" 项\"\nEnd Sub",
+        "howToRun": "按 F5，打开「视图 → 立即窗口」看输出。",
+        "result": "立即窗口打印两行键值，消息框显示「共 2 项」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接取值前不判断键是否存在",
+        "reason": "取不存在的键会返回 Empty 而不报错，后续参与运算才出问题。",
+        "fix": "先 `If d.Exists(key) Then`，或直接赋值 `d(key)=值`（不存在即新增）。",
+        "level": "high",
+        "errorCode": "13"
+      },
+      {
+        "title": "以为遍历顺序等于插入顺序",
+        "reason": "Dictionary 的 Keys 顺序不保证按插入顺序，日志/报表里看起来会「乱」。",
+        "fix": "顺序敏感就先收集键再排序，或改用 Collection（按添加顺序）。",
+        "level": "mid"
+      },
+      {
+        "title": "前期绑定忘了勾引用",
+        "reason": "`Dim d As New Dictionary` 需要引用「Microsoft Scripting Runtime」，换机器就编译失败。",
+        "fix": "用后期绑定 `CreateObject(\"Scripting.Dictionary\")` + `Dim d As Object`，免引用。",
+        "level": "mid",
+        "errorCode": "35"
+      }
+    ],
+    "related": [
+      {
+        "id": "collection-index",
+        "kind": "companion",
+        "why": "Dictionary 和 Collection 都是「按名取元素」的集合。"
+      },
+      {
+        "id": "for-each-next",
+        "kind": "companion",
+        "why": "遍历 Keys/Items 用 For Each 最省事。"
+      }
+    ],
+    "oneLiner": "按键存取值、顺手做去重统计",
+    "summary": "Dictionary 是 VBA 里最好用的「键值表」：Exists 判断、赋值即新增、Keys/Items 批量取。做去重、分组汇总、按编号查名称，比反复用 Find 快得多。"
+  },
+  {
+    "id": "collection-object",
+    "enName": "Collection",
+    "zhName": "Collection 集合对象",
+    "alias": [
+      "Collection",
+      "集合对象",
+      "Add",
+      "Remove",
+      "Item"
+    ],
+    "keywords": [
+      "Collection 怎么用",
+      "按顺序存数据",
+      "集合删除",
+      "集合遍历",
+      "不定长数据"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Dim c As Collection\nSet c = New Collection\nc.Add item, key\nc.Item(i) / c.Count / c.Remove i",
+    "examples": [
+      {
+        "title": "按顺序加、按名字取",
+        "code": "Sub Collection基本用法()\n    Dim c As Collection\n    Set c = New Collection\n    c.Add \"甲\", \"a\"\n    c.Add \"乙\", \"b\"\n    MsgBox c.Count & \" / \" & c.Item(\"b\")\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「2 / 乙」。"
+      },
+      {
+        "title": "删除一项后再遍历",
+        "code": "Sub 删除与遍历()\n    Dim c As Collection, i As Long\n    Set c = New Collection\n    For i = 1 To 3\n        c.Add i * 10\n    Next i\n    c.Remove 2\n    MsgBox \"剩 \" & c.Count & \"，第一个 \" & c(1)\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「剩 2，第一个 10」；原来的第 3 项移到第 2 位。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Remove 之后还按旧索引取",
+        "reason": "删除一项后，后面的元素索引整体前移，旧的 i 已经指向别的元素。",
+        "fix": "删除用倒序循环 `For i = c.Count To 1 Step -1`，或删完重新遍历。",
+        "level": "high",
+        "errorCode": "9"
+      },
+      {
+        "title": "同一个键 Add 两次",
+        "reason": "Collection 的键必须唯一，重复 Add 直接 457。",
+        "fix": "加之前判断键是否已存在（On Error Resume Next + Err），或改用 Dictionary 覆盖。",
+        "level": "high",
+        "errorCode": "457"
+      }
+    ],
+    "related": [
+      {
+        "id": "collection-index",
+        "kind": "companion",
+        "why": "集合的序号/名字取法与 Count 都在这里。"
+      },
+      {
+        "id": "dictionary",
+        "kind": "companion",
+        "why": "需要按键覆盖/Exists 时，Dictionary 比 Collection 合适。"
+      }
+    ],
+    "oneLiner": "按添加顺序存一组不定长数据",
+    "summary": "Collection 轻量、无需引用、按添加顺序遍历，适合「攒一批结果最后统一处理」。缺点是没有 Exists、不能按键覆盖，重复键会直接 457。"
+  },
+  {
+    "id": "byref-vs-byval",
+    "enName": "ByRef vs ByVal",
+    "zhName": "传址与传值",
+    "alias": [
+      "ByRef",
+      "ByVal",
+      "传值",
+      "传址",
+      "参数被改"
+    ],
+    "keywords": [
+      "参数会不会被改",
+      "ByRef ByVal 区别",
+      "函数改了调用方变量",
+      "默认传参方式"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Sub 改原值(ByRef x As Long)   ' 默认就是 ByRef\nSub 只读副本(ByVal x As Long)",
+    "examples": [
+      {
+        "title": "ByRef：过程里改，调用方的变量也变",
+        "code": "Sub 传址演示()\n    Dim n As Long\n    n = 10\n    加一 n\n    MsgBox \"调用后：\" & n\nEnd Sub\nSub 加一(ByRef x As Long)\n    x = x + 1\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「调用后：11」——n 被过程改掉了。"
+      },
+      {
+        "title": "ByVal：过程里怎么改都只动副本",
+        "code": "Sub 传值演示()\n    Dim n As Long\n    n = 10\n    加一不改 n\n    MsgBox \"调用后：\" & n\nEnd Sub\nSub 加一不改(ByVal x As Long)\n    x = x + 1\nEnd Sub",
+        "howToRun": "按 F5。",
+        "result": "显示「调用后：10」——n 没变。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "VBA 默认是 ByRef，不是 ByVal",
+        "reason": "不写修饰符时，过程能改调用方的变量，很多人以为是副本。",
+        "fix": "不想让过程改原值就显式写 `ByVal`；要回传结果才用 `ByRef`。",
+        "level": "high"
+      },
+      {
+        "title": "对象变量 ByRef 传进去又被 Set",
+        "reason": "过程里 `Set x = 别的对象` 会把调用方也改指向新对象。",
+        "fix": "只读对象用 `ByVal`（传引用副本），或在过程内另建局部变量。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "Call 与括号写法决定参数怎么传。"
+      },
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "传址会改到调用方变量，作用域要看清。"
+      }
+    ],
+    "oneLiner": "参数是原变量还是副本",
+    "summary": "ByRef 传地址（能改原变量），ByVal 传副本（改不到）。VBA 不写时默认 ByRef，这是「调用完变量莫名变了」的根源。"
+  },
+  {
+    "id": "optional-args",
+    "enName": "Optional arguments / Default values",
+    "zhName": "可选参数与默认值",
+    "alias": [
+      "Optional",
+      "可选参数",
+      "默认值",
+      "IsMissing",
+      "参数可省略"
+    ],
+    "keywords": [
+      "参数可以不给",
+      "默认参数怎么写",
+      "IsMissing 用法",
+      "Optional 限制"
+    ],
+    "kind": "concept",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "Sub 写标题(ByVal 文本 As String, Optional ByVal 字号 As Long = 11)",
+    "examples": [
+      {
+        "title": "不给就用默认值",
+        "code": "Sub 写标题(ByVal 文本 As String, Optional ByVal 字号 As Long = 11)\n    With Range(\"A1\")\n        .Value = 文本\n        .Font.Size = 字号\n    End With\nEnd Sub\nSub 调用写标题()\n    写标题 \"月报\"\nEnd Sub",
+        "howToRun": "两段放同一模块，按 F5 运行「调用写标题」。",
+        "result": "A1 写入「月报」，字号是默认的 11。"
+      },
+      {
+        "title": "用 IsMissing 区分「没传」和「传了空」",
+        "code": "Sub 可空参数(Optional v As Variant)\n    If IsMissing(v) Then\n        MsgBox \"没传参数\"\n    Else\n        MsgBox \"传了：\" & v\n    End If\nEnd Sub\nSub 试一次()\n    可空参数\nEnd Sub",
+        "howToRun": "运行「试一次」；再把调用改成 `可空参数 \"x\"` 对比。",
+        "result": "不传时显示「没传参数」；传了则显示具体值。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "Optional 参数没放在参数表最后",
+        "reason": "VBA 要求可选参数排在所有必填参数之后，否则编译报错。",
+        "fix": "把 Optional 全部挪到参数表末尾；必填放前面。",
+        "level": "high"
+      },
+      {
+        "title": "默认值写成变量或函数调用",
+        "reason": "默认值只能是常量（字面量/Const），不能写 `=Range(\"A1\").Value`。",
+        "fix": "默认给常量，进过程后再判断并读单元格。",
+        "level": "mid"
+      },
+      {
+        "title": "对非 Variant 参数用 IsMissing",
+        "reason": "IsMissing 只对 Variant 有效；Long/String 即使省略也有默认值（0/空串）。",
+        "fix": "需要区分「没传」就把参数声明成 `Optional v As Variant`，否则用默认值判断即可。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "call",
+        "kind": "companion",
+        "why": "调用时省略参数、命名参数的写法在这里。"
+      },
+      {
+        "id": "sub-vs-function",
+        "kind": "companion",
+        "why": "Function 的 Optional 返回值与参数规则一起看。"
+      }
+    ],
+    "oneLiner": "参数可以不传，不传就用默认",
+    "summary": "Optional 让一个过程适配多种调用场景：常用值设默认，特殊需求再显式传。三条硬规则：放参数表末尾、默认值只能是常量、IsMissing 只认 Variant。"
+  }
+]

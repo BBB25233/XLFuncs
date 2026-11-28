@@ -1,0 +1,359 @@
+[
+  {
+    "id": "freeze-panes",
+    "enName": "Window.FreezePanes",
+    "zhName": "冻结窗格",
+    "alias": [
+      "FreezePanes",
+      "冻结窗格",
+      "锁定表头"
+    ],
+    "keywords": [
+      "冻结首行",
+      "冻结前两列",
+      "取消冻结"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "ActiveWindow.FreezePanes = False\nActiveWindow.SplitRow = 1      ' 冻结上方 1 行\nActiveWindow.SplitColumn = 2   ' 冻结左侧 2 列\nActiveWindow.FreezePanes = True",
+    "examples": [
+      {
+        "title": "冻结首行 + 前两列",
+        "code": "Sub 冻结表头()\n    With ActiveWindow\n        .FreezePanes = False\n        .SplitRow = 1\n        .SplitColumn = 2\n        .FreezePanes = True\n    End With\nEnd Sub",
+        "howToRun": "打开有表头的数据表，按 F5，再滚动试试。",
+        "result": "第 1 行和 A、B 两列固定不动，其余区域可滚动。"
+      },
+      {
+        "title": "一键取消冻结",
+        "code": "Sub 取消冻结()\n    ActiveWindow.FreezePanes = False\nEnd Sub",
+        "howToRun": "先跑上一个例子，再按 F5。",
+        "result": "冻结线消失，整表恢复自由滚动。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接设 FreezePanes = True，冻结位置不对",
+        "reason": "不先设 SplitRow/SplitColumn，Excel 会按当前选区边界随便切。",
+        "fix": "先 FreezePanes=False，再明确 SplitRow/SplitColumn，最后才置 True。",
+        "level": "high"
+      },
+      {
+        "title": "把 SplitRow 当成行号写 2",
+        "reason": "SplitRow 是「冻结几行」，写 2 会冻结前两行。",
+        "fix": "只冻结第 1 行就写 1；要冻结到第 3 行写 3。",
+        "level": "mid"
+      },
+      {
+        "title": "在非活动工作表上设置，冻结跑到别的表",
+        "reason": "FreezePanes 属于窗口，只作用于当前活动窗口里的表。",
+        "fix": "先 ws.Activate，再设置冻结。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "worksheet",
+        "kind": "companion",
+        "why": "冻结属于工作表视图操作。"
+      },
+      {
+        "id": "usedrange",
+        "kind": "companion",
+        "why": "先确认数据范围，冻结位置才不会切错。"
+      }
+    ],
+    "oneLiner": "锁住表头不随滚动跑",
+    "summary": "冻结窗格用 SplitRow/SplitColumn 指定行数列数，再开 FreezePanes。顺序错了冻结线就会乱，取消只要置 False。"
+  },
+  {
+    "id": "unified-date-format",
+    "enName": "统一日期格式",
+    "zhName": "统一日期格式",
+    "alias": [
+      "统一日期",
+      "日期格式",
+      "文本日期转日期"
+    ],
+    "keywords": [
+      "日期格式不一致",
+      "文本日期转真日期",
+      "批量设日期格式"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.Value = CDate(r.Value)          ' 文本转真日期\nr.NumberFormat = \"yyyy-mm-dd\"     ' 统一显示",
+    "examples": [
+      {
+        "title": "把一列文本日期转成真日期并统一显示",
+        "code": "Sub 统一日期()\n    Dim r As Range\n    For Each r In Range(\"A2:A100\")\n        If Len(r.Value) > 0 Then\n            On Error Resume Next\n            r.Value = CDate(r.Value)\n            On Error GoTo 0\n            r.NumberFormat = \"yyyy-mm-dd\"\n        End If\n    Next r\nEnd Sub",
+        "howToRun": "A 列混放 2026/11/28、2026-11-28、20261128 等写法，按 F5。",
+        "result": "能识别的都变成真日期并显示为 2026-11-28；识别不了的保持原样。"
+      },
+      {
+        "title": "只统一显示格式，不改底层值",
+        "code": "Sub 只改显示()\n    Range(\"A2:A100\").NumberFormat = \"yyyy-mm-dd\"\nEnd Sub",
+        "howToRun": "A 列本来就是日期，按 F5。",
+        "result": "显示统一成 2026-11-28，单元格里仍是日期序列号。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "CDate 受区域设置影响，13/01/2026 直接报错",
+        "reason": "VBA 按本机区域设置解析日期，月/日顺序不同会失败。",
+        "fix": "先规范成 yyyy-mm-dd 再 CDate，或按固定格式拆年月日再 DateSerial。",
+        "level": "high"
+      },
+      {
+        "title": "只设了 NumberFormat，文本日期还是文本",
+        "reason": "格式只影响显示，不会把字符串变成日期。",
+        "fix": "先用 CDate/CDateValue 转成真日期，再设 NumberFormat。",
+        "level": "mid"
+      },
+      {
+        "title": "对整列设格式，文件变慢",
+        "reason": "整列 1048576 行都写格式。",
+        "fix": "只处理实际数据范围。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "date-precision",
+        "kind": "companion",
+        "why": "日期本质是序列号，格式只影响显示。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "统一显示靠 NumberFormat。"
+      },
+      {
+        "id": "format-column",
+        "kind": "companion",
+        "why": "整列套格式的通用做法。"
+      }
+    ],
+    "oneLiner": "把乱七八糟的日期统一",
+    "summary": "统一日期分两步：文本先 CDate 转真日期，再设 yyyy-mm-dd 格式。只改格式不会改变文本，CDate 还会受区域设置影响。"
+  },
+  {
+    "id": "number-to-text",
+    "enName": "数字转文本",
+    "zhName": "数字转文本",
+    "alias": [
+      "数字转文本",
+      "保留前导零",
+      "文本格式"
+    ],
+    "keywords": [
+      "编号前面的 0 没了",
+      "数字变文本",
+      "补零"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "r.NumberFormat = \"@\"     ' 先设文本格式\nr.Value = CStr(r.Value)    ' 再写字符串",
+    "examples": [
+      {
+        "title": "把编号列转成文本，保住前导零",
+        "code": "Sub 编号转文本()\n    Dim r As Range\n    For Each r In Range(\"A2:A100\")\n        If Len(r.Value) > 0 Then\n            r.NumberFormat = \"@\"\n            r.Value = CStr(r.Value)\n        End If\n    Next r\nEnd Sub",
+        "howToRun": "A 列是 001、002 这类编号（已被 Excel 吃掉 0），按 F5 前先确认原始值。",
+        "result": "后续再输入 001 会原样保留，不再变成 1。"
+      },
+      {
+        "title": "生成固定 6 位的流水号",
+        "code": "Sub 生成编号()\n    Dim i As Long\n    For i = 1 To 10\n        Cells(i + 1, 1).NumberFormat = \"@\"\n        Cells(i + 1, 1).Value = Format(i, \"000000\")\n    Next i\nEnd Sub",
+        "howToRun": "A 列留空，按 F5。",
+        "result": "A2:A11 得到 000001 到 000010。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "先写值再设文本格式，前导零已经丢了",
+        "reason": "数值写入时就已变成 1，后面设 \"@\" 也补不回 00。",
+        "fix": "先 NumberFormat=\"@\"，再写字符串；已经丢零的只能用 Format 重新生成。",
+        "level": "high"
+      },
+      {
+        "title": "想用 r.Text 读带零的显示值再写回去",
+        "reason": "Text 是只读属性，不能赋值。",
+        "fix": "要显示值用 r.Text 读取，要写回用 CStr/Format 构造。",
+        "level": "mid"
+      },
+      {
+        "title": "转成文本后 SUM 结果变 0",
+        "reason": "SUM 会忽略文本型数字。",
+        "fix": "汇总列保留数值；只把编号、邮编、手机号这类字段转文本。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "text-value",
+        "kind": "companion",
+        "why": "文本与数值的取值口径。"
+      },
+      {
+        "id": "numberformat",
+        "kind": "companion",
+        "why": "文本格式就是 NumberFormat=\"@\"。"
+      }
+    ],
+    "oneLiner": "保住前导零和长编号",
+    "summary": "数字转文本的关键顺序：先设 \"@\"，再写字符串。已经丢掉的零只能靠 Format 重新补，转成文本后别再参与求和。"
+  },
+  {
+    "id": "filter-to-new-sheet",
+    "enName": "筛选到新表",
+    "zhName": "筛选到新表",
+    "alias": [
+      "筛选复制",
+      "筛选结果另存",
+      "按条件取数"
+    ],
+    "keywords": [
+      "筛选结果放到新表",
+      "按条件复制行",
+      "自动筛选导出"
+    ],
+    "kind": "recipe",
+    "level": 3,
+    "host": [
+      "excel"
+    ],
+    "syntax": "数据区.AutoFilter Field:=列号, Criteria1:=\"条件\"\n数据区.SpecialCells(xlCellTypeVisible).Copy 新表.Range(\"A1\")",
+    "examples": [
+      {
+        "title": "按第 3 列大于 100 筛出整行到新表",
+        "code": "Sub 筛选到新表()\n    Dim ws As Worksheet, r As Range, dst As Worksheet\n    Set ws = Worksheets(\"数据\")\n    ws.Range(\"A1:D100\").AutoFilter Field:=3, Criteria1:=\">100\"\n    Set r = ws.Range(\"A1:D100\").SpecialCells(xlCellTypeVisible)\n    Set dst = Worksheets.Add(After:=ws)\n    dst.Name = \"筛选结果\"\n    r.Copy Destination:=dst.Range(\"A1\")\n    ws.AutoFilterMode = False\nEnd Sub",
+        "howToRun": "「数据」表 A1:D100 有表头和数据，第 3 列是数字，按 F5。",
+        "result": "新表「筛选结果」得到表头 + 所有满足条件的行。"
+      },
+      {
+        "title": "把筛选结果只留值，不带格式",
+        "code": "Sub 筛选只留值()\n    Dim ws As Worksheet, r As Range, dst As Worksheet\n    Set ws = Worksheets(\"数据\")\n    ws.Range(\"A1:D100\").AutoFilter Field:=3, Criteria1:=\">100\"\n    Set r = ws.Range(\"A1:D100\").SpecialCells(xlCellTypeVisible)\n    Set dst = Worksheets.Add(After:=ws)\n    r.Copy\n    dst.Range(\"A1\").PasteSpecial xlPasteValues\n    Application.CutCopyMode = False\n    ws.AutoFilterMode = False\nEnd Sub",
+        "howToRun": "同上，按 F5。",
+        "result": "新表只有值，没有原表颜色和公式。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "直接 Copy 整个区域，隐藏行也一起复制",
+        "reason": "AutoFilter 只是隐藏，Copy 普通区域仍包含隐藏行。",
+        "fix": "先 SpecialCells(xlCellTypeVisible) 再 Copy。",
+        "level": "high"
+      },
+      {
+        "title": "筛完不关 AutoFilterMode，下次操作串味",
+        "reason": "筛选状态会留在表上，后续排序/复制都可能受影响。",
+        "fix": "收尾写 ws.AutoFilterMode = False。",
+        "level": "mid"
+      },
+      {
+        "title": "新表名重复，直接报 1004",
+        "reason": "同一工作簿不允许同名工作表。",
+        "fix": "先删旧结果表，或用唯一名字（带日期/序号）。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "autofilter",
+        "kind": "companion",
+        "why": "筛选本身靠 AutoFilter。"
+      },
+      {
+        "id": "special-cells",
+        "kind": "companion",
+        "why": "取可见行必须 SpecialCells。"
+      },
+      {
+        "id": "advanced-filter",
+        "kind": "alternative",
+        "why": "多条件/去重筛选用 AdvancedFilter 更省事。"
+      }
+    ],
+    "oneLiner": "筛完把结果搬到新表",
+    "summary": "筛选到新表三步：AutoFilter 设条件、SpecialCells 取可见行、Copy 到新表，最后关掉筛选。少任何一步都会多带隐藏行或留下筛选状态。"
+  },
+  {
+    "id": "multi-column-sort",
+    "enName": "多列排序",
+    "zhName": "多列排序",
+    "alias": [
+      "多列排序",
+      "Sort",
+      "按两列排序"
+    ],
+    "keywords": [
+      "先按部门再按金额",
+      "多关键字排序",
+      "排序标题被排进去"
+    ],
+    "kind": "recipe",
+    "level": 2,
+    "host": [
+      "excel"
+    ],
+    "syntax": "数据区.Sort Key1:=列1, Order1:=xlAscending, Key2:=列2, Order2:=xlDescending, Header:=xlYes",
+    "examples": [
+      {
+        "title": "先按部门升序，再按金额降序",
+        "code": "Sub 多列排序()\n    With Range(\"A1:D100\")\n        .Sort Key1:=.Columns(1), Order1:=xlAscending, _\n              Key2:=.Columns(3), Order2:=xlDescending, _\n              Header:=xlYes\n    End With\nEnd Sub",
+        "howToRun": "A 列部门、C 列金额，按 F5。",
+        "result": "部门相同的行聚在一起，组内金额从大到小。"
+      },
+      {
+        "title": "按日期升序、同日期按编号升序",
+        "code": "Sub 日期排序()\n    With Range(\"A1:E200\")\n        .Sort Key1:=.Columns(2), Order1:=xlAscending, _\n              Key2:=.Columns(1), Order2:=xlAscending, _\n              Header:=xlYes\n    End With\nEnd Sub",
+        "howToRun": "B 列是日期、A 列是编号，按 F5。",
+        "result": "日期从早到晚，同一天内编号从小到大。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "没写 Header，标题行被当成数据排走",
+        "reason": "Header 省略时 Excel 会猜，猜错就把表头排进数据。",
+        "fix": "明确写 Header:=xlYes（有表头）或 xlNo（无表头）。",
+        "level": "high"
+      },
+      {
+        "title": "只选中数据行，标题留在外面",
+        "reason": "排序区域不含标题时，排序后列对不上标题。",
+        "fix": "区域从 A1 开始包含表头，并设 Header:=xlYes。",
+        "level": "mid"
+      },
+      {
+        "title": "Key1 用了区域外的列，报 1004",
+        "reason": "排序键必须是排序区域内的列。",
+        "fix": "用 .Columns(n) 引用区域内列，别用外部 Range。",
+        "level": "mid",
+        "errorCode": "1004"
+      }
+    ],
+    "related": [
+      {
+        "id": "sort",
+        "kind": "companion",
+        "why": "Sort 是排序的基础成员。"
+      },
+      {
+        "id": "autofilter",
+        "kind": "companion",
+        "why": "筛选后常要再排序。"
+      }
+    ],
+    "oneLiner": "按多个关键字排序",
+    "summary": "多列排序就是把 Key1/Key2 一起给 Sort，并明确 Header。表头没算进区域、键用了区域外列，是最常见的两个 1004。"
+  }
+]

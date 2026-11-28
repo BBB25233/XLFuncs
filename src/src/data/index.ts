@@ -10,8 +10,16 @@ import rawRelated from './related.json';
  * 只有 id、没有正文，用来让列表页和搜索页也能露出「相关推荐」。
  */
 
-const catalog = rawCatalog as unknown as CatalogRow[];
-const relatedIds = rawRelated as unknown as Record<string, string[]>;
+/** 文件夹构建时由 catalog.js 注入的索引；单文件/APK/测试走静态 import 回退 */
+interface InjectedCatalog {
+  rows?: CatalogRow[];
+  related?: Record<string, string[]>;
+}
+
+const injected = (globalThis as { __XLF_CATALOG__?: InjectedCatalog }).__XLF_CATALOG__;
+
+const catalog = injected?.rows ?? (rawCatalog as unknown as CatalogRow[]);
+const relatedIds = injected?.related ?? (rawRelated as unknown as Record<string, string[]>);
 
 /**
  * 按常用度降序排列的目录。

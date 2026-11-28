@@ -1,4 +1,4 @@
-import type { SearchEntry } from '@/types';
+import type { SearchableEntry } from '@/types';
 
 /**
  * 六级排序搜索（ARCHITECTURE §3.6 / PRD §5.2）。
@@ -22,7 +22,7 @@ export const SCORE = {
 } as const;
 
 /** 对单个条目打分；0 表示未命中 */
-export function score(entry: SearchEntry, keyword: string): number {
+export function score(entry: SearchableEntry, keyword: string): number {
   const q = keyword.trim().toLowerCase();
   if (q === '') {
     return 0;
@@ -61,13 +61,17 @@ export function score(entry: SearchEntry, keyword: string): number {
 }
 
 /** 搜索；只保留命中的条目，按分数降序（同分保持索引顺序 = 常用度降序） */
-export function query(index: SearchEntry[], rawKeyword: string, limit = 20): SearchEntry[] {
+export function query<T extends SearchableEntry>(
+  index: T[],
+  rawKeyword: string,
+  limit = 20,
+): T[] {
   const q = rawKeyword.trim().toLowerCase();
   if (q === '') {
     return [];
   }
 
-  const scored: Array<{ entry: SearchEntry; value: number }> = [];
+  const scored: Array<{ entry: T; value: number }> = [];
   for (const entry of index) {
     const value = score(entry, q);
     if (value > 0) {
@@ -80,6 +84,7 @@ export function query(index: SearchEntry[], rawKeyword: string, limit = 20): Sea
 }
 
 /** 搜索不到时给的兜底推荐（取常用度最高的前 N 个） */
-export function fallbackSuggestions(index: SearchEntry[], limit = 3): SearchEntry[] {
+export function fallbackSuggestions<T extends SearchableEntry>(index: T[], limit = 3): T[] {
   return index.slice(0, limit);
 }
+

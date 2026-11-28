@@ -1,0 +1,707 @@
+[
+  {
+    "id": "jsa-intro",
+    "enName": "WPS JS Macro",
+    "zhName": "JSA 是什么",
+    "alias": [
+      "JSA",
+      "JS宏",
+      "WPS JavaScript 宏"
+    ],
+    "keywords": [
+      "WPS JS宏",
+      "JSA 入门",
+      "JS宏和VBA"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "function 宏名() {\n  // JavaScript 代码\n}",
+    "examples": [
+      {
+        "title": "最小可运行的 JSA 宏",
+        "code": "function 试一下() {\n  alert(\"JSA 能跑\");\n}",
+        "howToRun": "WPS 表格里打开「WPS 宏编辑器」，新建 JS 模块，粘贴后按 F5。",
+        "result": "弹出「JSA 能跑」。"
+      },
+      {
+        "title": "读写单元格也是 JS 语法",
+        "code": "function 读单元格() {\n  const v = Sheets.Item(1).Range(\"A1\").Value2;\n  console.log(v);\n}",
+        "howToRun": "A1 随便填个值，按 F5，看控制台。",
+        "result": "控制台打印 A1 的内容。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "照着 VBA 写 Set / End Sub，直接语法错误",
+        "reason": "JSA 是 JavaScript，对象赋值用 =，函数用 {} 包起来。",
+        "fix": "删掉 Set、End Sub、Dim，改成 let / const 与 function。",
+        "level": "high"
+      },
+      {
+        "title": "存成 .xlsx，宏代码全部丢失",
+        "reason": "普通格式不保存宏。",
+        "fix": "存成 .xlsm 或 WPS 的 .et 等启用宏的格式。",
+        "level": "high"
+      },
+      {
+        "title": "以为 Excel 也能直接跑 JSA",
+        "reason": "JSA 是 WPS 的宏环境，Excel 只认 VBA。",
+        "fix": "Excel 用 VBA，WPS 用 JSA，两边代码不能直接互拷。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "what-is-macro",
+        "kind": "companion",
+        "why": "宏的基本概念。"
+      },
+      {
+        "id": "macro-security",
+        "kind": "companion",
+        "why": "启用宏与安全设置。"
+      }
+    ],
+    "oneLiner": "WPS 表格里的 JavaScript 宏",
+    "summary": "JSA 是 WPS 的 JS 宏环境，写的是 JavaScript 而不是 VBA。入口在 WPS 宏编辑器，文件要存成启用宏的格式，Excel 不能直接跑。"
+  },
+  {
+    "id": "jsa-first-macro",
+    "enName": "First JS Macro",
+    "zhName": "第一个 JS 宏",
+    "alias": [
+      "JS宏入门",
+      "第一个宏",
+      "Hello JSA"
+    ],
+    "keywords": [
+      "JSA 怎么开始",
+      "JS宏示例",
+      "alert"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "function 宏名() {\n  alert(\"提示\");\n}",
+    "examples": [
+      {
+        "title": "弹窗打招呼",
+        "code": "function 打招呼() {\n  alert(\"你好，JSA\");\n}",
+        "howToRun": "宏编辑器里新建模块，粘贴后按 F5。",
+        "result": "弹出「你好，JSA」。"
+      },
+      {
+        "title": "写值再读回来",
+        "code": "function 写读() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1\").Value2 = \"JSA 写入\";\n  alert(s.Range(\"A1\").Value2);\n}",
+        "howToRun": "在第 1 个工作表执行，按 F5。",
+        "result": "A1 被写入，弹窗显示同样的内容。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "函数名和已有宏重名，F5 执行了别的宏",
+        "reason": "F5 默认执行最后一个函数，重名会互相覆盖。",
+        "fix": "宏名加前缀或保持唯一，执行前确认光标所在函数。",
+        "level": "mid"
+      },
+      {
+        "title": "用中文引号，字符串解析失败",
+        "reason": "代码里的引号必须是英文半角。",
+        "fix": "把 “ ” 改成 \" \"。",
+        "level": "high"
+      },
+      {
+        "title": "alert 里塞了对象，显示 [object Object]",
+        "reason": "alert 只做字符串转换。",
+        "fix": "先 JSON.stringify(obj) 再弹。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "jsa-intro",
+        "kind": "companion",
+        "why": "JSA 环境与入口。"
+      },
+      {
+        "id": "jsa-console-log",
+        "kind": "companion",
+        "why": "比 alert 更好用的调试输出。"
+      }
+    ],
+    "oneLiner": "三行代码跑通第一个 JS 宏",
+    "summary": "JSA 宏就是一个 function，F5 执行。先用 alert 确认能跑，再通过 Sheets.Item(1).Range 读写单元格。"
+  },
+  {
+    "id": "jsa-function",
+    "enName": "JS Function",
+    "zhName": "JS 函数写法",
+    "alias": [
+      "function",
+      "箭头函数",
+      "JSA 函数"
+    ],
+    "keywords": [
+      "JSA 定义函数",
+      "箭头函数",
+      "默认参数"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "function 名(参数) { return 结果; }\nconst 名 = (参数) => 结果;",
+    "examples": [
+      {
+        "title": "普通函数声明",
+        "code": "function 加(a, b) {\n  return a + b;\n}\n\nfunction 测试() {\n  alert(加(1, 2));\n}",
+        "howToRun": "按 F5 执行「测试」。",
+        "result": "弹 3。"
+      },
+      {
+        "title": "箭头函数与默认参数",
+        "code": "const 折扣 = (价, 率 = 0.8) => 价 * 率;\n\nfunction 测试2() {\n  alert(折扣(100));\n  alert(折扣(100, 0.5));\n}",
+        "howToRun": "按 F5。",
+        "result": "先弹 80，再弹 50。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "函数没写 return，调用得到 undefined",
+        "reason": "JavaScript 不会自动返回最后一行。",
+        "fix": "需要结果就显式 return。",
+        "level": "high"
+      },
+      {
+        "title": "把箭头函数当构造器 new，报错",
+        "reason": "箭头函数没有自己的 this，也不能 new。",
+        "fix": "需要构造器就用 function 或 class。",
+        "level": "mid"
+      },
+      {
+        "title": "参数多了少了都不报错，结果却是 NaN",
+        "reason": "JS 不检查参数个数，缺参变 undefined。",
+        "fix": "入口处校验参数，或给默认值。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "jsa-first-macro",
+        "kind": "companion",
+        "why": "最小宏就是函数。"
+      },
+      {
+        "id": "sub-vs-function",
+        "kind": "companion",
+        "why": "有返回值与无返回值的区别。"
+      }
+    ],
+    "oneLiner": "JSA 里怎么定义和调用函数",
+    "summary": "JSA 用 function 或箭头函数，返回值必须显式 return。JS 不校验参数个数，缺参容易静默变成 undefined 或 NaN。"
+  },
+  {
+    "id": "jsa-let-const",
+    "enName": "let / const",
+    "zhName": "let 与 const",
+    "alias": [
+      "let",
+      "const",
+      "块级作用域"
+    ],
+    "keywords": [
+      "JSA 变量声明",
+      "const 能不能改",
+      "块级作用域"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "let 可改变量 = 1;\nconst 常量 = 2;",
+    "examples": [
+      {
+        "title": "let 可改，const 不可重新赋值",
+        "code": "function 变量() {\n  let n = 1;\n  n = 2;\n  const m = 10;\n  // m = 20; 会报错\n  alert(n + \",\" + m);\n}",
+        "howToRun": "按 F5；把注释掉的 m = 20 放开再跑一次。",
+        "result": "先弹「2,10」，放开后报 TypeError。"
+      },
+      {
+        "title": "块级作用域，循环变量不外泄",
+        "code": "function 作用域() {\n  for (let i = 0; i < 3; i++) {\n    // i 只在这个块里有效\n  }\n  alert(typeof i);\n}",
+        "howToRun": "按 F5。",
+        "result": "弹 undefined，说明 i 没有泄漏到函数外层块。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "const 声明的对象还能改属性，误以为全锁定",
+        "reason": "const 锁的是绑定，不是对象内容。",
+        "fix": "要不可变就冻结：Object.freeze(obj)。",
+        "level": "mid"
+      },
+      {
+        "title": "同一作用域重复 let 同名变量，报错",
+        "reason": "let/const 不允许重复声明。",
+        "fix": "改名，或改用外层变量。",
+        "level": "high"
+      },
+      {
+        "title": "在 if 块里 let，块外访问不到",
+        "reason": "块级作用域只活在 {} 内。",
+        "fix": "需要块外使用就在块外先声明。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "variable-scope",
+        "kind": "companion",
+        "why": "作用域概念对照。"
+      },
+      {
+        "id": "jsa-function",
+        "kind": "companion",
+        "why": "变量通常在函数里声明。"
+      }
+    ],
+    "oneLiner": "JSA 声明变量的两种方式",
+    "summary": "默认用 const，需要改再用 let，别用 var。const 只防重新赋值，不防对象内部修改。"
+  },
+  {
+    "id": "jsa-template-literal",
+    "enName": "Template Literal",
+    "zhName": "模板字符串",
+    "alias": [
+      "模板字符串",
+      "反引号",
+      "字符串插值"
+    ],
+    "keywords": [
+      "JSA 拼接字符串",
+      "反引号",
+      "${}"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "const s = `共 ${n} 条`;",
+    "examples": [
+      {
+        "title": "用 ${} 插入变量",
+        "code": "function 拼() {\n  const 名称 = \"张三\";\n  const 分数 = 90;\n  alert(`${名称}考了 ${分数} 分`);\n}",
+        "howToRun": "按 F5。",
+        "result": "弹「张三考了 90 分」。"
+      },
+      {
+        "title": "多行文本不用加号",
+        "code": "function 多行() {\n  const s = `第一行\n第二行`;\n  console.log(s);\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "输出两行文本。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "用了普通引号却写 ${}，原样输出",
+        "reason": "插值只对反引号生效。",
+        "fix": "把外层引号换成反引号。",
+        "level": "high"
+      },
+      {
+        "title": "反引号打成中文引号或单引号，语法错误",
+        "reason": "模板字符串必须用英文反引号 `。",
+        "fix": "检查键盘输入的符号。",
+        "level": "mid"
+      },
+      {
+        "title": "拼接大量文本时忘记转义反引号",
+        "reason": "字符串内部出现反引号会提前结束。",
+        "fix": "内部反引号写成 \\`。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "jsa-let-const",
+        "kind": "companion",
+        "why": "先有变量才能插值。"
+      },
+      {
+        "id": "string-encoding",
+        "kind": "companion",
+        "why": "字符串处理基础。"
+      }
+    ],
+    "oneLiner": "用反引号和 ${} 拼字符串",
+    "summary": "模板字符串用反引号，${} 里可以直接放变量和表达式，还能保留换行。普通引号里的 ${} 不会生效。"
+  },
+  {
+    "id": "jsa-array-methods",
+    "enName": "Array forEach / map / filter",
+    "zhName": "数组遍历与转换",
+    "alias": [
+      "forEach",
+      "map",
+      "filter"
+    ],
+    "keywords": [
+      "JSA 数组",
+      "遍历数组",
+      "筛选数组"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "arr.forEach((v, i) => {})\narr.map((v) => v * 2)\narr.filter((v) => v > 0)",
+    "examples": [
+      {
+        "title": "map 加工、filter 筛选",
+        "code": "function 数组() {\n  const nums = [1, 2, 3, 4];\n  const 双倍 = nums.map((v) => v * 2);\n  const 偶数 = nums.filter((v) => v % 2 === 0);\n  console.log(双倍, 偶数);\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "打印 [2,4,6,8] 与 [2,4]。"
+      },
+      {
+        "title": "forEach 把一维数组写进一列",
+        "code": "function 写一列() {\n  const s = Sheets.Item(1);\n  const arr = [\"甲\", \"乙\", \"丙\"];\n  arr.forEach((v, i) => {\n    s.Range(\"A\" + (i + 1)).Value2 = v;\n  });\n}",
+        "howToRun": "在第 1 个工作表执行，按 F5。",
+        "result": "A1:A3 依次写入甲、乙、丙。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "forEach 里 return 不能中断循环",
+        "reason": "return 只结束当前回调。",
+        "fix": "需要提前退出就用 for 循环或 some/every。",
+        "level": "high"
+      },
+      {
+        "title": "map 回调忘写 return，得到一堆 undefined",
+        "reason": "map 用回调返回值组成新数组。",
+        "fix": "确保每个分支都有 return。",
+        "level": "high"
+      },
+      {
+        "title": "把多单元格的 Value2 当一维数组用",
+        "reason": "区域读回来是二维数组。",
+        "fix": "先取一行 arr[0]，或直接用二维下标。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "arrays-vs-ranges",
+        "kind": "companion",
+        "why": "JS 数组与区域数组的区别。"
+      },
+      {
+        "id": "jsa-range-read-write",
+        "kind": "companion",
+        "why": "把数组写回单元格。"
+      }
+    ],
+    "oneLiner": "JS 数组的三种常用遍历",
+    "summary": "forEach 只遍历，map 生成新数组，filter 筛选。forEach 里 return 不会中断；区域读回来是二维数组，别当一维用。"
+  },
+  {
+    "id": "jsa-object-json",
+    "enName": "Object & JSON",
+    "zhName": "对象与 JSON",
+    "alias": [
+      "对象字面量",
+      "JSON.stringify",
+      "JSON.parse"
+    ],
+    "keywords": [
+      "JSA 对象",
+      "JSON 转换",
+      "键值对"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "const o = { 名称: \"张三\", 分数: 90 };\nJSON.stringify(o)\nJSON.parse(text)",
+    "examples": [
+      {
+        "title": "对象转字符串",
+        "code": "function 转文本() {\n  const o = { 名称: \"张三\", 分数: 90 };\n  alert(JSON.stringify(o));\n}",
+        "howToRun": "按 F5。",
+        "result": "弹 {\"名称\":\"张三\",\"分数\":90}。"
+      },
+      {
+        "title": "字符串转对象再取值",
+        "code": "function 转对象() {\n  const text = `{\"名称\":\"李四\",\"分数\":88}`;\n  const o = JSON.parse(text);\n  alert(o.名称 + \":\" + o.分数);\n}",
+        "howToRun": "按 F5。",
+        "result": "弹「李四:88」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "对象里有循环引用，JSON.stringify 抛错",
+        "reason": "序列化无法处理自己引用自己。",
+        "fix": "先拆掉循环字段，或自定义 replacer。",
+        "level": "mid"
+      },
+      {
+        "title": "JSON.parse 用了单引号或尾逗号，报错",
+        "reason": "JSON 比 JS 对象字面量严格。",
+        "fix": "键和字符串都用双引号，去掉尾逗号。",
+        "level": "high"
+      },
+      {
+        "title": "对象里的函数不会被序列化",
+        "reason": "JSON 只支持数据，不支持方法。",
+        "fix": "只存需要的字段，别指望方法一起过去。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "dictionary",
+        "kind": "companion",
+        "why": "VBA 里对应的键值结构。"
+      },
+      {
+        "id": "jsa-console-log",
+        "kind": "companion",
+        "why": "对象调试输出。"
+      }
+    ],
+    "oneLiner": "JSA 里的键值对象与 JSON 互转",
+    "summary": "对象用 {} 写键值，JSON.stringify 转文本、JSON.parse 转回对象。JSON 语法更严格：双引号、无尾逗号、不能带函数。"
+  },
+  {
+    "id": "jsa-try-catch",
+    "enName": "try / catch / finally",
+    "zhName": "异常处理",
+    "alias": [
+      "try catch",
+      "throw",
+      "JSA 报错处理"
+    ],
+    "keywords": [
+      "JSA 捕获错误",
+      "throw",
+      "finally"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "try {\n  // 可能出错\n} catch (e) {\n  // 处理\n} finally {\n  // 收尾\n}",
+    "examples": [
+      {
+        "title": "捕获并显示错误信息",
+        "code": "function 捕获() {\n  try {\n    const v = null;\n    alert(v.length);\n  } catch (e) {\n    alert(\"出错：\" + e.message);\n  }\n}",
+        "howToRun": "按 F5。",
+        "result": "弹出 TypeError 的 message，而不是直接中断。"
+      },
+      {
+        "title": "主动 throw 业务错误",
+        "code": "function 校验(n) {\n  if (n < 0) {\n    throw new Error(\"不能为负数\");\n  }\n  return n;\n}\n\nfunction 测试() {\n  try { 校验(-1); } catch (e) { alert(e.message); }\n}",
+        "howToRun": "按 F5。",
+        "result": "弹「不能为负数」。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "catch 里什么都不做，错误被吞掉",
+        "reason": "空 catch 让问题更难查。",
+        "fix": "至少记录 e.message 或用 console.log 输出。",
+        "level": "high"
+      },
+      {
+        "title": "finally 里写 return，覆盖了 try 的返回值",
+        "reason": "finally 总会执行，return 会截断。",
+        "fix": "finally 只做清理，不要 return。",
+        "level": "mid"
+      },
+      {
+        "title": "只 catch 不 throw，调用方以为成功了",
+        "reason": "异常被就地消化。",
+        "fix": "处理不了就 throw e 继续往上抛。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "error-handling-model",
+        "kind": "companion",
+        "why": "错误处理模型对照。"
+      },
+      {
+        "id": "jsa-function",
+        "kind": "companion",
+        "why": "异常通常从函数里抛出。"
+      }
+    ],
+    "oneLiner": "JSA 里怎么接住运行时错误",
+    "summary": "try/catch 捕获运行时错误，throw new Error 主动抛。catch 不要空着，finally 不要写 return，处理不了就继续抛。"
+  },
+  {
+    "id": "jsa-range-read-write",
+    "enName": "Range Read / Write",
+    "zhName": "读写单元格",
+    "alias": [
+      "Value2",
+      "Range 读写",
+      "批量写入"
+    ],
+    "keywords": [
+      "JSA 读写单元格",
+      "二维数组写入",
+      "Sheets.Item"
+    ],
+    "kind": "jsa",
+    "level": 2,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "Sheets.Item(1).Range(\"A1\").Value2 = 值;\nconst v = Sheets.Item(1).Range(\"A1\").Value2;",
+    "examples": [
+      {
+        "title": "单单元格读写",
+        "code": "function 单格() {\n  const s = Sheets.Item(1);\n  s.Range(\"A1\").Value2 = 123;\n  const v = s.Range(\"A1\").Value2;\n  console.log(v, typeof v);\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "输出 123 number（或按引擎返回数字类型）。"
+      },
+      {
+        "title": "二维数组批量写入与读回",
+        "code": "function 批量() {\n  const s = Sheets.Item(1);\n  const data = [[\"姓名\", \"分数\"], [\"张三\", 90], [\"李四\", 88]];\n  s.Range(\"A1\").Resize(3, 2).Value2 = data;\n  const back = s.Range(\"A1:B3\").Value2;\n  console.log(back);\n}",
+        "howToRun": "在第 1 个工作表执行，按 F5。",
+        "result": "A1:B3 写入表格，控制台打印 3×2 二维数组。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "多单元格读到的是二维数组，不是一维",
+        "reason": "区域按行×列返回。",
+        "fix": "用 back[i][j]，取一行写 back[0]。",
+        "level": "high"
+      },
+      {
+        "title": "写入区域尺寸和数组不匹配，值错位或报错",
+        "reason": "Resize 的行列必须与数组一致。",
+        "fix": "先算 data.length 与 data[0].length，再 Resize。",
+        "level": "high"
+      },
+      {
+        "title": "用 Range(\"A1:B3\") 却忘了先选对工作表",
+        "reason": "Range 默认作用于当前表。",
+        "fix": "统一写 Sheets.Item(名称或序号).Range(...)。",
+        "level": "mid"
+      }
+    ],
+    "related": [
+      {
+        "id": "value2",
+        "kind": "companion",
+        "why": "Value2 与 Value 的区别。"
+      },
+      {
+        "id": "range-vs-cells",
+        "kind": "companion",
+        "why": "Range 与 Cells 的选择。"
+      },
+      {
+        "id": "jsa-array-methods",
+        "kind": "companion",
+        "why": "用数组方法加工数据。"
+      }
+    ],
+    "oneLiner": "用 JS 语法读写 WPS 单元格",
+    "summary": "单格 Value2 是标量，多格是二维数组；写入前用 Resize 对齐行列。始终写清 Sheets.Item，避免作用在错误工作表上。"
+  },
+  {
+    "id": "jsa-console-log",
+    "enName": "console.log",
+    "zhName": "控制台输出",
+    "alias": [
+      "console.log",
+      "日志输出",
+      "JSA 调试"
+    ],
+    "keywords": [
+      "JSA 调试",
+      "看变量值",
+      "日志窗口"
+    ],
+    "kind": "jsa",
+    "level": 1,
+    "host": [
+      "wps"
+    ],
+    "hostNotes": "JSA 是 WPS 表格的 JavaScript 宏环境；本机未装 WPS，示例按 WPS 宏编辑器口径编写，未逐条真机运行。",
+    "syntax": "console.log(值1, 值2);",
+    "examples": [
+      {
+        "title": "一次打印多个值",
+        "code": "function 日志() {\n  const a = 1, b = \"二\";\n  console.log(\"a=\", a, \"b=\", b);\n}",
+        "howToRun": "按 F5，打开宏编辑器的日志/控制台。",
+        "result": "输出 a= 1 b= 二。"
+      },
+      {
+        "title": "对象先转 JSON 再看",
+        "code": "function 看对象() {\n  const o = { 名称: \"张三\", 分数: 90 };\n  console.log(JSON.stringify(o));\n}",
+        "howToRun": "按 F5，看控制台。",
+        "result": "输出完整的 JSON 文本。"
+      }
+    ],
+    "pitfalls": [
+      {
+        "title": "只写 console.log(obj)，看到 [object Object]",
+        "reason": "有的控制台实现不做对象展开。",
+        "fix": "用 JSON.stringify(obj) 或分字段打印。",
+        "level": "mid"
+      },
+      {
+        "title": "用 alert 调试循环，点到手酸",
+        "reason": "alert 阻塞且一次只能看一个值。",
+        "fix": "循环里用 console.log，最后再 alert 汇总。",
+        "level": "mid"
+      },
+      {
+        "title": "正式宏里留了一堆日志，拖慢执行",
+        "reason": "每次输出都有开销。",
+        "fix": "交付前删掉调试日志，或加开关统一控制。",
+        "level": "low"
+      }
+    ],
+    "related": [
+      {
+        "id": "jsa-first-macro",
+        "kind": "companion",
+        "why": "alert 与 console 的分工。"
+      },
+      {
+        "id": "jsa-object-json",
+        "kind": "companion",
+        "why": "对象转文本再输出。"
+      }
+    ],
+    "oneLiner": "比 alert 更好用的调试输出",
+    "summary": "console.log 可以一次输出多个值且不阻塞；对象建议 JSON.stringify 后再看。交付前清理调试日志。"
+  }
+]
